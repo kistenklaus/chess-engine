@@ -1,3 +1,9 @@
 #include <iostream>
 
-int main() { std::cout << "Hello World" << std::endl; }
+#include "Board.h"
+#include "fen.h"
+
+int main() {
+  Board board = board_from_fen("");
+  std::cout << board << std::endl;
+}
