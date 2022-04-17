@@ -28,6 +28,7 @@ KnightLookUpTable::KnightLookUpTable() {
       if (row <= 7 && column <= 6) {
         lookUp |= ((bitmap_t)1ULL) << (tile_index + 10);
       }
+      this->psudo_legal_moves[tile_index] = lookUp;
     }
   }
   std::cout << "CALCULATING-PSUDO-KNIGHT-MOVES" << std::endl;
