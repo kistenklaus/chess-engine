@@ -34,7 +34,7 @@ KnightLookUpTable::KnightLookUpTable() {
   std::cout << "CALCULATING-PSUDO-KNIGHT-MOVES" << std::endl;
 }
 
-KnightLookUpTable& KnightLookUpTable::get() {
+const KnightLookUpTable& KnightLookUpTable::get() {
   static KnightLookUpTable instance;  // some cpp weirdness
   return instance;
 }

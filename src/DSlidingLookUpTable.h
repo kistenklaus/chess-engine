@@ -6,14 +6,14 @@
 #include "bitmap.h"
 #include "tile_index.h"
 
-class KingLookUpTable {
+class DSlidingLookUpTable {
  private:
   bitmap_t psudo_legal_moves[64];
-  KingLookUpTable();
+  DSlidingLookUpTable();
 
  public:
-  KingLookUpTable(KingLookUpTable const&) = delete;
-  KingLookUpTable& operator=(KingLookUpTable const&) = delete;
+  DSlidingLookUpTable(DSlidingLookUpTable const&) = delete;
+  DSlidingLookUpTable& operator=(DSlidingLookUpTable const&) = delete;
 
   inline bitmap_t operator[](const tile_index_t tile_index) const {
     assert(tile_index >= 0);
@@ -21,5 +21,5 @@ class KingLookUpTable {
     return psudo_legal_moves[tile_index];
   }
 
-  static const KingLookUpTable& get();
+  static const DSlidingLookUpTable& get();
 };

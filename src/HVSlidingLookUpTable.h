@@ -15,11 +15,11 @@ class HVSlidingLookUpTable {
   HVSlidingLookUpTable(HVSlidingLookUpTable const&) = delete;
   HVSlidingLookUpTable& operator=(HVSlidingLookUpTable const&) = delete;
 
-  bitmap_t operator[](tile_index_t tile_index) {
+  inline bitmap_t operator[](const tile_index_t tile_index) const {
     assert(tile_index >= 0);
     assert(tile_index < 64);
     return psudo_legal_moves[tile_index];
   }
 
-  static HVSlidingLookUpTable& get();
+  static const HVSlidingLookUpTable& get();
 };

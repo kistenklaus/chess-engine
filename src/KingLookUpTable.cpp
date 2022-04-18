@@ -1,5 +1,5 @@
-
 #include "KingLookUpTable.h"
+
 KingLookUpTable::KingLookUpTable() {
   for (int row = 0; row < 8; row++) {
     for (int column = 0; column < 8; column++) {
@@ -15,7 +15,7 @@ KingLookUpTable::KingLookUpTable() {
   }
 }
 
-KingLookUpTable& KingLookUpTable::get() {
+const KingLookUpTable& KingLookUpTable::get() {
   static KingLookUpTable instance;  // some cpp weirdness
   return instance;
 }

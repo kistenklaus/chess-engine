@@ -11,7 +11,7 @@ HVSlidingLookUpTable::HVSlidingLookUpTable() {
   }
 }
 
-HVSlidingLookUpTable& HVSlidingLookUpTable::get() {
+const HVSlidingLookUpTable& HVSlidingLookUpTable::get() {
   static HVSlidingLookUpTable instance;  // some cpp weirdness
   return instance;
 }
