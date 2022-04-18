@@ -10,22 +10,22 @@ KnightLookUpTable::KnightLookUpTable() {
       if (row >= 1 && column >= 2) {
         lookUp |= ((bitmap_t)1ULL) << (tile_index - 10);
       }
-      if (row >= 2 && column <= 7) {
+      if (row >= 2 && column < 7) {
         lookUp |= ((bitmap_t)1ULL) << (tile_index - 15);
       }
-      if (row >= 1 && column <= 6) {
+      if (row >= 1 && column < 6) {
         lookUp |= ((bitmap_t)1ULL) << (tile_index - 6);
       }
-      if (row <= 7 && column >= 2) {
+      if (row < 7 && column >= 2) {
         lookUp |= ((bitmap_t)1ULL) << (tile_index + 6);
       }
-      if (row <= 6 && column >= 1) {
+      if (row < 6 && column >= 1) {
         lookUp |= ((bitmap_t)1ULL) << (tile_index + 15);
       }
-      if (row <= 6 && column <= 7) {
+      if (row < 6 && column < 7) {
         lookUp |= ((bitmap_t)1ULL) << (tile_index + 17);
       }
-      if (row <= 7 && column <= 6) {
+      if (row < 7 && column < 6) {
         lookUp |= ((bitmap_t)1ULL) << (tile_index + 10);
       }
       this->psudo_legal_moves[tile_index] = lookUp;
