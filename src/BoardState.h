@@ -1,15 +1,16 @@
 #pragma once
+#include "color.h"
 
 class BoardState {
  public:
-  const bool _white_move;
+  const color_t _white_move;
   const bool _has_ep_pawn;
   const bool _white_has_long_castle;
   const bool _white_has_short_castle;
   const bool _black_has_long_castle;
   const bool _black_has_short_castle;
 
-  constexpr BoardState(bool white_move, bool has_ep_pawn,
+  constexpr BoardState(color_t white_move, bool has_ep_pawn,
                        bool white_has_long_castle, bool white_has_short_castle,
                        bool black_has_long_castle, bool black_has_short_castle)
       : _white_move(white_move),
@@ -18,6 +19,12 @@ class BoardState {
         _white_has_short_castle(white_has_short_castle),
         _black_has_long_castle(white_has_long_castle),
         _black_has_short_castle(black_has_short_castle) {}
+
+  static constexpr BoardState Default() {
+    return BoardState(WHITE, false, true, true, true, true);
+  }
+
+  inline constexpr color_t turn() const { return _white_move; }
 
   inline constexpr bool has_long_castle() const {
     if (_white_move)
