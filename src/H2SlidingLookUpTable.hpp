@@ -1,19 +1,18 @@
 #pragma once
 
 #include <cassert>
-#include <iostream>
 
 #include "bitmap.h"
 #include "tile_index.h"
 
-class KnightLookUpTable {
-private:
+class H2SlidingLookUpTable {
+ private:
   bitmap_t psudo_legal_moves[64];
-  KnightLookUpTable();
+  H2SlidingLookUpTable();
 
-public:
-  KnightLookUpTable(KnightLookUpTable const &) = delete;
-  KnightLookUpTable &operator=(KnightLookUpTable const &) = delete;
+ public:
+  H2SlidingLookUpTable(H2SlidingLookUpTable const&) = delete;
+  H2SlidingLookUpTable& operator=(H2SlidingLookUpTable const&) = delete;
 
   inline bitmap_t operator[](const tile_index_t tile_index) const {
     assert(tile_index >= 0);
@@ -21,5 +20,5 @@ public:
     return psudo_legal_moves[tile_index];
   }
 
-  static const KnightLookUpTable &get();
+  static const H2SlidingLookUpTable& get();
 };
