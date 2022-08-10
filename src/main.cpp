@@ -13,7 +13,7 @@ int main() {
   // const Board board =
   //     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-  const Board board = fen::parse("8/4q3/8/4P3/8/4P3/8/4P3 w - - 0 1");
+  const Board board = fen::parse("8/8/8/3q4/8/5P2/8/8 w - - 0 1");
 
   std::cout << board << std::endl;
 

@@ -109,9 +109,12 @@ inline void generate_moves(const Board &board,
     iterate_bits(att, lookup) { move_callback(move_t(board, knight, att)); }
   }
 
-  // calculate West sliding moves.
+  // calculate horizontal / vertical sliding moves.
   bitmap_t rooksAndQueues =
       board.rooks_and_queens_of<state.turn()>() & ~(h_pinmask | d_pinmask);
+
+  bitmap_t bishopsAndQueens = board.bishop_and_queens_of<state.turn()>();
+
   bitmap_t itBits = rooksAndQueues;
   iterate_bits(dsliding, itBits) {
     bitmap_t lookup = WestSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
@@ -169,6 +172,66 @@ inline void generate_moves(const Board &board,
     bitmap_t hit = inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
     bitmap_t possibleMoves =
         ~SouthSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+    iterate_bits(target, possibleMoves) {
+      move_callback(move_t(board, dsliding, target));
+    }
+  }
+
+  itBits = bishopsAndQueens;
+  iterate_bits(dsliding, itBits) {
+    bitmap_t lookup = SouthEastSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+    bitmap_t enemiesInPath =
+        lookup & board.occupied_by_enemy_of<state.turn()>();
+    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    bitmap_t inPath = (aliesInPath << ((bitmap_t)7)) | enemiesInPath;
+    bitmap_t hit = inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
+    bitmap_t possibleMoves =
+        ~SouthEastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+    iterate_bits(target, possibleMoves) {
+      move_callback(move_t(board, dsliding, target));
+    }
+  }
+
+  itBits = bishopsAndQueens;
+  iterate_bits(dsliding, itBits) {
+    bitmap_t lookup = SouthWestSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+    bitmap_t enemiesInPath =
+        lookup & board.occupied_by_enemy_of<state.turn()>();
+    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    bitmap_t inPath = (aliesInPath << ((bitmap_t)9)) | enemiesInPath;
+    bitmap_t hit = inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
+    bitmap_t possibleMoves =
+        ~SouthWestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+    iterate_bits(target, possibleMoves) {
+      move_callback(move_t(board, dsliding, target));
+    }
+  }
+
+  itBits = bishopsAndQueens;
+  iterate_bits(dsliding, itBits) {
+    bitmap_t lookup = NorthWestSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+    bitmap_t enemiesInPath =
+        lookup & board.occupied_by_enemy_of<state.turn()>();
+    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    bitmap_t inPath = (aliesInPath >> ((bitmap_t)7)) | enemiesInPath;
+    bitmap_t hit = _blsi_u64(inPath);
+    bitmap_t possibleMoves =
+        ~NorthWestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+    iterate_bits(target, possibleMoves) {
+      move_callback(move_t(board, dsliding, target));
+    }
+  }
+
+  itBits = bishopsAndQueens;
+  iterate_bits(dsliding, itBits) {
+    bitmap_t lookup = NorthEastSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+    bitmap_t enemiesInPath =
+        lookup & board.occupied_by_enemy_of<state.turn()>();
+    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    bitmap_t inPath = (aliesInPath >> ((bitmap_t)9)) | enemiesInPath;
+    bitmap_t hit = _blsi_u64(inPath);
+    bitmap_t possibleMoves =
+        ~NorthEastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
     iterate_bits(target, possibleMoves) {
       move_callback(move_t(board, dsliding, target));
     }
