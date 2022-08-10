@@ -1,10 +1,9 @@
 #pragma once
 
 #include "DSlidingLookUpTable.h"
-#include "H1SlidingLookUpTable.hpp"
-#include "H2SlidingLookUpTable.hpp"
-#include "H3SlidingLookUpTable.hpp"
-#include "H4SlidingLookUpTable.hpp"
-#include "HVSlidingLookUpTable.h"
+#include "EastSlidingLookUpTable.hpp"
 #include "KingLookUpTable.h"
 #include "KnightLookUpTable.h"
+#include "NorthSlidingLookUpTable.hpp"
+#include "SouthSlidingLookUpTable.hpp"
+#include "WestSlidingLookUpTable.hpp"

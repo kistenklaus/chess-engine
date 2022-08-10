@@ -1,6 +1,6 @@
-#include "H4SlidingLookUpTable.hpp"
+#include "SouthSlidingLookUpTable.hpp"
 
-H4SlidingLookUpTable::H4SlidingLookUpTable() {
+SouthSlidingLookUpTable::SouthSlidingLookUpTable() {
   //
   for (int row = 0; row < 8; row++) {
     for (int column = 0; column < 8; column++) {
@@ -15,7 +15,7 @@ H4SlidingLookUpTable::H4SlidingLookUpTable() {
   psudo_legal_moves[64] = 0;
 }
 
-const H4SlidingLookUpTable& H4SlidingLookUpTable::get() {
-  static H4SlidingLookUpTable instance;
+const SouthSlidingLookUpTable& SouthSlidingLookUpTable::get() {
+  static SouthSlidingLookUpTable instance;
   return instance;
 }

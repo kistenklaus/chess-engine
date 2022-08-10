@@ -6,18 +6,18 @@
 #include "tile_index.h"
 
 // lookup table for north horizontal sliding moves
-class H3SlidingLookUpTable {
+class NorthSlidingLookUpTable {
  private:
   bitmap_t psudo_legal_moves[65];
-  H3SlidingLookUpTable();
+  NorthSlidingLookUpTable();
 
  public:
-  H3SlidingLookUpTable(H3SlidingLookUpTable const&) = delete;
-  H3SlidingLookUpTable& operator=(H3SlidingLookUpTable const&) = delete;
+  NorthSlidingLookUpTable(NorthSlidingLookUpTable const&) = delete;
+  NorthSlidingLookUpTable& operator=(NorthSlidingLookUpTable const&) = delete;
 
   inline bitmap_t operator[](const tile_index_t tile_index) const {
     return psudo_legal_moves[tile_index];
   }
 
-  static const H3SlidingLookUpTable& get();
+  static const NorthSlidingLookUpTable& get();
 };

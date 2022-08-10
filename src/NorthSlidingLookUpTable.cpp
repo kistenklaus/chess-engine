@@ -1,6 +1,6 @@
-#include "H3SlidingLookUpTable.hpp"
+#include "NorthSlidingLookUpTable.hpp"
 
-H3SlidingLookUpTable::H3SlidingLookUpTable() {
+NorthSlidingLookUpTable::NorthSlidingLookUpTable() {
   //
   for (int row = 0; row < 8; row++) {
     for (int column = 0; column < 8; column++) {
@@ -15,7 +15,7 @@ H3SlidingLookUpTable::H3SlidingLookUpTable() {
   psudo_legal_moves[64] = 0;
 }
 
-const H3SlidingLookUpTable& H3SlidingLookUpTable::get() {
-  static H3SlidingLookUpTable instance;
+const NorthSlidingLookUpTable& NorthSlidingLookUpTable::get() {
+  static NorthSlidingLookUpTable instance;
   return instance;
 }
