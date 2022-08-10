@@ -13,11 +13,11 @@ int main() {
   // const Board board =
   //     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-  const Board board = fen::parse("8/8/8/3q4/8/5P2/8/8 w - - 0 1");
+  const Board board = fen::parse("8/3p1p2/8/4K3/1p4p1/8/8/8 w - - 0 1");
 
   std::cout << board << std::endl;
 
-  generate_moves<BoardState(BLACK, false, true, true, true, true)>(
+  generate_moves<BoardState(WHITE, false, true, true, true, true)>(
       board, [](const move_t move) {
         uint64_t from = SQUARE_OF(move.origin);
         uint64_t to = SQUARE_OF(move.target);
