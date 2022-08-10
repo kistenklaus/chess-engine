@@ -13,7 +13,7 @@ int main() {
   // const Board board =
   //     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-  const Board board = fen::parse("8/4k3/8/8/8/1p6/PrP1K3/8 w - - 0 1");
+  const Board board = fen::parse("8/4q3/8/4P3/8/4P3/8/4P3 w - - 0 1");
 
   std::cout << board << std::endl;
 
@@ -24,5 +24,6 @@ int main() {
         tmp |= move.target;
         std::cout << "move{from:" << from << ",to:" << to << "}" << std::endl;
       });
+  std::cout << "possible squares to move to (by black)" << std::endl;
   std::cout << bitmap_to_bitboard_string(tmp) << std::endl;
 }

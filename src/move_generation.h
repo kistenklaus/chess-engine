@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Board.h"
@@ -110,17 +109,68 @@ inline void generate_moves(const Board &board,
     iterate_bits(att, lookup) { move_callback(move_t(board, knight, att)); }
   }
 
-  // calculate D1 sliding moves.
+  // calculate H1 sliding moves.
   bitmap_t rooksAndQueues =
       board.rooks_and_queens_of<state.turn()>() & ~(h_pinmask | d_pinmask);
-  iterate_bits(dsliding, rooksAndQueues) {
-    bitmap_t l1 = H1SlidingLookUpTable::get()[SQUARE_OF(dsliding)] &
-                  board.empty_or_occupied_by_enemy_of<state.turn()>() &
-                  checkmask;
-    bitmap_t l2 = ~l1 & H1SlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    bitmap_t s = H1SlidingLookUpTable::get()[SQUARE_OF(_blsr_u64(l2) ^ l2)];
-    bitmap_t r = H1SlidingLookUpTable::get()[SQUARE_OF(dsliding)] & (~s);
+  bitmap_t itBits = rooksAndQueues;
+  iterate_bits(dsliding, itBits) {
+    bitmap_t lookup = H1SlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+    bitmap_t enemiesInPath =
+        lookup & board.occupied_by_enemy_of<state.turn()>();
+    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    bitmap_t inPath = (aliesInPath << ((bitmap_t)1)) | enemiesInPath;
+    bitmap_t hit = inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
+    bitmap_t possibleMoves =
+        ~H1SlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+    iterate_bits(target, possibleMoves) {
+      move_callback(move_t(board, dsliding, target));
+    }
+  }
 
-    iterate_bits(att, r) { move_callback(move_t(board, dsliding, att)); }
+  itBits = rooksAndQueues;
+  iterate_bits(dsliding, itBits) {
+    bitmap_t lookup = H2SlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+
+    // hit enemy
+    bitmap_t enemiesInPath =
+        lookup & board.occupied_by_enemy_of<state.turn()>();
+    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    bitmap_t inPath = (aliesInPath >> ((bitmap_t)1)) | enemiesInPath;
+    bitmap_t hit = _blsi_u64(inPath);
+    bitmap_t possibleMoves =
+        ~H2SlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+    iterate_bits(target, possibleMoves) {
+      move_callback(move_t(board, dsliding, target));
+    }
+  }
+
+  itBits = rooksAndQueues;
+  iterate_bits(dsliding, itBits) {
+    bitmap_t lookup = H3SlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+    bitmap_t enemiesInPath =
+        lookup & board.occupied_by_enemy_of<state.turn()>();
+    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    bitmap_t inPath = (aliesInPath >> ((bitmap_t)8)) | enemiesInPath;
+    bitmap_t hit = _blsi_u64(inPath);
+    bitmap_t possibleMoves =
+        ~H3SlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+    iterate_bits(target, possibleMoves) {
+      move_callback(move_t(board, dsliding, target));
+    }
+  }
+
+  itBits = rooksAndQueues;
+  iterate_bits(dsliding, itBits) {
+    bitmap_t lookup = H4SlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+    bitmap_t enemiesInPath =
+        lookup & board.occupied_by_enemy_of<state.turn()>();
+    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    bitmap_t inPath = (aliesInPath << ((bitmap_t)8)) | enemiesInPath;
+    bitmap_t hit = inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
+    bitmap_t possibleMoves =
+        ~H4SlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+    iterate_bits(target, possibleMoves) {
+      move_callback(move_t(board, dsliding, target));
+    }
   }
 }

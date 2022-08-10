@@ -6,7 +6,6 @@
 #include <string>
 
 Board fen::parse(const std::string FEN) {
-
   std::string split[6];
   int index = 0;
   for (const char c : FEN) {
@@ -48,42 +47,42 @@ Board fen::parse(const std::string FEN) {
       }
       const bitmap_t mask = ((bitmap_t)1) << (rank * 8 + file);
       switch (c) {
-      case 'K':
-        w_king |= mask;
-        break;
-      case 'k':
-        b_king |= mask;
-        break;
-      case 'Q':
-        w_queen |= mask;
-        break;
-      case 'q':
-        b_queen |= mask;
-        break;
-      case 'R':
-        w_rooks |= mask;
-        break;
-      case 'r':
-        b_rooks |= mask;
-        break;
-      case 'N':
-        w_knights |= mask;
-        break;
-      case 'n':
-        b_knights |= mask;
-        break;
-      case 'B':
-        w_bishops |= mask;
-        break;
-      case 'b':
-        b_bishops |= mask;
-        break;
-      case 'P':
-        w_pawns |= mask;
-        break;
-      case 'p':
-        b_pawns |= mask;
-        break;
+        case 'K':
+          w_king |= mask;
+          break;
+        case 'k':
+          b_king |= mask;
+          break;
+        case 'Q':
+          w_queen |= mask;
+          break;
+        case 'q':
+          b_queen |= mask;
+          break;
+        case 'R':
+          w_rooks |= mask;
+          break;
+        case 'r':
+          b_rooks |= mask;
+          break;
+        case 'N':
+          w_knights |= mask;
+          break;
+        case 'n':
+          b_knights |= mask;
+          break;
+        case 'B':
+          w_bishops |= mask;
+          break;
+        case 'b':
+          b_bishops |= mask;
+          break;
+        case 'P':
+          w_pawns |= mask;
+          break;
+        case 'p':
+          b_pawns |= mask;
+          break;
       }
       file++;
     }
