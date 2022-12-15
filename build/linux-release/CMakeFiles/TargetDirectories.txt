@@ -1,3 +1,0 @@
-/home/karl/Development/chess-engine/build/linux-release/CMakeFiles/chess-engine.dir
-/home/karl/Development/chess-engine/build/linux-release/CMakeFiles/edit_cache.dir
-/home/karl/Development/chess-engine/build/linux-release/CMakeFiles/rebuild_cache.dir

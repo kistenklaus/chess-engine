@@ -16,6 +16,7 @@ int main() {
   
   generate_moves<BoardState(WHITE, false, true, true, true, true)>(
       board, [](const move_t move) {
+        
         uint64_t from = SQUARE_OF(move.origin);
         uint64_t to = SQUARE_OF(move.target);
         tmp |= move.target;
