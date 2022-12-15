@@ -8,6 +8,8 @@
 
 static bitmap_t tmp;
 
+#define LOGGING
+
 int main() {
   // const Board board =
   //     fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");

@@ -3,4 +3,4 @@
 .vim-build/
 cmake-build-debug/
 build/
-./.cache/
+.cache/

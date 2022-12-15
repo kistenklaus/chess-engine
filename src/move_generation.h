@@ -45,9 +45,6 @@ inline bitmap_t calculate_checkmask(const Board &board) {
 
   // pawn checkmask
   if constexpr (state.turn()) {
-    std::cout << bitmap_to_bitboard_string(
-                     (board.enemy_pawns_of<state.turn()>() & (~rank8)) << 7)
-              << std::endl;
     bitmap_t left_checking_pawns =
         (((board.enemy_pawns_of<state.turn()>() & (~rank8)) >> 7) &
          board.king_of<state.turn()>())
@@ -301,12 +298,12 @@ static inline void generate_sliding_moves(
 
   itBits = bishopsAndQueens;
   iterate_bits(dsliding, itBits) {
-    bitmap_t lookup = NorthWestSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    bitmap_t enemiesInPath =
+    const bitmap_t lookup = NorthWestSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+    const bitmap_t enemiesInPath =
         lookup & board.occupied_by_enemy_of<state.turn()>();
-    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    bitmap_t inPath = (aliesInPath >> ((bitmap_t)7)) | enemiesInPath;
-    bitmap_t hit = _blsi_u64(inPath);
+    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    const bitmap_t inPath = (aliesInPath >> ((bitmap_t)7)) | enemiesInPath;
+    const bitmap_t hit = _blsi_u64(inPath);
     bitmap_t possibleMoves =
         ~NorthWestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
     iterate_bits(target, possibleMoves) {
@@ -316,12 +313,12 @@ static inline void generate_sliding_moves(
 
   itBits = bishopsAndQueens;
   iterate_bits(dsliding, itBits) {
-    bitmap_t lookup = NorthEastSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    bitmap_t enemiesInPath =
+    const bitmap_t lookup = NorthEastSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
+    const bitmap_t enemiesInPath =
         lookup & board.occupied_by_enemy_of<state.turn()>();
-    bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    bitmap_t inPath = (aliesInPath >> ((bitmap_t)9)) | enemiesInPath;
-    bitmap_t hit = _blsi_u64(inPath);
+    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
+    const bitmap_t inPath = (aliesInPath >> ((bitmap_t)9)) | enemiesInPath;
+    const bitmap_t hit = _blsi_u64(inPath);
     bitmap_t possibleMoves =
         ~NorthEastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
     iterate_bits(target, possibleMoves) {
