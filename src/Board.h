@@ -29,7 +29,10 @@ class Board {
         bitmap_t w_bishops, bitmap_t b_knights, bitmap_t w_knights,
         bitmap_t b_rooks, bitmap_t w_rooks, bitmap_t b_queen, bitmap_t w_queen,
         bitmap_t b_king, bitmap_t w_king)
-      : b_pawns(b_pawns),
+      : b_occ(b_pawns | b_bishops | b_knights | b_rooks | b_queen | b_king),
+        w_occ(w_pawns | w_bishops | w_knights | w_rooks | w_queen | w_king),
+        occ(w_occ | b_occ),
+        b_pawns(b_pawns),
         w_pawns(w_pawns),
         b_bishops(b_bishops),
         w_bishops(w_bishops),
@@ -37,13 +40,10 @@ class Board {
         w_knights(w_knights),
         b_rooks(b_rooks),
         w_rooks(w_rooks),
-        b_queen(b_queen),
-        w_queen(w_queen),
-        b_king(b_king),
         w_king(w_king),
-        w_occ(w_pawns | w_bishops | w_knights | w_rooks | w_queen | w_king),
-        b_occ(b_pawns | b_bishops | b_knights | b_rooks | b_queen | b_king),
-        occ(w_occ | b_occ)  // probably doesn't work
+        b_king(b_king),
+        w_queen(w_queen),
+        b_queen(b_queen)  // probably doesn't work
   {}
 
   constexpr inline bitmap_t occupied() const { return occ; }
