@@ -40,8 +40,11 @@ int main() {
   //const Board board = fen::parse("8/8/8/K5r1/8/8/2k5/8 b - - 0 1"); //rook checkmask test #4.
   
   // rook pinmask left.
-  const Board board = fen::parse("8/3q4/8/8/2KRP1r1/8/8/6k1 b - - 0 1"); //rook pinmask test #1.
-
+  //const Board board = fen::parse("8/3q4/8/8/2KRP1r1/8/8/6k1 b - - 0 1"); //rook pinmask test #1.
+                                                                         //
+  // king moves check.
+  //const Board board = fen::parse("8/3q4/8/8/2K5/8/8/6k1 b - - 0 1"); //king move test #1.
+  const Board board = fen::parse("8/1P1q4/8/8/2K5/8/8/6k1 b - - 0 1"); //king move test #1.
 
   std::cout << board << std::endl;
   

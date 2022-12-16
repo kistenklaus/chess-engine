@@ -1,7 +1,10 @@
 #pragma once
 
+#include <x86intrin.h>
 #include "Board.h"
 #include "BoardState.h"
+#include "NorthEastSlidingLookUpTable.hpp"
+#include "SouthSlidingLookUpTable.hpp"
 #include "bitmap.h"
 #include "build_config.h"
 #include "lookup.h"
@@ -24,22 +27,28 @@ struct pinmask_t {
 
 typedef bitmap_t checkmask_t;
 
+typedef bitmap_t banmask_t;
+
 template <class BoardState state>
 inline void generate_moves(const Board &board,
                            void (*move_callback)(const move_t move)) {
   // calculate masks
   const checkmask_t checkmask = calculate_checkmask<state>(board);
   const pinmask_t pinmask = calculate_pinmask<state>(board);
-  if constexpr (LOGGING) {
+  const banmask_t banmask = calculate_banmask<state>(board);
+  if constexpr (LOGGING && MASK_LOGGING) {
     std::cout << "====CHECKMASK===" << std::endl;
     std::cout << bitmap_to_bitboard_string(checkmask) << std::endl;
     std::cout << "====PINMASK-HV==" << std::endl;
     std::cout << bitmap_to_bitboard_string(pinmask.hv) << std::endl;
     std::cout << "====PINMASK-D===" << std::endl;
     std::cout << bitmap_to_bitboard_string(pinmask.d) << std::endl;
+    std::cout << "====BANMASK=====" << std::endl;
+    std::cout << bitmap_to_bitboard_string(banmask) << std::endl;
+
   }
   // generate moves.
-  generate_king_moves<state>(board, move_callback, checkmask);
+  generate_king_moves<state>(board, move_callback, checkmask, banmask);
   generate_pawn_moves<state>(board, move_callback, checkmask, pinmask);
   generate_knight_moves<state>(board, move_callback, checkmask, pinmask);
   generate_sliding_moves<state>(board, move_callback, checkmask, pinmask);
@@ -325,6 +334,108 @@ static inline pinmask_t calculate_pinmask(const Board &board) {
 }
 
 /**
+ * Calculates the banmask.
+ *
+ * The banmask includes all tiles that the enemy pieces attack.
+ */
+template <class BoardState state>
+static inline banmask_t calculate_banmask(const Board &board) {
+  // Calculate king banmask.
+  // NOTE: will probably create a branch in asm. Could be removed if, with the
+  // traidoff that only valid positions would be allowed.
+  banmask_t banmask = 0;
+  if (board.king_of<not state.turn()>()) {
+    bitmap_t king_attacks =
+        KingLookUpTable::get()[SQUARE_OF(board.king_of<not state.turn()>())] &
+        ~board.occupied();
+    banmask |= king_attacks;
+  }
+
+  // Calculate pawn attacks.
+  bitmap_t pawns = board.pawns_of<not state.turn()>();
+  if constexpr (state.turn()) {
+    // pawn attack left.
+    const bitmap_t left_attacking_pawns =
+        (((pawns & ~(file1 | rank8)) << 7) &
+         board.occupied_by<!state.turn()>()) >>
+        7;
+    banmask |= left_attacking_pawns << 7;
+    // pawn attack right.
+    const bitmap_t right_attacking_pawns =
+        (((pawns & ~(file1 | rank8)) << 9) &
+         board.occupied_by<!state.turn()>()) >>
+        9;
+    banmask |= right_attacking_pawns << 9;
+  } else {
+    // pawns attack right.
+    const bitmap_t right_attacking_pawn =
+        (((pawns & ~(file8 | rank1)) >> 7) & board.occupied_by<!state.turn()>())
+        << 7;
+    banmask |= right_attacking_pawn >> 7;
+    // pawns attack left.
+    const bitmap_t left_attacking_pawn =
+        (((pawns & ~(file1 | rank1)) >> 9) & board.occupied_by<!state.turn()>())
+        << 9;
+    banmask |= left_attacking_pawn >> 9;
+  }
+
+  // Calculate knight attacks.
+
+  bitmap_t knights = board.knights_of<state.turn()>();
+  iterate_bits(knight, knights) {
+    bitmap_t lookup = KnightLookUpTable::get()[SQUARE_OF(knight)] &
+                      board.not_occupied();
+    banmask |= lookup;
+  }
+
+  // Calculate hv sliding piece attacks.
+  bitmap_t rooksAndQueens =
+      board.rooks_and_queens_of<not state.turn()>();
+  iterate_bits(hvSliding, rooksAndQueens) {
+    // hvSliding to the left.
+    const bitmap_t lookup1 = WestSlidingLookUpTable::get()[SQUARE_OF(hvSliding)];
+    const bitmap_t hit1 =
+        (lookup1 & board.occupied()) & (((bitmap_t)(-1)) << (-_lzcnt_u64(lookup1 & board.occupied()) - 1));
+    banmask |= lookup1 & ~((!!hit1) * WestSlidingLookUpTable::get()[SQUARE_OF(hit1)]);
+
+    const bitmap_t lookup2 = SouthSlidingLookUpTable::get()[SQUARE_OF(hvSliding)];
+    const bitmap_t hit2 = (lookup2 & board.occupied()) & (((bitmap_t)-1)) << (-_lzcnt_u64(lookup2 & board.occupied()) -1 );
+    banmask |= lookup2 & ~((!!hit2) * SouthSlidingLookUpTable::get()[SQUARE_OF(hit2)]);
+
+    const bitmap_t lookup3 = NorthSlidingLookUpTable::get()[SQUARE_OF(hvSliding)];
+    const bitmap_t hit3 = _blsi_u64(lookup3 & board.occupied());
+    banmask |= lookup3 & ~((!!hit3) * NorthSlidingLookUpTable::get()[SQUARE_OF(hit3)]);
+
+    const bitmap_t lookup4 = EastSlidingLookUpTable::get()[SQUARE_OF(hvSliding)];
+    const bitmap_t hit4 = _blsi_u64(lookup4 & board.occupied());
+    banmask |= lookup4 & ~((!!hit4) * EastSlidingLookUpTable::get()[SQUARE_OF(hit4)]);
+  }
+
+  // Calculate diagonal sliding piece attacks.
+  bitmap_t bishopsAndQueens =
+      board.bishop_and_queens_of<not state.turn()>();
+  iterate_bits(dSliding, bishopsAndQueens){
+    const bitmap_t lookup1 = SouthEastSlidingLookUpTable::get()[SQUARE_OF(dSliding)];
+    const bitmap_t hit1 = (lookup1 & board.occupied()) & (((bitmap_t)-1) << (-_lzcnt_u64(lookup1 & board.occupied()) -1));
+    banmask |= lookup1 & ~((!!hit1) * SouthEastSlidingLookUpTable::get()[SQUARE_OF(hit1)]);
+
+    const bitmap_t lookup2 = SouthWestSlidingLookUpTable::get()[SQUARE_OF(dSliding)];
+    const bitmap_t hit2 = (lookup2 & board.occupied()) & (((bitmap_t)-1) << (-_lzcnt_u64(lookup2 & board.occupied()) -1));
+    banmask |= lookup2 & ~((!!hit2) * SouthEastSlidingLookUpTable::get()[SQUARE_OF(hit2)]);
+
+    const bitmap_t lookup3 = NorthWestSlidingLookUpTable::get()[SQUARE_OF(dSliding)];
+    const bitmap_t hit3 = _blsi_u64(lookup3 & board.occupied());
+    banmask |= lookup3 & ~((!!hit3) * NorthWestSlidingLookUpTable::get()[SQUARE_OF(hit3)]);
+
+    const bitmap_t lookup4 = NorthEastSlidingLookUpTable::get()[SQUARE_OF(dSliding)];
+    const bitmap_t hit4 = _blsi_u64(lookup4 & board.occupied());
+    banmask |= lookup4 & ~((!!hit4) * NorthEastSlidingLookUpTable::get()[SQUARE_OF(hit4)]);
+  }
+
+  return banmask;
+}
+
+/**
  *  Generate king moves.
  *
  *  @param <state> : the current state of the chess game.
@@ -338,15 +449,15 @@ static inline pinmask_t calculate_pinmask(const Board &board) {
 template <class BoardState state>
 static inline void generate_king_moves(const Board &board,
                                        void (*move_callback)(const move_t move),
-                                       const bitmap_t checkmask) {
-  if (board.king_of<state.turn()>()) {  // NOT A CONSTEXPR (NOTE will probably
-                                        // create a branch in asm).
-    bitmap_t king_squares =
-        KingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())] &
-        board.empty_or_occupied_by_enemy_of<state.turn()>() & checkmask;
-    iterate_bits(i, king_squares) {
-      move_callback(move_t(board, board.king_of<state.turn()>(), i));
-    }
+                                       const bitmap_t checkmask, const bitmap_t banmask) {
+  // NOT A CONSTEXPR
+  // NOTE will probably create a branch in asm.
+  if (!board.king_of<state.turn()>()) return;
+  bitmap_t king_squares =
+      KingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())] &
+      board.empty_or_occupied_by_enemy_of<state.turn()>() & checkmask & ~banmask;
+  iterate_bits(i, king_squares) {
+    move_callback(move_t(board, board.king_of<state.turn()>(), i));
   }
 }
 
