@@ -44,7 +44,9 @@ int main() {
                                                                          //
   // king moves check.
   //const Board board = fen::parse("8/3q4/8/8/2K5/8/8/6k1 b - - 0 1"); //king move test #1.
-  const Board board = fen::parse("8/1P1q4/8/8/2K5/8/8/6k1 b - - 0 1"); //king move test #1.
+  //const Board board = fen::parse("8/1P1q4/8/8/2K5/8/8/6k1 b - - 0 1"); //king move test #2.
+
+  const Board board = fen::parse("8/5q2/8/3P4/2K5/8/6k1/8 w - - 0 1"); //pawn pin test #1.
 
   std::cout << board << std::endl;
   
