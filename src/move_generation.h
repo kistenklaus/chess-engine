@@ -240,17 +240,13 @@ static inline pinmask_t calculate_pinmask(const Board &board) {
 
   // Calculate hv pinmask.
   const bitmap_t kingLookupSouth =
-      SouthSlidingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())] |
-      board.king_of<state.turn()>();
+      SouthSlidingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())];
   const bitmap_t kingLookupWest =
-      WestSlidingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())] |
-      board.king_of<state.turn()>();
+      WestSlidingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())];
   const bitmap_t kingLookupNorth =
-      NorthSlidingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())] |
-      board.king_of<state.turn()>();
+      NorthSlidingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())];
   const bitmap_t kingLookupEast =
-      EastSlidingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())] |
-      board.king_of<state.turn()>();
+      EastSlidingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())];
   bitmap_t enemyRooksAndQueens =
       board.enemy_rooks_and_queens_of<state.turn()>();
   iterate_bits(hvSliding, enemyRooksAndQueens) {
@@ -258,46 +254,41 @@ static inline pinmask_t calculate_pinmask(const Board &board) {
         SouthSlidingLookUpTable::get()[SQUARE_OF(hvSliding)] & ~kingLookupSouth;
     pinmask.hv |= (((c0 & board.king_of<state.turn()>()) &&
                     c0 & board.occupied_by<state.turn()>()) &&
-                   !(_blsr_u64(c0 & board.occupied_by<state.turn()>()))) *
-                  (c0 | hvSliding);
+                   !(_blsr_u64(c0 & board.occupied_by<state.turn()>() & ~board.king_of<state.turn()>()))) *
+                  ((c0 | hvSliding)& ~board.king_of<state.turn()>());
 
     const bitmap_t c1 =
         WestSlidingLookUpTable::get()[SQUARE_OF(hvSliding)] & ~kingLookupWest;
     pinmask.hv |= (((c1 & board.king_of<state.turn()>()) &&
-                    c1 & board.occupied_by<state.turn()>()) &&
-                   !(_blsr_u64(c1 & board.occupied_by<state.turn()>()))) *
-                  (c1 | hvSliding);
-
+                    (c1 & board.occupied_by<state.turn()>())) &&
+                   !(_blsr_u64(c1 & board.occupied_by<state.turn()>() & ~board.king_of<state.turn()>()))) *
+                  ((c1 | hvSliding) & ~board.king_of<state.turn()>());
     const bitmap_t c2 =
         NorthSlidingLookUpTable::get()[SQUARE_OF(hvSliding)] & ~kingLookupNorth;
     pinmask.hv |= (((c2 & board.king_of<state.turn()>()) &&
                     c2 & board.occupied_by<state.turn()>()) &&
-                   !(_blsr_u64(c1 & board.occupied_by<state.turn()>()))) *
-                  (c2 | hvSliding);
+                   !(_blsr_u64(c1 & board.occupied_by<state.turn()>() & ~board.king_of<state.turn()>()))) *
+                  ((c2 | hvSliding) & ~board.king_of<state.turn()>());
 
     const bitmap_t c3 =
         EastSlidingLookUpTable::get()[SQUARE_OF(hvSliding)] & ~kingLookupEast;
     pinmask.hv |= (((c3 & board.king_of<state.turn()>()) &&
                     c3 & board.occupied_by<state.turn()>()) &&
-                   !(_blsr_u64(c1 & board.occupied_by<state.turn()>()))) *
-                  (c3 | hvSliding);
+                   !(_blsr_u64(c1 & board.occupied_by<state.turn()>() & ~board.king_of<state.turn()>()))) *
+                  ((c3 | hvSliding) & ~board.king_of<state.turn()>());
   }
   const bitmap_t kingLookupSouthEast =
       SouthEastSlidingLookUpTable::get()[SQUARE_OF(
-          board.king_of<state.turn()>())] |
-      board.king_of<state.turn()>();
+          board.king_of<state.turn()>())];
   const bitmap_t kingLookupSouthWest =
       SouthWestSlidingLookUpTable::get()[SQUARE_OF(
-          board.king_of<state.turn()>())] |
-      board.king_of<state.turn()>();
+          board.king_of<state.turn()>())];
   const bitmap_t kingLookupNorthWest =
       NorthWestSlidingLookUpTable::get()[SQUARE_OF(
-          board.king_of<state.turn()>())] |
-      board.king_of<state.turn()>();
+          board.king_of<state.turn()>())];
   const bitmap_t kingLookupNorthEast =
       NorthEastSlidingLookUpTable::get()[SQUARE_OF(
-          board.king_of<state.turn()>())] |
-      board.king_of<state.turn()>();
+          board.king_of<state.turn()>())];
   bitmap_t enemyBishopsAndQueens =
       board.enemy_bishop_and_queens_of<state.turn()>();
   iterate_bits(dSliding, enemyBishopsAndQueens) {
@@ -306,29 +297,29 @@ static inline pinmask_t calculate_pinmask(const Board &board) {
         ~kingLookupSouthEast;
     pinmask.d |= (((c0 & board.king_of<state.turn()>()) &&
                    c0 & board.occupied_by<state.turn()>()) &&
-                  !(_blsr_u64(c0 & board.occupied_by<state.turn()>()))) *
-                 (c0 | dSliding);
+                  !(_blsr_u64(c0 & board.occupied_by<state.turn()>() & ~board.king_of<state.turn()>()))) *
+                 ((c0 | dSliding) & ~board.king_of<state.turn()>());
     const bitmap_t c1 =
         SouthWestSlidingLookUpTable::get()[SQUARE_OF(dSliding)] &
         ~kingLookupSouthWest;
     pinmask.d |= (((c0 & board.king_of<state.turn()>()) &&
                    c1 & board.occupied_by<state.turn()>()) &&
-                  !(_blsr_u64(c0 & board.occupied_by<state.turn()>()))) *
-                 (c1 | dSliding);
+                  !(_blsr_u64(c0 & board.occupied_by<state.turn()>() & ~board.king_of<state.turn()>()))) *
+                 ((c1 | dSliding) & ~board.king_of<state.turn()>());
     const bitmap_t c2 =
         NorthWestSlidingLookUpTable::get()[SQUARE_OF(dSliding)] &
         ~kingLookupNorthWest;
     pinmask.d |= (((c2 & board.king_of<state.turn()>()) &&
                    c2 & board.occupied_by<state.turn()>()) &&
-                  !(_blsr_u64(c0 & board.occupied_by<state.turn()>()))) *
-                 (c2 | dSliding);
+                  !(_blsr_u64(c0 & board.occupied_by<state.turn()>() & ~board.king_of<state.turn()>()))) *
+                 ((c2 | dSliding) & ~board.king_of<state.turn()>());
     const bitmap_t c3 =
         NorthEastSlidingLookUpTable::get()[SQUARE_OF(dSliding)] &
         ~kingLookupNorthEast;
     pinmask.d |= (((c3 & board.king_of<state.turn()>()) &&
                    c3 & board.occupied_by<state.turn()>()) &&
-                  !(_blsr_u64(c0 & board.occupied_by<state.turn()>()))) *
-                 (c3 | dSliding);
+                  !(_blsr_u64(c0 & board.occupied_by<state.turn()>() & ~board.king_of<state.turn()>()))) *
+                 ((c3 | dSliding) & ~board.king_of<state.turn()>());
   }
   return pinmask;
 }
@@ -478,8 +469,9 @@ static inline void generate_pawn_moves(const Board &board,
                                        void (*move_callback)(const move_t move),
                                        const bitmap_t checkmask,
                                        const pinmask_t pinmask) {
-  bitmap_t pawns = board.pawns_of<state.turn()>();
+  const bitmap_t pawns = board.pawns_of<state.turn()>();
   if constexpr (state.turn()) {
+    //bitmap_t unpined_pawns = (pawns & ~(pinmask.d | pinmask.hv));
     // pawns that can go forward.
     bitmap_t pushable_pawns =
         (((pawns & ~(rank7 | rank8)) << 8) & board.not_occupied()) >> 8;

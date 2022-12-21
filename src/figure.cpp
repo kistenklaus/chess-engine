@@ -9,22 +9,22 @@ std::ostream &operator<<(std::ostream &cout, const figure_t &figure) {
   figure_type type = figure.type();
   switch (type) {
     case PAWN:
-      cout << " ";
+      cout << "";
       break;
     case BISHOP:
-      cout << " ";
+      cout << "";
       break;
     case KNIGHT:
-      cout << " ";
+      cout << "";
       break;
     case ROOK:
-      cout << " ";
+      cout << "";
       break;
     case QUEEN:
-      cout << " ";
+      cout << "";
       break;
     case KING:
-      cout << " ";
+      cout << "";
       break;
     default:
       break;

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "tile_index.h"
+
 figure_t Board::get_figure_at(uint8_t tile_index) const {
   assert(tile_index <= 63);
   bitmap_t tile_mask = (((bitmap_t)0x1ULL) << tile_index);
@@ -52,7 +54,7 @@ std::ostream &operator<<(std::ostream &cout, const Board &board) {
       uint8_t tile_index = row * 8 + column;
       const figure_t figure = board.get_figure_at(tile_index);
       std::stringstream stream;
-      stream << figure;
+      stream << figure << " ";;
       std::string occ = stream.str();
       size_t length = occ.length();
       if (length < 2) {
@@ -72,6 +74,5 @@ std::ostream &operator<<(std::ostream &cout, const Board &board) {
     }
     cout << std::endl;
   }
-
   return cout;
 }

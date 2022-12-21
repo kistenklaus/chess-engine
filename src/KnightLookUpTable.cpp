@@ -31,7 +31,6 @@ KnightLookUpTable::KnightLookUpTable() {
       this->psudo_legal_moves[tile_index] = lookUp;
     }
   }
-  std::cout << "CALCULATING-PSUDO-KNIGHT-MOVES" << std::endl;
 }
 
 const KnightLookUpTable& KnightLookUpTable::get() {
