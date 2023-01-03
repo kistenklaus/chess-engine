@@ -3,7 +3,7 @@
 #include "Board.h"
 #include "BoardState.h"
 #include "fen.h"
-#include "display.h";
+#include "display.h"
 #include "lookup.h"
 #include "move_generation.h"
 #include "x86utils.h"
