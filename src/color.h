@@ -1,4 +1,4 @@
 #pragma once
-#define color_t bool
+typedef bool color_t;
 #define BLACK false
 #define WHITE true

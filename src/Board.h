@@ -1,10 +1,13 @@
 #pragma once
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
+#include "BoardState.h"
 #include "bitmap.h"
 #include "cinttypes"
 #include "figure.h"
+#include "move.h"
 
 class Board {
  public:
@@ -35,10 +38,10 @@ class Board {
   const bitmap_t b_queen;
 
  public:
-  Board(bitmap_t b_pawns, bitmap_t w_pawns, bitmap_t b_bishops,
-        bitmap_t w_bishops, bitmap_t b_knights, bitmap_t w_knights,
-        bitmap_t b_rooks, bitmap_t w_rooks, bitmap_t b_queen, bitmap_t w_queen,
-        bitmap_t b_king, bitmap_t w_king)
+  explicit Board(bitmap_t b_pawns, bitmap_t w_pawns, bitmap_t b_bishops,
+                 bitmap_t w_bishops, bitmap_t b_knights, bitmap_t w_knights,
+                 bitmap_t b_rooks, bitmap_t w_rooks, bitmap_t b_queen,
+                 bitmap_t w_queen, bitmap_t b_king, bitmap_t w_king)
       : b_occ(b_pawns | b_bishops | b_knights | b_rooks | b_queen | b_king),
         w_occ(w_pawns | w_bishops | w_knights | w_rooks | w_queen | w_king),
         occ(w_occ | b_occ),
@@ -56,12 +59,13 @@ class Board {
         b_queen(b_queen)  // probably doesn't work
   {}
 
-  constexpr inline bitmap_t occupied() const { return occ; }
+  [[nodiscard]] constexpr inline bitmap_t occupied() const { return occ; }
 
-  constexpr inline bitmap_t not_occupied() const { return ~occ; }
+  [[nodiscard]] constexpr inline bitmap_t not_occupied() const { return ~occ; }
 
   template <color_t current_player>
-  constexpr inline bitmap_t empty_or_occupied_by_enemy_of() const {
+  [[nodiscard]] constexpr inline bitmap_t empty_or_occupied_by_enemy_of()
+      const {
     if constexpr (current_player)
       return ~w_occ;
     else
@@ -69,7 +73,7 @@ class Board {
   }
 
   template <color_t current_player>
-  constexpr inline bitmap_t rooks_and_queens_of() const {
+  [[nodiscard]] constexpr inline bitmap_t rooks_and_queens_of() const {
     if constexpr (current_player)
       return w_rooks | w_queen;
     else
@@ -77,7 +81,7 @@ class Board {
   }
 
   template <color_t current_player>
-  constexpr inline bitmap_t enemy_rooks_and_queens_of() const {
+  [[nodiscard]] constexpr inline bitmap_t enemy_rooks_and_queens_of() const {
     if constexpr (current_player)
       return b_rooks | b_queen;
     else
@@ -85,7 +89,7 @@ class Board {
   }
 
   template <color_t current_player>
-  constexpr inline bitmap_t bishop_and_queens_of() const {
+  [[nodiscard]] constexpr inline bitmap_t bishop_and_queens_of() const {
     if constexpr (current_player)
       return w_bishops | w_queen;
     else
@@ -93,7 +97,7 @@ class Board {
   }
 
   template <color_t current_player>
-  constexpr inline bitmap_t enemy_bishop_and_queens_of() const {
+  [[nodiscard]] constexpr inline bitmap_t enemy_bishop_and_queens_of() const {
     if constexpr (current_player)
       return b_bishops | b_queen;
     else
@@ -101,7 +105,7 @@ class Board {
   }
 
   template <color_t current_player>
-  constexpr inline bitmap_t occupied_by() const {
+  [[nodiscard]] constexpr inline bitmap_t occupied_by() const {
     if constexpr (current_player)
       return w_occ;
     else
@@ -109,94 +113,99 @@ class Board {
   }
 
   template <color_t current_player>
-  constexpr inline bitmap_t occupied_by_enemy_of() const {
+  [[nodiscard]] constexpr inline bitmap_t occupied_by_enemy_of() const {
     if constexpr (current_player)
       return b_occ;
     else
       return w_occ;
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t pawns_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t pawns_of() const {
     if constexpr (current_player)
       return w_pawns;
     else
       return b_pawns;
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t enemy_pawns_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t enemy_pawns_of() const {
     return this->pawns_of<!current_player>();
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t bishops_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t bishops_of() const {
     if constexpr (current_player)
       return w_bishops;
     else
       return b_bishops;
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t enemy_bishops_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t enemy_bishops_of() const {
     return this->bishops_of<!current_player>();
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t knights_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t knights_of() const {
     if constexpr (current_player)
       return w_knights;
     else
       return b_knights;
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t enemy_knights_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t enemy_knights_of() const {
     return this->knights_of<!current_player>();
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t rooks_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t rooks_of() const {
     if constexpr (current_player)
       return w_rooks;
     else
       return b_rooks;
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t enemy_rooks_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t enemy_rooks_of() const {
     return this->rooks_of<!current_player>();
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t queens_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t queens_of() const {
     if constexpr (current_player)
       return w_queen;
     else
       return b_queen;
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t enemy_queens_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t enemy_queens_of() const {
     return this->queens_of<!current_player>();
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t king_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t king_of() const {
     if constexpr (current_player)
       return w_king;
     else
       return b_king;
   }
 
-  template <bool current_player>
-  constexpr inline bitmap_t enemy_king_of() const {
+  template <color_t current_player>
+  [[nodiscard]] constexpr inline bitmap_t enemy_king_of() const {
     return this->king_of<!current_player>();
   }
 
+  [[nodiscard]] Board invertBoard() const {
+    return Board(w_pawns, b_pawns, w_bishops, b_bishops, w_knights, b_knights,
+                 w_rooks, b_rooks, w_queen, b_queen, w_king, b_king);
+  }
+
   // this is not to most efficient method. SHOULD AVOIDED IN MOVEGEN.
-  figure_t get_figure_at(uint8_t tile_index) const;
-  figure_t get_figure_at(uint8_t row, uint8_t column) const;
+  [[nodiscard]] figure_t get_figure_at(uint8_t tile_index) const;
+  [[nodiscard]] figure_t get_figure_at(uint8_t row, uint8_t column) const;
 };
 
-std::ostream &operator<<(std::ostream &cout, const Board &board);
+std::ostream& operator<<(std::ostream& cout, const Board& board);

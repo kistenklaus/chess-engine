@@ -81,7 +81,7 @@
  *  NOTE: There can be upto 8 pins on one board.
  */
 template <class BoardState state>
-static inline pinmask_t calculate_pinmask(const Board &board) {
+static inline pinmask_t generate_pinmask(const Board &board) {
   pinmask_t pinmask;
 
   // Calculate hv pinmask.

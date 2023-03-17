@@ -36,6 +36,11 @@ set(HEADERS
         "src/pinmask.h"
         "src/checkmask.h"
         "src/banmask.h"
+        "src/BoardCompiletimeState.h"
+        "src/Movestack.h"
+        "src/MoveCounter.h"
+        "src/MoveBitmapAccumulator.h"
+        "src/MoveAccumulator.h"
         )
 
 set(SOURCES
@@ -77,10 +82,18 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 set(TEST_SOURCES
-        "test/movegen_test.cpp"
+        "test/movegen_common_basic.cpp"
+        "test/movegen_bishop_basic.cpp"
+        "test/pinmaskgen_rook.cpp"
+        "test/movegen_knight_basic.cpp"
+        "test/movegen_rook_basic.cpp"
+        "test/movegen_pawn_basic.cpp"
+        "test/movegen_king_basic.cpp"
+        "test/movegen_queen_basic.cpp"
         )
 
 set(TEST_HEADERS
+        "test/MoveTestReceiver.h"
         )
 
 

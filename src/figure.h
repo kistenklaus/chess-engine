@@ -8,7 +8,7 @@
 #define FIGURE_T_COLOR_MASK (1 << 7)
 
 enum figure_type : uint8_t{
-  EMPTY = 0,
+  NOT_A_FIGURE = 0,
   PAWN = 1,
   BISHOP = 2,
   KNIGHT = 3,
