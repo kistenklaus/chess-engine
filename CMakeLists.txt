@@ -6,40 +6,93 @@ project(${This} C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# set(CMAKE_CXX_STANDARD 99)
-# set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(HEADERS
+        "src/bitmap.h"
+        "src/Board.h"
+        "src/BoardState.h"
+        "src/build_config.h"
+        "src/color.h"
+        "src/display.h"
+        "src/EastSlidingLookUpTable.h"
+        "src/fen.h"
+        "src/figure.h"
+        "src/KingLookUpTable.h"
+        "src/KnightLookUpTable.h"
+        "src/lookup.h"
+        "src/move.h"
+        "src/move_generation.h"
+        "src/NorthEastSlidingLookUpTable.h"
+        "src/NorthSlidingLookUpTable.h"
+        "src/NorthWestSlidingLookUpTable.h"
+        "src/SouthEastSlidingLookUpTable.h"
+        "src/SouthSlidingLookUpTable.h"
+        "src/SouthWestSlidingLookUpTable.h"
+        "src/tile_index.h"
+        "src/WestSlidingLookUpTable.h"
+        "src/x86utils.h"
+        "src/checkmask_generation.h"
+        "src/pinmask_generation.h"
+        "src/banmask_generation.h"
+        "src/pinmask.h"
+        "src/checkmask.h"
+        "src/banmask.h"
+        )
 
-# set(CMAKE_C_STANDARD 11)
-# set(CMAKE_C_COMPILER "gcc")
+set(SOURCES
+        "src/bitmap.cpp"
+        "src/Board.cpp"
+        "src/display.cpp"
+        "src/EastSlidingLookUpTable.cpp"
+        "src/fen.cpp"
+        "src/figure.cpp"
+        "src/KingLookUpTable.cpp"
+        "src/KnightLookUpTable.cpp"
+        "src/NorthEastSlidingLookUpTable.cpp"
+        "src/NorthSlidingLookUpTable.cpp"
+        "src/NorthWestSlidingLookUpTable.cpp"
+        "src/SouthEastSlidingLookUpTable.cpp"
+        "src/SouthSlidingLookUpTable.cpp"
+        "src/SouthWestSlidingLookUpTable.cpp"
+        "src/WestSlidingLookUpTable.cpp"
+        )
 
-# set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-# set(BUILD_SHARED_LIBS ON)
+set(MAIN_SOURCE "src/main.cpp")
 
+include_directories(src) #kinda sketchy but easier to code.
 add_compile_options(-march=native -g -Wall -O0 -std=c++20) #required for x86 instructions
+add_executable(${This} ${SOURCES} ${HEADERS} ${MAIN_SOURCE})
+
+
+#==================== TESTING ================
+
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_subdirectory(googletest)
+set(TEST_SOURCES
+        "test/movegen_test.cpp"
+        )
 
-file(GLOB_RECURSE HEADERS 
-  "src/*.h"
-  "src/*.hpp"
-  "include/*.h"
-  "include/*.hpp"
-)
-
-file(GLOB SOURCES
-  "src/*.cpp",
-  "src/*.c"
-)
+set(TEST_HEADERS
+        )
 
 
+add_executable(${This}.test
+        ${TEST_SOURCES}
+        ${TEST_HEADERS}
+        ${HEADERS}
+        ${SOURCES}
+        )
+target_link_libraries(${This}.test
+        GTest::gtest_main
+        )
 
-add_library(${This}.lib STATIC ${SOURCES} ${HEADERS})
-
-add_subdirectory(test)
-
-
-file(GLOB SOURCE_FILES "src/*.cpp" "src/*.h" "src/*.hpp" "include/*.h" "include/*.hpp")
-
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+include(GoogleTest)
+gtest_discover_tests(${This}.test)

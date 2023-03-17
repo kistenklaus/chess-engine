@@ -1,4 +1,4 @@
-#include "WestSlidingLookUpTable.hpp"
+#include "WestSlidingLookUpTable.h"
 
 WestSlidingLookUpTable::WestSlidingLookUpTable() {
   //

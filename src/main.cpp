@@ -45,7 +45,9 @@ int main() {
   // - - 0 1"); //rook checkmask test #2.
 
   // rook checkmask left
-  const Board board = fen::parse("8/8/8/K3P1r1/8/8/2k5/8 b - - 0 1"); //rook
+  //const Board board = fen::parse("8/8/8/K3P1r1/8/8/2k5/8 b - - 0 1"); //rook
+
+  const Board board = fen::parse("2k5/8/K7/8/4Q3/8/8/8 w - - 0 1");
   // checkmask test #3. const Board board = fen::parse("8/8/8/K5r1/8/8/2k5/8 b -
   // - 0 1"); //rook checkmask test #4.
 
@@ -64,7 +66,7 @@ int main() {
   //std::cout << board << std::endl;
 
   generate_moves<BoardState(WHITE, false, true, true, true, true)>(
-      board, [](const move_t move) {
+      board, [&](const move_t move) {
         /* uint64_t from = SQUARE_OF(move.origin); */
         /* uint64_t to = SQUARE_OF(move.target); */
         tmp |= move.target;

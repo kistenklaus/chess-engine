@@ -1,77 +1,182 @@
 [
 {
   "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/Board.cpp.o -c /home/karl/Development/chess-engine/src/Board.cpp",
-  "file": "/home/karl/Development/chess-engine/src/Board.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/EastSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/EastSlidingLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/EastSlidingLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/KingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/KingLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/KingLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/KnightLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/KnightLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/KnightLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/NorthEastSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/NorthEastSlidingLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/NorthEastSlidingLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/NorthSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/NorthSlidingLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/NorthSlidingLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/NorthWestSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/NorthWestSlidingLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/NorthWestSlidingLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/SouthEastSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/SouthEastSlidingLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/SouthEastSlidingLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/SouthSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/SouthSlidingLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/SouthSlidingLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/SouthWestSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/SouthWestSlidingLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/SouthWestSlidingLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/WestSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/WestSlidingLookUpTable.cpp",
-  "file": "/home/karl/Development/chess-engine/src/WestSlidingLookUpTable.cpp"
-},
-{
-  "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/bitmap.cpp.o -c /home/karl/Development/chess-engine/src/bitmap.cpp",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/bitmap.cpp.o -c /home/karl/Development/chess-engine/src/bitmap.cpp",
   "file": "/home/karl/Development/chess-engine/src/bitmap.cpp"
 },
 {
   "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/fen.cpp.o -c /home/karl/Development/chess-engine/src/fen.cpp",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/Board.cpp.o -c /home/karl/Development/chess-engine/src/Board.cpp",
+  "file": "/home/karl/Development/chess-engine/src/Board.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/display.cpp.o -c /home/karl/Development/chess-engine/src/display.cpp",
+  "file": "/home/karl/Development/chess-engine/src/display.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/EastSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/EastSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/EastSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/fen.cpp.o -c /home/karl/Development/chess-engine/src/fen.cpp",
   "file": "/home/karl/Development/chess-engine/src/fen.cpp"
 },
 {
   "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/figure.cpp.o -c /home/karl/Development/chess-engine/src/figure.cpp",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/figure.cpp.o -c /home/karl/Development/chess-engine/src/figure.cpp",
   "file": "/home/karl/Development/chess-engine/src/figure.cpp"
 },
 {
   "directory": "/home/karl/Development/chess-engine/build",
-  "command": "g++   -march=native -g -Wall -O0 -std=c++17 -std=c++20 -o CMakeFiles/chess-engine.dir/src/main.cpp.o -c /home/karl/Development/chess-engine/src/main.cpp",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/KingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/KingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/KingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/KnightLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/KnightLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/KnightLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/NorthEastSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/NorthEastSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/NorthEastSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/NorthSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/NorthSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/NorthSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/NorthWestSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/NorthWestSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/NorthWestSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/SouthEastSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/SouthEastSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/SouthEastSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/SouthSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/SouthSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/SouthSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/SouthWestSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/SouthWestSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/SouthWestSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/WestSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/WestSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/WestSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.dir/src/main.cpp.o -c /home/karl/Development/chess-engine/src/main.cpp",
   "file": "/home/karl/Development/chess-engine/src/main.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/test/movegen_test.cpp.o -c /home/karl/Development/chess-engine/test/movegen_test.cpp",
+  "file": "/home/karl/Development/chess-engine/test/movegen_test.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/bitmap.cpp.o -c /home/karl/Development/chess-engine/src/bitmap.cpp",
+  "file": "/home/karl/Development/chess-engine/src/bitmap.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/Board.cpp.o -c /home/karl/Development/chess-engine/src/Board.cpp",
+  "file": "/home/karl/Development/chess-engine/src/Board.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/display.cpp.o -c /home/karl/Development/chess-engine/src/display.cpp",
+  "file": "/home/karl/Development/chess-engine/src/display.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/EastSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/EastSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/EastSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/fen.cpp.o -c /home/karl/Development/chess-engine/src/fen.cpp",
+  "file": "/home/karl/Development/chess-engine/src/fen.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/figure.cpp.o -c /home/karl/Development/chess-engine/src/figure.cpp",
+  "file": "/home/karl/Development/chess-engine/src/figure.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/KingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/KingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/KingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/KnightLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/KnightLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/KnightLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/NorthEastSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/NorthEastSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/NorthEastSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/NorthSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/NorthSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/NorthSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/NorthWestSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/NorthWestSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/NorthWestSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/SouthEastSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/SouthEastSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/SouthEastSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/SouthSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/SouthSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/SouthSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/SouthWestSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/SouthWestSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/SouthWestSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/chess-engine.test.dir/src/WestSlidingLookUpTable.cpp.o -c /home/karl/Development/chess-engine/src/WestSlidingLookUpTable.cpp",
+  "file": "/home/karl/Development/chess-engine/src/WestSlidingLookUpTable.cpp"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build/_deps/googletest-build/googlemock",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -I/home/karl/Development/chess-engine/build/_deps/googletest-src/googlemock/include -I/home/karl/Development/chess-engine/build/_deps/googletest-src/googlemock -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -Wall -Wshadow -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/gmock.dir/src/gmock-all.cc.o -c /home/karl/Development/chess-engine/build/_deps/googletest-src/googlemock/src/gmock-all.cc",
+  "file": "/home/karl/Development/chess-engine/build/_deps/googletest-src/googlemock/src/gmock-all.cc"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build/_deps/googletest-build/googlemock",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googlemock/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googlemock -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -Wall -Wshadow -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/gmock_main.dir/src/gmock_main.cc.o -c /home/karl/Development/chess-engine/build/_deps/googletest-src/googlemock/src/gmock_main.cc",
+  "file": "/home/karl/Development/chess-engine/build/_deps/googletest-src/googlemock/src/gmock_main.cc"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build/_deps/googletest-build/googletest",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -I/home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -I/home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -Wall -Wshadow -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "file": "/home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/src/gtest-all.cc"
+},
+{
+  "directory": "/home/karl/Development/chess-engine/build/_deps/googletest-build/googletest",
+  "command": "/sbin/c++  -I/home/karl/Development/chess-engine/src -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/include -isystem /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest -Wall -Wshadow -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -march=native -g -Wall -O0 -std=c++20 -o CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/src/gtest_main.cc",
+  "file": "/home/karl/Development/chess-engine/build/_deps/googletest-src/googletest/src/gtest_main.cc"
 }
 ]

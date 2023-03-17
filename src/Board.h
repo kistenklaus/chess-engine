@@ -7,6 +7,16 @@
 #include "figure.h"
 
 class Board {
+ public:
+  const static bitmap_t Rank7 = 0xFF000000000000;
+  const static bitmap_t Rank8 = 0xFF00000000000000;
+  const static bitmap_t Rank1 = 0xFF;
+  const static bitmap_t Rank2 = 0xFF00;
+  const static bitmap_t File8 = 0x8080808080808080;
+  const static bitmap_t File7 = File8 >> 1;
+  const static bitmap_t File2 = File7 >> 5;
+  const static bitmap_t File1 = File2 >> 1;
+
  private:
   const bitmap_t b_occ;
   const bitmap_t w_occ;

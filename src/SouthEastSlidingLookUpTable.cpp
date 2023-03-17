@@ -1,4 +1,4 @@
-#include "SouthEastSlidingLookUpTable.hpp"
+#include "SouthEastSlidingLookUpTable.h"
 
 SouthEastSlidingLookUpTable::SouthEastSlidingLookUpTable() {
   //

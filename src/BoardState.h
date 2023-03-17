@@ -17,63 +17,74 @@ class BoardState {
         _has_ep_pawn(has_ep_pawn),
         _white_has_long_castle(white_has_long_castle),
         _white_has_short_castle(white_has_short_castle),
-        _black_has_long_castle(white_has_long_castle),
+        _black_has_long_castle(black_has_long_castle),
         _black_has_short_castle(black_has_short_castle) {}
 
   static constexpr BoardState Default() {
-    return BoardState(WHITE, false, true, true, true, true);
+    return {WHITE, false, true, true, true, true};
   }
 
-  inline constexpr color_t turn() const { return _white_move; }
+  [[nodiscard]] inline constexpr color_t turn() const { return _white_move; }
 
-  inline constexpr bool has_long_castle() const {
+  [[nodiscard]] inline constexpr bool has_long_castle() const {
     if (_white_move)
       return _white_has_long_castle;
     else
       return _black_has_long_castle;
   }
 
-  inline constexpr bool has_short_castle() const {
+  [[nodiscard]] inline constexpr bool has_short_castle() const {
     if (_white_move)
       return _white_has_short_castle;
     else
       return _black_has_short_castle;
   }
 
-  inline constexpr BoardState register_short_rook_move() const {
+  [[nodiscard]] inline constexpr BoardState register_short_rook_move() const {
     if (_white_move) {
-      return BoardState(!_white_move, false, _white_has_long_castle, false,
-                        _black_has_long_castle, _black_has_short_castle);
+      return {!_white_move,           false,
+              _white_has_long_castle, false,
+              _black_has_long_castle, _black_has_short_castle};
     } else {
-      return BoardState(!_white_move, false, _white_has_long_castle,
-                        _white_has_short_castle, _black_has_long_castle, false);
+      return {!_white_move,           false,
+              _white_has_long_castle, _white_has_short_castle,
+              _black_has_long_castle, false};
     }
   }
 
-  inline constexpr BoardState register_long_rook_move() const {
+  [[nodiscard]] inline constexpr BoardState register_long_rook_move() const {
     if (_white_move) {
-      return BoardState(!_white_move, false, false, _white_has_short_castle,
-                        _black_has_long_castle, _black_has_short_castle);
+      return {!_white_move,
+              false,
+              false,
+              _white_has_short_castle,
+              _black_has_long_castle,
+              _black_has_short_castle};
     } else {
-      return BoardState(!_white_move, false, _white_has_long_castle,
-                        _white_has_short_castle, false,
-                        _black_has_short_castle);
+      return {!_white_move,
+              false,
+              _white_has_long_castle,
+              _white_has_short_castle,
+              false,
+              _black_has_short_castle};
     }
   }
 
-  inline constexpr BoardState register_king_move() const {
+  [[nodiscard]] inline constexpr BoardState register_king_move() const {
     if (_white_move) {
-      return BoardState(!_white_move, false, false, false,
-                        _black_has_long_castle, _black_has_short_castle);
+      return {
+          !_white_move,           false, false, false, _black_has_long_castle,
+          _black_has_short_castle};
     } else {
-      return BoardState(!_white_move, false, _white_has_long_castle,
-                        _white_has_short_castle, false, false);
+      return {
+          !_white_move, false, _white_has_long_castle, _white_has_short_castle,
+          false,        false};
     }
   }
 
-  inline constexpr BoardState register_move() const {
-    return BoardState(!_white_move, false, _white_has_long_castle,
-                      _white_has_short_castle, _black_has_long_castle,
-                      _black_has_short_castle);
+  [[nodiscard]] inline constexpr BoardState register_move() const {
+    return {!_white_move,           false,
+            _white_has_long_castle, _white_has_short_castle,
+            _black_has_long_castle, _black_has_short_castle};
   }
 };

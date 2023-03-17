@@ -1,4 +1,4 @@
 ./build.sh
-cd ./build/test/
-./chess-engine-tests
-cd ../..
+cd ./build/
+./chess-engine.test
+cd ..
