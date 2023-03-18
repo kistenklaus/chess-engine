@@ -92,7 +92,4 @@ class MoveTestReceiver {
     m_counterReceiver.reset();
     m_bitmapAccumulator.reset();
   }
-
-
-
 };
