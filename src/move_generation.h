@@ -22,7 +22,7 @@ template <class BoardState state, typename MoveReceiver>
 inline void generate_moves(const Board &board, MoveReceiver &receiver) {
   const checkmask_t checkmask = generate_checkmask<state>(board);
   const pinmask_t pinmask = generate_pinmask<state>(board);
-  const banmask_t banmask = calculate_banmask<state>(board);
+  const banmask_t banmask = generate_banmask<state>(board);
   generate_king_moves<state, MoveReceiver>(board, receiver, checkmask, banmask);
   generate_pawn_moves<state, MoveReceiver>(board, receiver, checkmask, pinmask);
   generate_knight_moves<state, MoveReceiver>(board, receiver, checkmask,

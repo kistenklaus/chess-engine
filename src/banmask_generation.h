@@ -1,11 +1,11 @@
 #pragma once
-#include "BoardState.h"
 #include "Board.h"
-#include "checkmask.h"
-#include "pinmask.h"
+#include "BoardState.h"
 #include "banmask.h"
-#include "x86utils.h"
+#include "checkmask.h"
 #include "lookup.h"
+#include "pinmask.h"
+#include "x86utils.h"
 
 /*
  * The banmask is the last of the masks to prune moves.
@@ -18,7 +18,7 @@
  * square to capture the King.
  */
 template <class BoardState state>
-static inline banmask_t calculate_banmask(const Board &board) {
+static inline banmask_t generate_banmask(const Board &board) {
   // Calculate king banmask.
   // NOTE: will probably create a branch in asm. Could be removed if, with the
   // tradeoff that only valid positions would be allowed.
@@ -31,38 +31,31 @@ static inline banmask_t calculate_banmask(const Board &board) {
   }
 
   // Calculate pawn attacks.
-  bitmap_t pawns = board.pawns_of<not state.turn()>();
+  bitmap_t pawns = board.enemy_pawns_of<state.turn()>();
   if constexpr (state.turn()) {
     // pawn attack left.
-    const bitmap_t left_attacking_pawns =
-        (((pawns & ~(Board::File1 | Board::Rank8)) << 7) &
-         board.occupied_by<!state.turn()>()) >>
-                                             7;
-    banmask |= left_attacking_pawns << 7;
+    const bitmap_t left_attacking_pawn(
+        (pawns & ~(Board::File1 | Board::Rank1)) >> 9);
+    banmask |= left_attacking_pawn;
     // pawn attack right.
-    const bitmap_t right_attacking_pawns =
-        (((pawns & ~(Board::File1 | Board::Rank8)) << 9) &
-         board.occupied_by<!state.turn()>()) >>
-                                             9;
-    banmask |= right_attacking_pawns << 9;
+    const bitmap_t right_attacking_pawn(
+        (pawns & ~(Board::File1 | Board::Rank1)) >> 7);
+    banmask |= right_attacking_pawn;
+
   } else {
-    // pawns attack right.
-    const bitmap_t right_attacking_pawn =
-        (((pawns & ~(Board::File8 | Board::Rank1)) >> 7) &
-         board.occupied_by<!state.turn()>())
-            << 7;
-    banmask |= right_attacking_pawn >> 7;
     // pawns attack left.
     const bitmap_t left_attacking_pawn =
-        (((pawns & ~(Board::File1 | Board::Rank1)) >> 9) &
-         board.occupied_by<!state.turn()>())
-            << 9;
-    banmask |= left_attacking_pawn >> 9;
+        ((pawns & ~(Board::File1 | Board::Rank8)) << 7);
+    banmask |= left_attacking_pawn;
+    // pawns attack right.
+    const bitmap_t right_attacking_pawn =
+        ((pawns & ~(Board::File8 | Board::Rank8)) << 9);
+    banmask |= right_attacking_pawn;
   }
 
   // Calculate knight attacks.
 
-  bitmap_t knights = board.knights_of<state.turn()>();
+  bitmap_t knights = board.enemy_knights_of<state.turn()>();
   iterate_bits(knight, knights) {
     bitmap_t lookup =
         KnightLookUpTable::get()[SQUARE_OF(knight)] & board.not_occupied();
@@ -119,7 +112,7 @@ static inline banmask_t calculate_banmask(const Board &board) {
         (lookup2 & board.occupied()) &
         (((bitmap_t)-1) << (-_lzcnt_u64(lookup2 & board.occupied()) - 1));
     banmask |= lookup2 & ~((!!hit2) *
-                           SouthEastSlidingLookUpTable::get()[SQUARE_OF(hit2)]);
+                           SouthWestSlidingLookUpTable::get()[SQUARE_OF(hit2)]);
 
     const bitmap_t lookup3 =
         NorthWestSlidingLookUpTable::get()[SQUARE_OF(dSliding)];
