@@ -90,10 +90,15 @@ set(TEST_SOURCES
         "test/movegen_pawn_basic.cpp"
         "test/movegen_king_basic.cpp"
         "test/movegen_queen_basic.cpp"
+        "test/pinmaskgen_bishop.cpp"
+        "test/pinmaskgen_queen.cpp"
+        "test/checkmaskgen_pawn.cpp"
+        "test/checkmaskgen_knight.cpp"
         )
 
 set(TEST_HEADERS
         "test/MoveTestReceiver.h"
+        "test/test_utils.h"
         )
 
 

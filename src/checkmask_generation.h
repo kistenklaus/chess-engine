@@ -40,7 +40,7 @@
  *  NOTE: There can only be two check per move.
  */
 template <class BoardState state>
-inline checkmask_t calculate_checkmask(const Board &board) {
+inline checkmask_t generate_checkmask(const Board &board) {
   checkmask_t checkmask = 0;
   // pawn checkmask
   if constexpr (state.turn()) {
