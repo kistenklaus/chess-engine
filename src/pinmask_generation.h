@@ -1,12 +1,12 @@
 #pragma once
 
-#include "BoardState.h"
 #include "Board.h"
-#include "checkmask.h"
-#include "pinmask.h"
+#include "BoardState.h"
 #include "banmask.h"
-#include "x86utils.h"
+#include "checkmask.h"
 #include "lookup.h"
+#include "pinmask.h"
+#include "x86utils.h"
 
 /*
  * The pinmask is the second mask used to prune illegal moves.
@@ -83,7 +83,6 @@
 template <class BoardState state>
 static inline pinmask_t generate_pinmask(const Board &board) {
   pinmask_t pinmask;
-
   // Calculate hv pinmask.
   const bitmap_t kingLookupSouth =
       SouthSlidingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())];
@@ -100,31 +99,29 @@ static inline pinmask_t generate_pinmask(const Board &board) {
         SouthSlidingLookUpTable::get()[SQUARE_OF(hvSliding)] & ~kingLookupSouth;
     pinmask.hv |= (((c0 & board.king_of<state.turn()>()) &&
                     c0 & board.occupied_by<state.turn()>()) &&
-                   !(_blsr_u64(c0 & board.occupied_by<state.turn()>() &
-                               ~board.king_of<state.turn()>()))) *
+                   !(REST_LOWEST_BIT(c0 & board.occupied_by<state.turn()>() &
+                                     ~board.king_of<state.turn()>()))) *
                   ((c0 | hvSliding) & ~board.king_of<state.turn()>());
-
     const bitmap_t c1 =
         WestSlidingLookUpTable::get()[SQUARE_OF(hvSliding)] & ~kingLookupWest;
     pinmask.hv |= (((c1 & board.king_of<state.turn()>()) &&
                     (c1 & board.occupied_by<state.turn()>())) &&
-                   !(_blsr_u64(c1 & board.occupied_by<state.turn()>() &
-                               ~board.king_of<state.turn()>()))) *
+                   !(REST_LOWEST_BIT(c1 & board.occupied_by<state.turn()>() &
+                                     ~board.king_of<state.turn()>()))) *
                   ((c1 | hvSliding) & ~board.king_of<state.turn()>());
     const bitmap_t c2 =
         NorthSlidingLookUpTable::get()[SQUARE_OF(hvSliding)] & ~kingLookupNorth;
     pinmask.hv |= (((c2 & board.king_of<state.turn()>()) &&
                     c2 & board.occupied_by<state.turn()>()) &&
-                   !(_blsr_u64(c1 & board.occupied_by<state.turn()>() &
-                               ~board.king_of<state.turn()>()))) *
+                   !(REST_LOWEST_BIT(c2 & board.occupied_by<state.turn()>() &
+                                     ~board.king_of<state.turn()>()))) *
                   ((c2 | hvSliding) & ~board.king_of<state.turn()>());
-
     const bitmap_t c3 =
         EastSlidingLookUpTable::get()[SQUARE_OF(hvSliding)] & ~kingLookupEast;
     pinmask.hv |= (((c3 & board.king_of<state.turn()>()) &&
                     c3 & board.occupied_by<state.turn()>()) &&
-                   !(_blsr_u64(c1 & board.occupied_by<state.turn()>() &
-                               ~board.king_of<state.turn()>()))) *
+                   !(REST_LOWEST_BIT(c3 & board.occupied_by<state.turn()>() &
+                                     ~board.king_of<state.turn()>()))) *
                   ((c3 | hvSliding) & ~board.king_of<state.turn()>());
   }
   const bitmap_t kingLookupSouthEast =
@@ -153,7 +150,7 @@ static inline pinmask_t generate_pinmask(const Board &board) {
     const bitmap_t c1 =
         SouthWestSlidingLookUpTable::get()[SQUARE_OF(dSliding)] &
         ~kingLookupSouthWest;
-    pinmask.d |= (((c0 & board.king_of<state.turn()>()) &&
+    pinmask.d |= (((c1 & board.king_of<state.turn()>()) &&
                    c1 & board.occupied_by<state.turn()>()) &&
                   !(_blsr_u64(c0 & board.occupied_by<state.turn()>() &
                               ~board.king_of<state.turn()>()))) *

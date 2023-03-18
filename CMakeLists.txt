@@ -94,7 +94,9 @@ set(TEST_SOURCES
         "test/pinmaskgen_queen.cpp"
         "test/checkmaskgen_pawn.cpp"
         "test/checkmaskgen_knight.cpp"
-        )
+        "test/checkmaskgen_bishop.cpp"
+        "test/checkmaskgen_rook.cpp"
+        test/checkmaskgen_queen.cpp)
 
 set(TEST_HEADERS
         "test/MoveTestReceiver.h"

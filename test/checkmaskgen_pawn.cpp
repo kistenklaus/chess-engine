@@ -29,23 +29,25 @@ TEST(checkmaskgen_pawn, black_pawn_no_attack) {
 TEST(checkmaskgen_pawn, white_pawn_attack_left) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
-  const Board board = fen::parse("8/8/8/2k5/3P4/8/1K6/8 w - - 0 1");
+  const Board board = fen::parse("8/5k2/8/8/3p4/2K5/8/8 w - - 0 1");
   const checkmask_t checkmask = generate_checkmask<state>(board);
+  std::cout << bitmap_to_bitboard_string(checkmask) << std::endl;
   EXPECT_BITBOARD(checkmask, 0x8000000, board);
 }
 
 TEST(checkmaskgen_pawn, black_pawn_attack_left) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
-  const Board board = fen::parse("8/5k2/8/8/3p4/2K5/8/8 w - - 0 1");
+  const Board board = fen::parse("8/8/8/2k5/3P4/8/1K6/8 w - - 0 1");
   const checkmask_t checkmask = generate_checkmask<state>(board);
+  std::cout << bitmap_to_bitboard_string(checkmask) << std::endl;
   EXPECT_BITBOARD(checkmask, 0x8000000, board);
 }
 
 TEST(checkmaskgen_pawn, white_pawn_attack_right) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
-  const Board board = fen::parse("8/8/8/4k3/3P4/8/1K6/8 w - - 0 1");
+  const Board board = fen::parse("8/5k2/8/8/3p4/4K3/8/8 w - - 0 1");
   const checkmask_t checkmask = generate_checkmask<state>(board);
   EXPECT_BITBOARD(checkmask, 0x8000000, board);
 }
@@ -53,7 +55,7 @@ TEST(checkmaskgen_pawn, white_pawn_attack_right) {
 TEST(checkmaskgen_pawn, black_pawn_attack_right) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
-  const Board board = fen::parse("8/5k2/8/8/3p4/4K3/8/8 w - - 0 1");
+  const Board board = fen::parse("8/8/8/4k3/3P4/8/1K6/8 w - - 0 1");
   const checkmask_t checkmask = generate_checkmask<state>(board);
   EXPECT_BITBOARD(checkmask, 0x8000000, board);
 }
