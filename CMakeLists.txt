@@ -101,7 +101,7 @@ set(TEST_SOURCES
 set(TEST_HEADERS
         "test/MoveTestReceiver.h"
         "test/test_utils.h"
-        test/banmaskgen_pawn.cpp test/banmaskgen_king.cpp test/banmaskgen_knight.cpp test/banmaskgen_bishop.cpp test/banmaskgen_rook.cpp test/banmaskgen_queen.cpp)
+        test/banmaskgen_pawn.cpp test/banmaskgen_king.cpp test/banmaskgen_knight.cpp test/banmaskgen_bishop.cpp test/banmaskgen_rook.cpp test/banmaskgen_queen.cpp test/movegen_king_banmask.cpp test/movegen_pawn_checkmask.cpp test/movegen_knight_checkmask.cpp test/movegen_bishop_checkmask.cpp test/movegen_rook_checkmask.cpp test/movegen_queen_checkmask.cpp)
 
 
 add_executable(${This}.test

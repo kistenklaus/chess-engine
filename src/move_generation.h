@@ -89,7 +89,7 @@ static inline void generate_pawn_moves(const Board &board,
     // bitmap_t unpinned_pawns = (pawns & ~(pinmask.d | pinmask.hv));
     //  pawns that can go forward.
     bitmap_t pushable_pawns = (((pawns & ~(Board::Rank7 | Board::Rank8)) << 8) &
-                               board.not_occupied()) >>
+                               board.not_occupied() & checkmask) >>
                               8;
     iterate_bits(pushable_pawn, pushable_pawns) {
       receiver.template move<PAWN>(pushable_pawn, (pushable_pawn << 8),
@@ -99,7 +99,7 @@ static inline void generate_pawn_moves(const Board &board,
     // pawns that can double push.
     bitmap_t double_pushable_pawns =
         (((((pawns & Board::Rank2) << 8) & board.not_occupied()) << 8) &
-         board.not_occupied()) >>
+         board.not_occupied() & checkmask) >>
         16;
     iterate_bits(pushable_pawn, double_pushable_pawns) {
       receiver.template move<PAWN>(pushable_pawn, pushable_pawn << 16,
@@ -125,9 +125,9 @@ static inline void generate_pawn_moves(const Board &board,
     }
   } else {
     // pawns that can go forward.
-    bitmap_t pushable_pawns =
-        (((pawns & ~(Board::Rank1 | Board::Rank2)) >> 8) & board.not_occupied())
-        << 8;
+    bitmap_t pushable_pawns = (((pawns & ~(Board::Rank1 | Board::Rank2)) >> 8) &
+                               board.not_occupied() & checkmask)
+                              << 8;
     iterate_bits(pushable_pawn, pushable_pawns) {
       receiver.template move<PAWN>(pushable_pawn, pushable_pawn >> 8,
                                    MOVE_FLAG_NONE);
@@ -135,7 +135,7 @@ static inline void generate_pawn_moves(const Board &board,
     // pawns that can double push.
     bitmap_t double_pushable_pawns =
         (((((pawns & Board::Rank7) >> 8) & board.not_occupied()) >> 8) &
-         board.not_occupied())
+         board.not_occupied() & checkmask)
         << 16;
     iterate_bits(pushable_pawn, double_pushable_pawns) {
       receiver.template move<PAWN>(pushable_pawn, pushable_pawn >> 16,
@@ -211,7 +211,7 @@ static inline void generate_hvSliding_moves(const Board &board,
     const bitmap_t hit =
         inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
     bitmap_t possibleMoves =
-        ~WestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+        ~WestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup & checkmask;
     iterate_bits(target, possibleMoves) {
       // TODO add capture hint.
       // TODO add check hint.
@@ -230,7 +230,7 @@ static inline void generate_hvSliding_moves(const Board &board,
     const bitmap_t inPath = (aliesInPath >> ((bitmap_t)1)) | enemiesInPath;
     const bitmap_t hit = _blsi_u64(inPath);  // extract the lowest bit
     bitmap_t possibleMoves =
-        ~EastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+        ~EastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup & checkmask;
     iterate_bits(target, possibleMoves) {
       // TODO add capture hint
       receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
@@ -248,7 +248,7 @@ static inline void generate_hvSliding_moves(const Board &board,
     const bitmap_t inPath = (aliesInPath >> ((bitmap_t)8)) | enemiesInPath;
     const bitmap_t hit = _blsi_u64(inPath);  // extract the lowest bit
     bitmap_t possibleMoves =
-        ~NorthSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+        ~NorthSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup & checkmask;
     iterate_bits(target, possibleMoves) {
       // TODO add capture hint
       receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
@@ -267,7 +267,7 @@ static inline void generate_hvSliding_moves(const Board &board,
     const bitmap_t hit =
         inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
     bitmap_t possibleMoves =
-        ~SouthSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+        ~SouthSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup & checkmask;
     iterate_bits(target, possibleMoves) {
       // TODO add capture hint.
       receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
@@ -294,7 +294,8 @@ static inline void generate_dSliding_moves(const Board &board,
     const bitmap_t hit =
         inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
     bitmap_t possibleMoves =
-        ~SouthEastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+        ~SouthEastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup &
+        checkmask;
     iterate_bits(target, possibleMoves) {
       // TODO add capture hint.
       receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
@@ -314,7 +315,8 @@ static inline void generate_dSliding_moves(const Board &board,
     const bitmap_t hit =
         inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
     bitmap_t possibleMoves =
-        ~SouthWestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+        ~SouthWestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup &
+        checkmask;
     iterate_bits(target, possibleMoves) {
       // TODO add receiver callback.
       receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
@@ -333,7 +335,9 @@ static inline void generate_dSliding_moves(const Board &board,
     const bitmap_t inPath = (aliesInPath >> ((bitmap_t)7)) | enemiesInPath;
     const bitmap_t hit = _blsi_u64(inPath);  // extract the lowest bit
     bitmap_t possibleMoves =
-        ~NorthWestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+        ~NorthWestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup &
+        checkmask;
+    //std::cout << bitmap_to_bitboard_string(possibleMoves) << std::endl;
     iterate_bits(target, possibleMoves) {
       // TODO add capture hint.
       receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
@@ -352,7 +356,8 @@ static inline void generate_dSliding_moves(const Board &board,
     const bitmap_t inPath = (aliesInPath >> ((bitmap_t)9)) | enemiesInPath;
     const bitmap_t hit = _blsi_u64(inPath);  // extract the lowest bit
     bitmap_t possibleMoves =
-        ~NorthEastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup;
+        ~NorthEastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup &
+        checkmask;
     iterate_bits(target, possibleMoves) {
       // TODO add capture hint.
       receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
