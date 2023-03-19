@@ -13,7 +13,7 @@
 #include "test_utils.h"
 
 
-TEST(movegen_queen, white_queen_legal_up_left) {
+TEST(movegen_queen_checkmask, white_queen_legal_up_left) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/5K2/8/8/2b5/8/1k6/7Q w - - 0 1");
@@ -24,7 +24,7 @@ TEST(movegen_queen, white_queen_legal_up_left) {
   EXPECT_BITBOARD(receiver.queenTargets(), 34359738368, board);
 }
 
-TEST(movegen_queen, white_queen_legal_up_right) {
+TEST(movegen_queen_checkmask, white_queen_legal_up_right) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/2K5/8/8/8/6b1/4k3/Q7 w - - 0 1");
@@ -35,7 +35,7 @@ TEST(movegen_queen, white_queen_legal_up_right) {
   EXPECT_BITBOARD(receiver.queenTargets(), 68719476736, board);
 }
 
-TEST(movegen_queen, white_queen_legal_down_right) {
+TEST(movegen_queen_checkmask, white_queen_legal_down_right) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("Q7/5K2/8/8/8/1b6/4k3/8 w - - 0 1");
@@ -46,7 +46,7 @@ TEST(movegen_queen, white_queen_legal_down_right) {
   EXPECT_BITBOARD(receiver.queenTargets(), 34359738368, board);
 }
 
-TEST(movegen_queen, white_queen_legal_down_left) {
+TEST(movegen_queen_checkmask, white_queen_legal_down_left) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("7Q/8/1K6/8/6k1/8/5b2/8 w - - 0 1");
@@ -57,7 +57,7 @@ TEST(movegen_queen, white_queen_legal_down_left) {
   EXPECT_BITBOARD(receiver.queenTargets(), 134217728, board);
 }
 
-TEST(movegen_queen_banmask, white_queen_legal_up) {
+TEST(movegen_queen_checkmask, white_queen_legal_up) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("9/1K4r1/8/5k2/8/8/3Q4/8 w - - 0 1");
@@ -68,7 +68,7 @@ TEST(movegen_queen_banmask, white_queen_legal_up) {
   EXPECT_BITBOARD(receiver.queenTargets(), 2251799813685248, board);
 }
 
-TEST(movegen_queen_banmask, white_queen_legal_right) {
+TEST(movegen_queen_checkmask, white_queen_legal_right) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/6K1/8/1Q6/8/4k3/6r1/8 w - - 0 1");
@@ -79,7 +79,7 @@ TEST(movegen_queen_banmask, white_queen_legal_right) {
   EXPECT_BITBOARD(receiver.queenTargets(), 274877906944, board);
 }
 
-TEST(movegen_queen_banmask, white_queen_legal_down) {
+TEST(movegen_queen_checkmask, white_queen_legal_down) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/4Q3/8/8/2k5/8/1r4K1/8 w - - 0 1");
@@ -90,7 +90,7 @@ TEST(movegen_queen_banmask, white_queen_legal_down) {
   EXPECT_BITBOARD(receiver.queenTargets(), 4096, board);
 }
 
-TEST(movegen_queen_banmask, white_queen_legal_left) {
+TEST(movegen_queen_checkmask, white_queen_legal_left) {
   constexpr BoardState state =
       BoardState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/1r6/3k4/8/6Q1/8/1K6/8 w - - 0 1");
@@ -102,7 +102,7 @@ TEST(movegen_queen_banmask, white_queen_legal_left) {
 }
 
 
-TEST(movegen_queen, black_queen_legal_up_left) {
+TEST(movegen_queen_checkmask, black_queen_legal_up_left) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/5K2/8/8/2b5/8/1k6/7Q w - - 0 1")
@@ -114,7 +114,7 @@ TEST(movegen_queen, black_queen_legal_up_left) {
   EXPECT_BITBOARD(receiver.queenTargets(), 34359738368, board);
 }
 
-TEST(movegen_queen, black_queen_legal_up_right) {
+TEST(movegen_queen_checkmask, black_queen_legal_up_right) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/2K5/8/8/8/6b1/4k3/Q7 w - - 0 1")
@@ -126,7 +126,7 @@ TEST(movegen_queen, black_queen_legal_up_right) {
   EXPECT_BITBOARD(receiver.queenTargets(), 68719476736, board);
 }
 
-TEST(movegen_queen, black_queen_legal_down_right) {
+TEST(movegen_queen_checkmask, black_queen_legal_down_right) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("Q7/5K2/8/8/8/1b6/4k3/8 w - - 0 1")
@@ -138,7 +138,7 @@ TEST(movegen_queen, black_queen_legal_down_right) {
   EXPECT_BITBOARD(receiver.queenTargets(), 34359738368, board);
 }
 
-TEST(movegen_queen, black_queen_legal_down_left) {
+TEST(movegen_queen_checkmask, black_queen_legal_down_left) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("7Q/8/1K6/8/6k1/8/5b2/8 w - - 0 1")
@@ -150,7 +150,7 @@ TEST(movegen_queen, black_queen_legal_down_left) {
   EXPECT_BITBOARD(receiver.queenTargets(), 134217728, board);
 }
 
-TEST(movegen_queen_banmask, black_queen_legal_up) {
+TEST(movegen_queen_checkmask, black_queen_legal_up) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("9/1K4r1/8/5k2/8/8/3Q4/8 w - - 0 1")
@@ -162,7 +162,7 @@ TEST(movegen_queen_banmask, black_queen_legal_up) {
   EXPECT_BITBOARD(receiver.queenTargets(), 2251799813685248, board);
 }
 
-TEST(movegen_queen_banmask, black_queen_legal_right) {
+TEST(movegen_queen_checkmask, black_queen_legal_right) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/6K1/8/1Q6/8/4k3/6r1/8 w - - 0 1")
@@ -174,7 +174,7 @@ TEST(movegen_queen_banmask, black_queen_legal_right) {
   EXPECT_BITBOARD(receiver.queenTargets(), 274877906944, board);
 }
 
-TEST(movegen_queen_banmask, black_queen_legal_down) {
+TEST(movegen_queen_checkmask, black_queen_legal_down) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/4Q3/8/8/2k5/8/1r4K1/8 w - - 0 1")
@@ -186,7 +186,7 @@ TEST(movegen_queen_banmask, black_queen_legal_down) {
   EXPECT_BITBOARD(receiver.queenTargets(), 4096, board);
 }
 
-TEST(movegen_queen_banmask, black_queen_legal_left) {
+TEST(movegen_queen_checkmask, black_queen_legal_left) {
   constexpr BoardState state =
       BoardState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/1r6/3k4/8/6Q1/8/1K6/8 w - - 0 1")
