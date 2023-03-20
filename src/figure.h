@@ -37,3 +37,5 @@ struct figure_t {
 };
 
 std::ostream &operator<<(std::ostream &cout, const figure_t &figure);
+
+std::ostream &operator<<(std::ostream &cout, const figure_type &figure_type);

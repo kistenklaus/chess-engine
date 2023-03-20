@@ -1,11 +1,11 @@
 #include "fen.h"
 
-#include <assert.h>
+#include <cassert>
 
 #include <iostream>
 #include <string>
 
-Board fen::parse(const std::string FEN) {
+Board fen::parse(const std::string& FEN) {
   std::string split[6];
   int index = 0;
   for (const char c : FEN) {

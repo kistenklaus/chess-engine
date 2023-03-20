@@ -9,7 +9,6 @@
 #include "banmask.h"
 #include "banmask_generation.h"
 #include "bitmap.h"
-#include "build_config.h"
 #include "checkmask.h"
 #include "checkmask_generation.h"
 #include "lookup.h"
@@ -362,6 +361,340 @@ static inline void generate_dSliding_moves(const Board &board,
       // TODO add capture hint.
       receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
       // move_callback(move_t(board, dsliding, target));
+    }
+  }
+}
+
+/*
+ * This is slightly retarded it converts the
+ * runtime BoardState into a compiletime constant BoardState.
+ * To explain this fiasco further a compiletime constant BoardState
+ * is required for move generation because this way the amount of
+ * branching can be reduces greatly, but for usability a runtime BoardState
+ * is much more powerful because it allows for dynamic changes.
+ *
+ * It should however be noted, that this should not be used for minimax
+ * because it will to greatly impact the performance because this function
+ * call branches a fuck-ton.
+ */
+template <typename MoveReceiver>
+inline void generate_moves(const Board &board, const BoardState &state,
+                           MoveReceiver &receiver) {
+  if (state.turn()) {
+    if (state.hasEnPassant()) {
+      if (state.whiteHasLongCastle()) {
+        if (state.whiteHasShortCastle()) {      //
+          if (state.blackHasLongCastle()) {     //
+            if (state.blackHasShortCastle()) {  //
+              generate_moves<BoardState(true, true, true, true, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, true, true, true, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, true, true, true, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, true, true, true, false, false)>(
+                  board, receiver);
+            }
+          }
+        } else {
+          if (state.blackHasLongCastle()) {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, true, true, false, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, true, true, false, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, true, true, false, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, true, true, false, false, false)>(
+                  board, receiver);
+            }
+          }
+        }
+      } else {
+        if (state.whiteHasShortCastle()) {      //
+          if (state.blackHasLongCastle()) {     //
+            if (state.blackHasShortCastle()) {  //
+              generate_moves<BoardState(true, true, false, true, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, true, false, true, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, true, false, true, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, true, false, true, false, false)>(
+                  board, receiver);
+            }
+          }
+        } else {
+          if (state.blackHasLongCastle()) {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, true, false, false, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, true, false, false, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, true, false, false, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, true, false, false, false,
+                                        false)>(board, receiver);
+            }
+          }
+        }
+      }
+    } else {
+      if (state.whiteHasLongCastle()) {
+        if (state.whiteHasShortCastle()) {      //
+          if (state.blackHasLongCastle()) {     //
+            if (state.blackHasShortCastle()) {  //
+              generate_moves<BoardState(true, false, true, true, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, false, true, true, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, false, true, true, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, false, true, true, false, false)>(
+                  board, receiver);
+            }
+          }
+        } else {
+          if (state.blackHasLongCastle()) {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, false, true, false, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, false, true, false, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, false, true, false, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, false, true, false, false,
+                                        false)>(board, receiver);
+            }
+          }
+        }
+      } else {
+        if (state.whiteHasShortCastle()) {      //
+          if (state.blackHasLongCastle()) {     //
+            if (state.blackHasShortCastle()) {  //
+              generate_moves<BoardState(true, false, false, true, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, false, false, true, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, false, false, true, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, false, false, true, false,
+                                        false)>(board, receiver);
+            }
+          }
+        } else {
+          if (state.blackHasLongCastle()) {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, false, false, false, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(true, false, false, false, true,
+                                        false)>(board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(true, false, false, false, false,
+                                        true)>(board, receiver);
+            } else {
+              generate_moves<BoardState(true, false, false, false, false,
+                                        false)>(board, receiver);
+            }
+          }
+        }
+      }
+    }
+  } else {
+    if (state.hasEnPassant()) {
+      if (state.whiteHasLongCastle()) {
+        if (state.whiteHasShortCastle()) {      //
+          if (state.blackHasLongCastle()) {     //
+            if (state.blackHasShortCastle()) {  //
+              generate_moves<BoardState(false, true, true, true, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, true, true, true, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, true, true, true, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, true, true, true, false, false)>(
+                  board, receiver);
+            }
+          }
+        } else {
+          if (state.blackHasLongCastle()) {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, true, true, false, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, true, true, false, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, true, true, false, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, true, true, false, false,
+                                        false)>(board, receiver);
+            }
+          }
+        }
+      } else {
+        if (state.whiteHasShortCastle()) {      //
+          if (state.blackHasLongCastle()) {     //
+            if (state.blackHasShortCastle()) {  //
+              generate_moves<BoardState(false, true, false, true, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, true, false, true, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, true, false, true, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, true, false, true, false,
+                                        false)>(board, receiver);
+            }
+          }
+        } else {
+          if (state.blackHasLongCastle()) {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, true, false, false, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, true, false, false, true,
+                                        false)>(board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, true, false, false, false,
+                                        true)>(board, receiver);
+            } else {
+              generate_moves<BoardState(false, true, false, false, false,
+                                        false)>(board, receiver);
+            }
+          }
+        }
+      }
+    } else {
+      if (state.whiteHasLongCastle()) {
+        if (state.whiteHasShortCastle()) {      //
+          if (state.blackHasLongCastle()) {     //
+            if (state.blackHasShortCastle()) {  //
+              generate_moves<BoardState(false, false, true, true, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, false, true, true, true, false)>(
+                  board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, false, true, true, false, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, false, true, true, false,
+                                        false)>(board, receiver);
+            }
+          }
+        } else {
+          if (state.blackHasLongCastle()) {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, false, true, false, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, false, true, false, true,
+                                        false)>(board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, false, true, false, false,
+                                        true)>(board, receiver);
+            } else {
+              generate_moves<BoardState(false, false, true, false, false,
+                                        false)>(board, receiver);
+            }
+          }
+        }
+      } else {
+        if (state.whiteHasShortCastle()) {      //
+          if (state.blackHasLongCastle()) {     //
+            if (state.blackHasShortCastle()) {  //
+              generate_moves<BoardState(false, false, false, true, true, true)>(
+                  board, receiver);
+            } else {
+              generate_moves<BoardState(false, false, false, true, true,
+                                        false)>(board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, false, false, true, false,
+                                        true)>(board, receiver);
+            } else {
+              generate_moves<BoardState(false, false, false, true, false,
+                                        false)>(board, receiver);
+            }
+          }
+        } else {
+          if (state.blackHasLongCastle()) {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, false, false, false, true,
+                                        true)>(board, receiver);
+            } else {
+              generate_moves<BoardState(false, false, false, false, true,
+                                        false)>(board, receiver);
+            }
+          } else {
+            if (state.blackHasShortCastle()) {
+              generate_moves<BoardState(false, false, false, false, false,
+                                        true)>(board, receiver);
+            } else {
+              generate_moves<BoardState(false, false, false, false, false,
+                                        false)>(board, receiver);
+            }
+          }
+        }
+      }
     }
   }
 }

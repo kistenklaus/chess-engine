@@ -10,25 +10,14 @@ set(HEADERS
         "src/bitmap.h"
         "src/Board.h"
         "src/BoardState.h"
-        "src/build_config.h"
         "src/color.h"
         "src/display.h"
-        "src/EastSlidingLookUpTable.h"
         "src/fen.h"
         "src/figure.h"
-        "src/KingLookUpTable.h"
-        "src/KnightLookUpTable.h"
         "src/lookup.h"
         "src/move.h"
         "src/move_generation.h"
-        "src/NorthEastSlidingLookUpTable.h"
-        "src/NorthSlidingLookUpTable.h"
-        "src/NorthWestSlidingLookUpTable.h"
-        "src/SouthEastSlidingLookUpTable.h"
-        "src/SouthSlidingLookUpTable.h"
-        "src/SouthWestSlidingLookUpTable.h"
         "src/tile_index.h"
-        "src/WestSlidingLookUpTable.h"
         "src/x86utils.h"
         "src/checkmask_generation.h"
         "src/pinmask_generation.h"
@@ -36,35 +25,32 @@ set(HEADERS
         "src/pinmask.h"
         "src/checkmask.h"
         "src/banmask.h"
-        "src/BoardCompiletimeState.h"
-        "src/Movestack.h"
         "src/MoveCounter.h"
         "src/MoveBitmapAccumulator.h"
         "src/MoveAccumulator.h"
+        "src/PvPConsole.h"
         )
 
 set(SOURCES
         "src/bitmap.cpp"
         "src/Board.cpp"
         "src/display.cpp"
-        "src/EastSlidingLookUpTable.cpp"
         "src/fen.cpp"
         "src/figure.cpp"
-        "src/KingLookUpTable.cpp"
-        "src/KnightLookUpTable.cpp"
-        "src/NorthEastSlidingLookUpTable.cpp"
-        "src/NorthSlidingLookUpTable.cpp"
-        "src/NorthWestSlidingLookUpTable.cpp"
-        "src/SouthEastSlidingLookUpTable.cpp"
-        "src/SouthSlidingLookUpTable.cpp"
-        "src/SouthWestSlidingLookUpTable.cpp"
-        "src/WestSlidingLookUpTable.cpp"
+        "src/lookup.cpp"
+        "src/PvPConsole.cpp"
         )
 
-set(MAIN_SOURCE "src/main.cpp")
+set(MAIN_SOURCE "src/main.cpp" src/tile_index.cpp src/move.cpp)
 
 include_directories(src) #kinda sketchy but easier to code.
-add_compile_options(-march=native -g -Wall -O0 -std=c++20) #required for x86 instructions
+add_compile_options(
+        -march=native #required for x86 instructions
+        -Wall
+        -g
+        -O0
+        -std=c++20
+        )
 add_executable(${This} ${SOURCES} ${HEADERS} ${MAIN_SOURCE})
 
 
@@ -101,7 +87,21 @@ set(TEST_SOURCES
 set(TEST_HEADERS
         "test/MoveTestReceiver.h"
         "test/test_utils.h"
-        test/banmaskgen_pawn.cpp test/banmaskgen_king.cpp test/banmaskgen_knight.cpp test/banmaskgen_bishop.cpp test/banmaskgen_rook.cpp test/banmaskgen_queen.cpp test/movegen_king_banmask.cpp test/movegen_pawn_checkmask.cpp test/movegen_knight_checkmask.cpp test/movegen_bishop_checkmask.cpp test/movegen_rook_checkmask.cpp test/movegen_queen_checkmask.cpp test/movegen_knight_pinmask.cpp test/movegen_rook_pinmask.cpp test/movegen_bishop_pinmask.cpp)
+        test/banmaskgen_pawn.cpp
+        test/banmaskgen_king.cpp
+        test/banmaskgen_knight.cpp
+        test/banmaskgen_bishop.cpp
+        test/banmaskgen_rook.cpp
+        test/banmaskgen_queen.cpp
+        test/movegen_king_banmask.cpp
+        test/movegen_pawn_checkmask.cpp
+        test/movegen_knight_checkmask.cpp
+        test/movegen_bishop_checkmask.cpp
+        test/movegen_rook_checkmask.cpp
+        test/movegen_queen_checkmask.cpp
+        test/movegen_knight_pinmask.cpp
+        test/movegen_rook_pinmask.cpp
+        test/movegen_bishop_pinmask.cpp)
 
 
 add_executable(${This}.test
