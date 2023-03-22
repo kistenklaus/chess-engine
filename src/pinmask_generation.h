@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Board.h"
-#include "BoardState.h"
+#include "GameState.h"
 #include "banmask.h"
 #include "checkmask.h"
 #include "lookup.h"
@@ -80,7 +80,7 @@
  *
  *  NOTE: There can be upto 8 pins on one board.
  */
-template <class BoardState state>
+template <class GameState state>
 static inline pinmask_t generate_pinmask(const Board &board) {
   pinmask_t pinmask;
   // Calculate hv pinmask.

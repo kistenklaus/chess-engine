@@ -12,8 +12,8 @@
 #include "banmask_generation.h"
 
 TEST(banmaskgen_king, black_king_center) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/8/4K3/8/8/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -21,8 +21,8 @@ TEST(banmaskgen_king, black_king_center) {
 }
 
 TEST(banmaskgen_king, black_king_right) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/8/7K/8/8/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -30,8 +30,8 @@ TEST(banmaskgen_king, black_king_right) {
 }
 
 TEST(banmaskgen_king, black_king_bottom) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/8/8/8/8/4K3 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -39,8 +39,8 @@ TEST(banmaskgen_king, black_king_bottom) {
 }
 
 TEST(banmaskgen_king, black_king_left) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/K7/8/8/8/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -48,8 +48,8 @@ TEST(banmaskgen_king, black_king_left) {
 }
 
 TEST(banmaskgen_king, black_king_up) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3K4/8/8/7k/8/8/8/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);

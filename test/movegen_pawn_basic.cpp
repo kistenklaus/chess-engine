@@ -12,8 +12,8 @@
 #include "test_utils.h"
 
 TEST(movegen_pawn_basic, white_pawn_push) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/8/8/8/3P4/8/8/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -23,8 +23,8 @@ TEST(movegen_pawn_basic, white_pawn_push) {
 }
 
 TEST(movegen_pawn_basic, white_pawn_double_push) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/8/8/8/8/8/3P4/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -34,8 +34,8 @@ TEST(movegen_pawn_basic, white_pawn_double_push) {
 }
 
 TEST(movegen_pawn_basic, white_pawn_attack_left) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/8/8/8/8/2r5/3P4/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -45,8 +45,8 @@ TEST(movegen_pawn_basic, white_pawn_attack_left) {
 }
 
 TEST(movegen_pawn_basic, white_pawn_attack_right) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/8/8/8/8/4r3/3P4/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -56,8 +56,8 @@ TEST(movegen_pawn_basic, white_pawn_attack_right) {
 }
 
 TEST(movegen_pawn_basic, white_pawn_blocked_push) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/8/8/8/8/3r4/3P4/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -67,8 +67,8 @@ TEST(movegen_pawn_basic, white_pawn_blocked_push) {
 }
 
 TEST(movegen_pawn_basic, white_pawn_blocked_double_push) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/8/8/8/3r4/8/3P4/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -78,8 +78,8 @@ TEST(movegen_pawn_basic, white_pawn_blocked_double_push) {
 }
 
 TEST(movegen_pawn_basic, black_pawn_push) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/8/3p4/8/8/8/8/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -89,8 +89,8 @@ TEST(movegen_pawn_basic, black_pawn_push) {
 }
 
 TEST(movegen_pawn_basic, black_pawn_double_push) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/3p4/8/8/8/8/8/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -100,8 +100,8 @@ TEST(movegen_pawn_basic, black_pawn_double_push) {
 }
 
 TEST(movegen_pawn_basic, black_pawn_attack_left) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/3p4/2R5/8/8/8/8/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -111,8 +111,8 @@ TEST(movegen_pawn_basic, black_pawn_attack_left) {
 }
 
 TEST(movegen_pawn_basic, black_pawn_attack_right) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/3p4/4R3/8/8/8/8/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -122,8 +122,8 @@ TEST(movegen_pawn_basic, black_pawn_attack_right) {
 }
 
 TEST(movegen_pawn_basic, black_pawn_blocked_push) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/3p4/3R4/8/8/8/8/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -133,8 +133,8 @@ TEST(movegen_pawn_basic, black_pawn_blocked_push) {
 }
 
 TEST(movegen_pawn_basic, black_pawn_blocked_double_push) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7k/3p4/8/3R4/8/8/8/K7 w - - 0 1");
   generate_moves<state>(board, receiver);

@@ -1,34 +1,21 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 
 #include "Board.h"
+#include "RuntimeMoveCollector.h"
+#include "algebraic_notation.h"
 #include "display.h"
 #include "fen.h"
 #include "move.h"
 #include "move_generation.h"
 
-class PvPConsoleMoveReceiver {
- public:
-  template <figure_type figure>
-  void move(bitmap_t origin, bitmap_t target, move_flag flag) {
-    m_moves.emplace_back(origin, target, figure, flag);
-  }
-  [[nodiscard]] const std::vector<runtime_move>& moves() const {
-    return m_moves;
-  }
-  void reset(){
-    m_moves.clear();
-  }
- private:
-  std::vector<runtime_move> m_moves;
-};
-
 class PvPConsole {
  public:
   explicit PvPConsole(const std::string& FEN)
-      : m_board(fen::parse(FEN)), m_state(BoardState::Default()) {}
+      : m_board(fen::parse(FEN)), m_state(GameState::Default()) {}
 
   void focus() {
     m_running = true;
@@ -45,14 +32,16 @@ class PvPConsole {
 
   void printState() {
     print_display(m_board);
-    m_receiver.reset();
-    generate_moves(m_board, m_state, m_receiver);
+    m_moveCollector.reset();
+    generate_moves(m_board, m_state, m_moveCollector);
     int n = 1;
-    for(const runtime_move& move : m_receiver.moves()){
-      if(n % 4 == 1)std::cout << "[";
-      std::cout << move;
-      if(n % 4 == 0)std::cout << "]" << std::endl;
-      else std::cout << ", ";
+    for (const runtime_move& move : m_moveCollector.moves()) {
+      if (n % 10 == 1) std::cout << "[";
+      std::cout << toAlgebraicNotation(m_board, m_state, move);
+      if (n % 10 == 0)
+        std::cout << "]" << std::endl;
+      else
+        std::cout << ", ";
       n++;
     }
     std::cout << std::endl;
@@ -61,11 +50,21 @@ class PvPConsole {
   void processInput() {
     std::string in;
     std::cin >> in;
+    // trim input.
+    in.erase(in.find_last_not_of(' ') + 1);
+    in.erase(0, in.find_first_not_of(' '));
+    try {
+      runtime_move move = parseAlgebraicNotation(m_board, m_state, in);
+      //apply move.
+      m_board = m_board.applyMove(m_state, move);
+    } catch (std::invalid_argument& err) {
+      std::cout << "Not a valid move! try again" << std::endl;
+    }
   }
 
  private:
   Board m_board;
-  BoardState m_state;
-  PvPConsoleMoveReceiver m_receiver;
+  GameState m_state;
+  RuntimeMoveCollector m_moveCollector;
   bool m_running = false;
 };

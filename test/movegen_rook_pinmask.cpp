@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "Board.h"
-#include "BoardState.h"
+#include "GameState.h"
 #include "MoveTestReceiver.h"
 #include "bitmap.h"
 #include "fen.h"
@@ -14,8 +14,8 @@
 
 
 TEST(movegen_rook_pinmask, white_rook_pinned_diagonally) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/1k6/6K1/8/4R3/8/2b5/8 w - - 0 1");
   MoveTestReceiver receiver;
   generate_moves<state>(board, receiver);
@@ -25,8 +25,8 @@ TEST(movegen_rook_pinmask, white_rook_pinned_diagonally) {
 }
 
 TEST(movegen_rook_pinmask, black_rook_pinned_diagonally) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/1k6/6K1/8/4R3/8/2b5/8 w - - 0 1")
                           .invertBoard();
   MoveTestReceiver receiver;

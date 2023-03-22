@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "Board.h"
-#include "BoardState.h"
+#include "GameState.h"
 #include "MoveTestReceiver.h"
 #include "bitmap.h"
 #include "fen.h"
@@ -13,8 +13,8 @@
 #include "test_utils.h"
 
 TEST(movegen_knight_checkmask, white_knight) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("7K/1k6/5n2/8/8/8/6B1/8 w - - 0 1")
                           .invertBoard();
   MoveTestReceiver receiver;
@@ -25,8 +25,8 @@ TEST(movegen_knight_checkmask, white_knight) {
 }
 
 TEST(movegen_knight_checkmask, black_knight) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("7K/1k6/5n2/8/8/8/6B1/8 w - - 0 1");
   MoveTestReceiver receiver;
   generate_moves<state>(board, receiver);

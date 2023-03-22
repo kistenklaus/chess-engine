@@ -1,6 +1,6 @@
 #pragma once
 #include "Board.h"
-#include "BoardState.h"
+#include "GameState.h"
 #include "banmask.h"
 #include "checkmask.h"
 #include "lookup.h"
@@ -39,7 +39,7 @@
  *          (inclusive) to the king (exclusive) is added to the checkmask.
  *  NOTE: There can only be two check per move.
  */
-template <class BoardState state>
+template <class GameState state>
 inline checkmask_t generate_checkmask(const Board &board) {
   checkmask_t checkmask = 0;
   // pawn checkmask

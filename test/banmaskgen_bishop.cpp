@@ -12,8 +12,8 @@
 #include "banmask_generation.h"
 
 TEST(banmaskgen_bishop, white_bishop_no_blocker) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board =
       fen::parse("4K3/8/8/7k/3b4/8/8/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -21,8 +21,8 @@ TEST(banmaskgen_bishop, white_bishop_no_blocker) {
 }
 
 TEST(banmaskgen_bishop, white_bishop_one_friendly_blocker) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board =
       fen::parse("4K3/8/1P3P2/7k/3b4/8/1P3P2/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -30,8 +30,8 @@ TEST(banmaskgen_bishop, white_bishop_one_friendly_blocker) {
 }
 
 TEST(banmaskgen_bishop, white_bishop_one_enemy_blocker) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board =
       fen::parse("4K3/8/1r3r2/7k/3b4/8/1r3r2/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -39,8 +39,8 @@ TEST(banmaskgen_bishop, white_bishop_one_enemy_blocker) {
 }
 
 TEST(banmaskgen_bishop, black_bishop_no_blocker) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("4K3/8/8/7k/3b4/8/8/8 w - - 0 1").invertBoard();
   const banmask_t banmask = generate_banmask<state>(board);
@@ -48,8 +48,8 @@ TEST(banmaskgen_bishop, black_bishop_no_blocker) {
 }
 
 TEST(banmaskgen_bishop, black_bishop_one_friendly_blocker) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("4K3/8/1P3P2/7k/3b4/8/1P3P2/8 w - - 0 1").invertBoard();
   const banmask_t banmask = generate_banmask<state>(board);
@@ -57,8 +57,8 @@ TEST(banmaskgen_bishop, black_bishop_one_friendly_blocker) {
 }
 
 TEST(banmaskgen_bishop, black_bishop_one_enemy_blocker) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("4K3/8/1r3r2/7k/3b4/8/1r3r2/8 w - - 0 1").invertBoard();
   const banmask_t banmask = generate_banmask<state>(board);

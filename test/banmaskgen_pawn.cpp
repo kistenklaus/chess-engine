@@ -12,8 +12,8 @@
 #include "banmask_generation.h"
 
 TEST(banmaskgen_pawn, white_pawns_center) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/3p4/8/8/8/3K4 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -21,8 +21,8 @@ TEST(banmaskgen_pawn, white_pawns_center) {
 }
 
 TEST(banmaskgen_pawn, white_pawns_center_occupied) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/3p4/2P1p3/8/8/3K4 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -30,8 +30,8 @@ TEST(banmaskgen_pawn, white_pawns_center_occupied) {
 }
 
 TEST(banmaskgen_pawn, white_pawns_center_blocked) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/3p4/3P4/8/8/3K4 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -39,8 +39,8 @@ TEST(banmaskgen_pawn, white_pawns_center_blocked) {
 }
 
 TEST(banmaskgen_pawn, black_pawns_center) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/8/3P4/8/8/3K4 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -48,8 +48,8 @@ TEST(banmaskgen_pawn, black_pawns_center) {
 }
 
 TEST(banmaskgen_pawn, black_pawns_center_occupied) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/2p1p3/3P4/8/8/3K4 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -57,8 +57,8 @@ TEST(banmaskgen_pawn, black_pawns_center_occupied) {
 }
 
 TEST(banmaskgen_pawn, black_pawns_center_blocked) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3k4/8/8/3p4/3P4/8/8/3K4 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);

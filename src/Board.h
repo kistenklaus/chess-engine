@@ -1,9 +1,10 @@
 #pragma once
+#include <cassert>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 
-#include "BoardState.h"
+#include "GameState.h"
 #include "bitmap.h"
 #include "cinttypes"
 #include "figure.h"
@@ -21,21 +22,21 @@ class Board {
   const static bitmap_t File1 = File2 >> 1;
 
  private:
-  const bitmap_t b_occ;
-  const bitmap_t w_occ;
-  const bitmap_t occ;
-  const bitmap_t b_pawns;
-  const bitmap_t w_pawns;
-  const bitmap_t b_bishops;
-  const bitmap_t w_bishops;
-  const bitmap_t b_knights;
-  const bitmap_t w_knights;
-  const bitmap_t b_rooks;
-  const bitmap_t w_rooks;
-  const bitmap_t w_king;
-  const bitmap_t b_king;
-  const bitmap_t w_queen;
-  const bitmap_t b_queen;
+  bitmap_t b_occ;
+  bitmap_t w_occ;
+  bitmap_t occ;
+  bitmap_t b_pawns;
+  bitmap_t w_pawns;
+  bitmap_t b_bishops;
+  bitmap_t w_bishops;
+  bitmap_t b_knights;
+  bitmap_t w_knights;
+  bitmap_t b_rooks;
+  bitmap_t w_rooks;
+  bitmap_t w_king;
+  bitmap_t b_king;
+  bitmap_t w_queen;
+  bitmap_t b_queen;
 
  public:
   explicit Board(bitmap_t b_pawns, bitmap_t w_pawns, bitmap_t b_bishops,
@@ -203,9 +204,279 @@ class Board {
                  w_rooks, b_rooks, w_queen, b_queen, w_king, b_king);
   }
 
-  // this is not to most efficient method. SHOULD AVOIDED IN MOVEGEN.
+  // this is not to most efficient method. SHOULD BE AVOIDED IN MOVE-GEN.
   [[nodiscard]] figure_t get_figure_at(uint8_t tile_index) const;
   [[nodiscard]] figure_t get_figure_at(uint8_t row, uint8_t column) const;
+
+  template <GameState state, figure_type figure>
+  Board applyMove(const compiletime_move<figure>& move) {
+    if constexpr (figure == PAWN) {
+      return applyPawnMove<state>(move);
+    } else if constexpr (figure == BISHOP){
+      return applyBishopMove<state>(move);
+    }else if constexpr (figure == KNIGHT){
+      return applyKnightMove<state>(move);
+    }else if constexpr (figure == ROOK){
+      return applyRookMove<state>(move);
+    }else if constexpr (figure == QUEEN){
+      return applyQueenMove<state>(move);
+    }else if constexpr (figure == KING){
+      return applyKingMove<state>(move);
+    }else {
+      throw std::runtime_error("failed to execute move");
+    }
+  }
+
+  template <GameState state>
+  [[nodiscard]] Board applyPawnMove(const compiletime_move<PAWN> move) const {
+    if constexpr (state.isWhitesTurn()) {
+      return applyPawnMoveWhite(move.m_origin, move.m_target);
+    } else {
+      return applyPawnMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  template <GameState state>
+  [[nodiscard]] Board applyBishopMove(
+      const compiletime_move<BISHOP> move) const {
+    if constexpr (state.isWhitesTurn()) {
+      return applyBishopMoveWhite(move.m_origin, move.m_target);
+    } else {
+      return applyBishopMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  template<GameState state>
+  [[nodiscard]] Board applyKnightMove(const compiletime_move<KNIGHT> move)
+      const {
+    if constexpr (state.isWhitesTurn()){
+      return applyKnightMoveWhite(move.m_origin, move.m_target);
+    }else{
+      return applyKnightMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  template<GameState state>
+  [[nodiscard]] Board applyRookMove(const compiletime_move<ROOK> move) const {
+    if constexpr (state.isWhitesTurn()){
+      return applyRookMoveWhite(move.m_origin, move.m_target);
+    }else{
+      return applyRookMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  template<GameState state>
+  [[nodiscard]] Board applyQueenMove(const compiletime_move<QUEEN> move) const{
+    if constexpr (state.isWhitesTurn()){
+      return applyQueenMoveWhite(move.m_origin, move.m_target);
+    }else{
+      return applyQueenMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  template<GameState state>
+  [[nodiscard]] Board applyKingMove(const compiletime_move<KING> move) const {
+    if constexpr (state.isWhitesTurn()){
+      return applyKingMoveWhite(move.m_origin, move.m_target);
+    }else{
+      return applyKingMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  [[nodiscard]] Board applyMove(const GameState& state,
+                                const runtime_move& move) {
+    switch (move.m_figure) {
+      case PAWN:
+        return applyPawnMove(state, move);
+      case BISHOP:
+        return applyBishopMove(state, move);
+      case KNIGHT:
+        return applyKnightMove(state, move);
+      case ROOK:
+        return applyRookMove(state, move);
+      case QUEEN:
+        return applyQueenMove(state, move);
+      case KING:
+        return applyKingMove(state, move);
+      default:
+        throw std::runtime_error("failed to execute the move");
+    }
+  }
+
+  template <GameState state>
+  [[nodiscard]] Board applyPawnMove(const compiletime_move<PAWN>& move) {
+    bitmap_t mask = ~move.m_target;
+    if constexpr (state.isWhitesTurn()) {
+      return applyPawnMoveWhite(move.m_origin, move.m_target);
+    } else {
+      return applyPawnMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  [[nodiscard]] Board applyPawnMove(const GameState& state,
+                                    const runtime_move& move) {
+    assert(move.m_figure == PAWN);
+    if (state.isWhitesTurn()) {
+      return applyPawnMoveWhite(move.m_origin, move.m_target);
+    } else {
+      return applyPawnMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  [[nodiscard]] Board applyBishopMove(const GameState& state,
+                                      const runtime_move& move) {
+    assert(move.m_figure == BISHOP);
+    if (state.isWhitesTurn()) {
+      return applyBishopMoveWhite(move.m_origin, move.m_target);
+    } else {
+      return applyBishopMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  [[nodiscard]] Board applyKnightMove(const GameState& state,
+                                      const runtime_move& move) const {
+    assert(move.m_figure == KNIGHT);
+    if (state.isWhitesTurn()) {
+      return applyKnightMoveWhite(move.m_origin, move.m_target);
+    } else {
+      return applyKnightMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  [[nodiscard]] Board applyRookMove(const GameState& state,
+                                    const runtime_move& move) const {
+    if (state.isWhitesTurn()) {
+      return applyRookMoveWhite(move.m_origin, move.m_target);
+    } else {
+      return applyRookMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  [[nodiscard]] Board applyQueenMove(const GameState& state,
+                                     const runtime_move& move) const {
+    if (state.isWhitesTurn()) {
+      return applyQueenMoveWhite(move.m_origin, move.m_target);
+    } else {
+      return applyQueenMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+  [[nodiscard]] Board applyKingMove(const GameState& state,
+                                    const runtime_move& move) const {
+    if (state.isWhitesTurn()) {
+      return applyKingMoveWhite(move.m_origin, move.m_target);
+    } else {
+      return applyKingMoveBlack(move.m_origin, move.m_target);
+    }
+  }
+
+ private:
+  [[nodiscard]] inline Board applyPawnMoveWhite(bitmap_t origin,
+                                                bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns & mask, (w_pawns & (~origin)) | target,
+                 b_bishops & mask, w_bishops, b_knights & mask, w_knights,
+                 b_rooks & mask, w_rooks, b_queen & mask, w_queen,
+                 b_king & mask, w_king);
+  }
+
+  [[nodiscard]] inline Board applyPawnMoveBlack(bitmap_t origin,
+                                                bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board((b_pawns & (~origin)) | target, w_pawns & mask, b_bishops,
+                 w_bishops & mask, b_knights, w_knights & mask, b_rooks,
+                 w_rooks & mask, b_queen, w_queen & mask, b_king,
+                 w_king & mask);
+  }
+
+  [[nodiscard]] inline Board applyBishopMoveWhite(bitmap_t origin,
+                                                  bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns & mask, w_pawns, b_bishops & mask,
+                 (w_bishops & (~origin)) | target, b_knights & mask, w_knights,
+                 b_rooks & mask, w_rooks, b_queen & mask, w_queen,
+                 b_king & mask, w_king);
+  }
+
+  [[nodiscard]] inline Board applyBishopMoveBlack(bitmap_t origin,
+                                                  bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns, w_pawns & mask, (b_bishops & (~origin)) | target,
+                 w_bishops & mask, b_knights, w_knights & mask, b_rooks,
+                 w_rooks & mask, b_queen, w_queen & mask, b_king,
+                 w_king & mask);
+  }
+
+  [[nodiscard]] inline Board applyKnightMoveWhite(bitmap_t origin,
+                                                  bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns & mask, w_pawns, b_bishops & mask,
+                 (w_bishops & ~origin) | target, b_knights & mask, w_knights,
+                 b_rooks & mask, w_rooks, b_queen & mask, w_queen,
+                 b_king & mask, w_king);
+  }
+
+  [[nodiscard]] inline Board applyKnightMoveBlack(bitmap_t origin,
+                                                  bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns, w_pawns & mask, b_bishops, w_bishops & mask,
+                 (b_knights & ~origin) | target, w_knights & mask, b_rooks,
+                 w_rooks & mask, b_queen, w_queen & mask, b_king,
+                 w_king & mask);
+  }
+
+  [[nodiscard]] inline Board applyRookMoveWhite(bitmap_t origin,
+                                                bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns & mask, w_pawns, b_bishops & mask, w_bishops,
+                 b_knights & mask, w_knights, b_rooks & mask,
+                 (w_rooks & ~origin) | target, b_queen & mask, w_queen,
+                 b_king & mask, w_king);
+  }
+
+  [[nodiscard]] inline Board applyRookMoveBlack(bitmap_t origin,
+                                                bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns, w_pawns & mask, b_bishops, w_bishops & mask,
+                 b_knights, w_knights & mask, (b_rooks & ~origin) | target,
+                 w_rooks & mask, b_queen, w_queen & mask, b_king,
+                 w_king & mask);
+  }
+
+  [[nodiscard]] inline Board applyQueenMoveWhite(bitmap_t origin,
+                                                 bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns & mask, w_pawns, b_bishops & mask, w_bishops,
+                 b_knights & mask, w_knights, b_rooks & mask, w_rooks,
+                 b_queen & mask, (w_queen & ~origin) | target, b_king & mask,
+                 w_king);
+  }
+
+  [[nodiscard]] inline Board applyQueenMoveBlack(bitmap_t origin,
+                                                 bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns, w_pawns & mask, b_bishops, w_bishops & mask,
+                 b_knights, w_knights & mask, b_rooks, w_rooks & mask,
+                 (b_queen & ~origin) | target, w_queen & mask, b_king,
+                 w_king & mask);
+  }
+
+  [[nodiscard]] inline Board applyKingMoveWhite(bitmap_t origin,
+                                                bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns & mask, w_pawns, b_bishops & mask, w_bishops,
+                 b_knights & mask, w_knights, b_rooks & mask, w_rooks,
+                 b_queen & mask, w_queen, b_king & mask,
+                 (w_king & ~origin) | target);
+  }
+
+  [[nodiscard]] inline Board applyKingMoveBlack(bitmap_t origin,
+                                                bitmap_t target) const {
+    bitmap_t mask = ~target;
+    return Board(b_pawns, w_pawns & mask, b_bishops, w_bishops & mask,
+                 b_knights, w_knights & mask, b_rooks, w_rooks & mask, b_queen,
+                 w_queen & mask, (b_king & ~origin) | target, w_king & mask);
+  }
 };
 
 std::ostream& operator<<(std::ostream& cout, const Board& board);

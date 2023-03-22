@@ -13,8 +13,8 @@
 
 TEST(movegen_knight_basic, white_knight_center) {
   const Board board1 = fen::parse("7k/8/8/3N4/8/8/8/K7 w - - 0 1");
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   generate_moves<state>(board1, receiver);
   EXPECT_EQ(receiver.knightMoveCount(), 8);
@@ -25,8 +25,8 @@ TEST(movegen_knight_basic, white_knight_center) {
 TEST(movegen_knight_basic, black_knight_center) {
   const Board board1 =
       fen::parse("7k/8/8/3N4/8/8/8/K7 w - - 0 1").invertBoard();
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   generate_moves<state>(board1, receiver);
   EXPECT_EQ(receiver.knightMoveCount(), 8);
@@ -35,8 +35,8 @@ TEST(movegen_knight_basic, black_knight_center) {
 }
 
 TEST(movegen_knight_basic, white_knight_bottom_right) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board1 = fen::parse("7k/8/8/8/8/8/8/K6N w - - 0 1");
   generate_moves<state>(board1, receiver);
@@ -46,8 +46,8 @@ TEST(movegen_knight_basic, white_knight_bottom_right) {
 }
 
 TEST(movegen_knight_basic, black_knight_bottom_right) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board1 = fen::parse("7k/8/8/8/8/8/8/K6N w - - 0 1").invertBoard();
   generate_moves<state>(board1, receiver);
@@ -57,8 +57,8 @@ TEST(movegen_knight_basic, black_knight_bottom_right) {
 }
 
 TEST(movegen_knight_basic, white_knight_top_right) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board2 = fen::parse("k6N/8/8/8/8/8/8/K7 w - - 0 1");
   generate_moves<state>(board2, receiver);
@@ -68,8 +68,8 @@ TEST(movegen_knight_basic, white_knight_top_right) {
 }
 
 TEST(movegen_knight_basic, black_knight_top_right) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board2 = fen::parse("k6N/8/8/8/8/8/8/K7 w - - 0 1").invertBoard();
   generate_moves<state>(board2, receiver);
@@ -79,8 +79,8 @@ TEST(movegen_knight_basic, black_knight_top_right) {
 }
 
 TEST(movegen_knight_basic, white_knight_top_left) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board3 = fen::parse("N7/8/8/8/8/8/8/K6k w - - 0 1");
   generate_moves<state>(board3, receiver);
@@ -90,8 +90,8 @@ TEST(movegen_knight_basic, white_knight_top_left) {
 }
 
 TEST(movegen_knight_basic, black_knight_top_left) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board3 = fen::parse("N7/8/8/8/8/8/8/K6k w - - 0 1").invertBoard();
   generate_moves<state>(board3, receiver);
@@ -101,8 +101,8 @@ TEST(movegen_knight_basic, black_knight_top_left) {
 }
 
 TEST(movegen_knight_basic, white_knight_bottom_left) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board4 = fen::parse("7K/8/8/8/8/8/8/N6k w - - 0 1");
   generate_moves<state>(board4, receiver);
@@ -112,8 +112,8 @@ TEST(movegen_knight_basic, white_knight_bottom_left) {
 }
 
 TEST(movegen_knight_basic, black_knight_bottom_left) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board4 = fen::parse("7K/8/8/8/8/8/8/N6k w - - 0 1").invertBoard();
   generate_moves<state>(board4, receiver);

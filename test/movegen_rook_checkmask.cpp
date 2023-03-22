@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "Board.h"
-#include "BoardState.h"
+#include "GameState.h"
 #include "MoveTestReceiver.h"
 #include "bitmap.h"
 #include "fen.h"
@@ -13,8 +13,8 @@
 #include "test_utils.h"
 
 TEST(movegen_rook_checkmask, white_rook_legal_up) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/1K4r1/8/5k2/8/8/3R4/8 w - - 0 1");
   MoveTestReceiver receiver;
   generate_moves<state>(board, receiver);
@@ -24,8 +24,8 @@ TEST(movegen_rook_checkmask, white_rook_legal_up) {
 }
 
 TEST(movegen_rook_checkmask, white_rook_legal_right) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/6K1/8/1R6/8/4k3/6r1/8 w - - 0 1");
   MoveTestReceiver receiver;
   generate_moves<state>(board, receiver);
@@ -35,8 +35,8 @@ TEST(movegen_rook_checkmask, white_rook_legal_right) {
 }
 
 TEST(movegen_rook_checkmask, white_rook_legal_down) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/4R3/8/8/2k5/8/1r4K1/8 w - - 0 1");
   MoveTestReceiver receiver;
   generate_moves<state>(board, receiver);
@@ -46,8 +46,8 @@ TEST(movegen_rook_checkmask, white_rook_legal_down) {
 }
 
 TEST(movegen_rook_checkmask, white_rook_legal_left) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/1r6/3k4/8/6R1/8/1K6/8 w - - 0 1");
   MoveTestReceiver receiver;
   generate_moves<state>(board, receiver);
@@ -57,8 +57,8 @@ TEST(movegen_rook_checkmask, white_rook_legal_left) {
 }
 
 TEST(movegen_rook_checkmask, black_rook_legal_up) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/1K4r1/8/5k2/8/8/3R4/8 w - - 0 1")
                           .invertBoard();
   MoveTestReceiver receiver;
@@ -69,8 +69,8 @@ TEST(movegen_rook_checkmask, black_rook_legal_up) {
 }
 
 TEST(movegen_rook_checkmask, black_rook_legal_right) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/6K1/8/1R6/8/4k3/6r1/8 w - - 0 1")
                           .invertBoard();
   MoveTestReceiver receiver;
@@ -81,8 +81,8 @@ TEST(movegen_rook_checkmask, black_rook_legal_right) {
 }
 
 TEST(movegen_rook_checkmask, black_rook_legal_down) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/4R3/8/8/2k5/8/1r4K1/8 w - - 0 1")
                           .invertBoard();
   MoveTestReceiver receiver;
@@ -93,8 +93,8 @@ TEST(movegen_rook_checkmask, black_rook_legal_down) {
 }
 
 TEST(movegen_rook_checkmask, black_rook_legal_left) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board = fen::parse("8/1r6/3k4/8/6R1/8/1K6/8 w - - 0 1")
                           .invertBoard();
   MoveTestReceiver receiver;

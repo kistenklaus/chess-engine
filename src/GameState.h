@@ -3,7 +3,7 @@
 #include "figure.h"
 #include "move.h"
 
-class BoardState {
+class GameState {
  public:
   const color_t m_turn;
   const bool m_has_ep_pawn;
@@ -12,7 +12,7 @@ class BoardState {
   const bool m_black_has_long_castle;
   const bool m_black_has_short_castle;
 
-  constexpr BoardState(color_t white_move, bool has_ep_pawn,
+  constexpr GameState(color_t white_move, bool has_ep_pawn,
                        bool white_has_long_castle, bool white_has_short_castle,
                        bool black_has_long_castle, bool black_has_short_castle)
       : m_turn(white_move),
@@ -22,7 +22,7 @@ class BoardState {
         m_black_has_long_castle(black_has_long_castle),
         m_black_has_short_castle(black_has_short_castle) {}
 
-  static constexpr BoardState Default() {
+  static constexpr GameState Default() {
     return {WHITE, false, true, true, true, true};
   }
 

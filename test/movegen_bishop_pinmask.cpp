@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "Board.h"
-#include "BoardState.h"
+#include "GameState.h"
 #include "MoveTestReceiver.h"
 #include "bitmap.h"
 #include "fen.h"
@@ -14,8 +14,8 @@
 
 
 TEST(movegen_bishop_pinmask, white_bishop_pinned_axial) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/8/k7/8/2r1B1K1/8/8/8 w - - 0 1");
   MoveTestReceiver receiver;
   generate_moves<state>(board, receiver);

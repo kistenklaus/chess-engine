@@ -1,13 +1,14 @@
 #pragma once
-#include "cinttypes"
+#include <cinttypes>
+#include <iostream>
+#include <memory>
+
 #include "color.h"
-#include "iostream"
-#include "memory"
 
 #define FIGURE_T_TYPE_MASK (0b111)
 #define FIGURE_T_COLOR_MASK (1 << 7)
 
-enum figure_type : uint8_t{
+enum figure_type : uint8_t {
   NOT_A_FIGURE = 0,
   PAWN = 1,
   BISHOP = 2,

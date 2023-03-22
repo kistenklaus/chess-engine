@@ -12,8 +12,8 @@
 #include "test_utils.h"
 
 TEST(movegen_rook_basic, white_rook_no_blocker_center) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board1 = fen::parse("7K/8/8/3R4/8/8/8/7k w - - 0 1");
   generate_moves<state>(board1, receiver);
@@ -23,8 +23,8 @@ TEST(movegen_rook_basic, white_rook_no_blocker_center) {
 }
 
 TEST(movegen_rook_basic, black_rook_no_blocker_center) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board1 =
       fen::parse("7K/8/8/3R4/8/8/8/7k w - - 0 1").invertBoard();
@@ -35,8 +35,8 @@ TEST(movegen_rook_basic, black_rook_no_blocker_center) {
 }
 
 TEST(movegen_rook_basic, white_rook_no_blocker_left_border) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7K/8/8/R7/8/8/8/7k w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -46,8 +46,8 @@ TEST(movegen_rook_basic, white_rook_no_blocker_left_border) {
 }
 
 TEST(movegen_rook_basic, black_rook_no_blocker_left_border) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("7K/8/8/R7/8/8/8/7k w - - 0 1").invertBoard();
   generate_moves<state>(board, receiver);
@@ -57,8 +57,8 @@ TEST(movegen_rook_basic, black_rook_no_blocker_left_border) {
 }
 
 TEST(movegen_rook_basic, white_rook_no_blocker_top_border) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("3R4/8/8/8/8/8/8/K6k w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -68,8 +68,8 @@ TEST(movegen_rook_basic, white_rook_no_blocker_top_border) {
 }
 
 TEST(movegen_rook_basic, black_rook_no_blocker_top_border) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("3R4/8/8/8/8/8/8/K6k w - - 0 1").invertBoard();
   generate_moves<state>(board, receiver);
@@ -79,8 +79,8 @@ TEST(movegen_rook_basic, black_rook_no_blocker_top_border) {
 }
 
 TEST(movegen_rook_basic, white_rook_no_blocker_right_border) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("k7/8/8/7R/8/8/8/K7 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -90,8 +90,8 @@ TEST(movegen_rook_basic, white_rook_no_blocker_right_border) {
 }
 
 TEST(movegen_rook_basic, black_rook_no_blocker_right_border) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("k7/8/8/7R/8/8/8/K7 w - - 0 1").invertBoard();
   generate_moves<state>(board, receiver);
@@ -101,8 +101,8 @@ TEST(movegen_rook_basic, black_rook_no_blocker_right_border) {
 }
 
 TEST(movegen_rook_basic, white_rook_no_blocker_bottom_border) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("k6K/8/8/8/8/8/8/3R4 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -112,8 +112,8 @@ TEST(movegen_rook_basic, white_rook_no_blocker_bottom_border) {
 }
 
 TEST(movegen_rook_basic, black_rook_no_blocker_bottom_border) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("k6K/8/8/8/8/8/8/3R4 w - - 0 1").invertBoard();
   generate_moves<state>(board, receiver);
@@ -123,8 +123,8 @@ TEST(movegen_rook_basic, black_rook_no_blocker_bottom_border) {
 }
 
 TEST(movegen_rook_basic, white_rook_friendly_blocker_right) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("k6K/8/8/8/2R2P2/8/8/8 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -134,8 +134,8 @@ TEST(movegen_rook_basic, white_rook_friendly_blocker_right) {
 }
 
 TEST(movegen_rook_basic, black_rook_friendly_blocker_right) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board =
       fen::parse("k6K/8/8/8/2R2P2/8/8/8 w - - 0 1").invertBoard();
@@ -146,8 +146,8 @@ TEST(movegen_rook_basic, black_rook_friendly_blocker_right) {
 }
 
 TEST(movegen_rook_basic, white_rook_friendly_blocker_top) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("k6K/2P5/8/8/2R5/8/8/8 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -157,8 +157,8 @@ TEST(movegen_rook_basic, white_rook_friendly_blocker_top) {
 }
 
 TEST(movegen_rook_basic, black_rook_friendly_blocker_top) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board =
       fen::parse("k6K/2P5/8/8/2R5/8/8/8 w - - 0 1").invertBoard();
@@ -169,8 +169,8 @@ TEST(movegen_rook_basic, black_rook_friendly_blocker_top) {
 }
 
 TEST(movegen_rook_basic, white_rook_friendly_blocker_left) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("k6K/8/8/2P2R2/8/8/8/8 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -180,8 +180,8 @@ TEST(movegen_rook_basic, white_rook_friendly_blocker_left) {
 }
 
 TEST(movegen_rook_basic, black_rook_friendly_blocker_left) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board =
       fen::parse("k6K/8/8/2P2R2/8/8/8/8 w - - 0 1").invertBoard();
@@ -192,8 +192,8 @@ TEST(movegen_rook_basic, black_rook_friendly_blocker_left) {
 }
 
 TEST(movegen_rook_basic, white_rook_friendly_blocker_bottom) {
-  constexpr BoardState state =
-      BoardState(WHITE, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(WHITE, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board = fen::parse("k6K/8/8/5R2/8/8/5P2/8 w - - 0 1");
   generate_moves<state>(board, receiver);
@@ -203,8 +203,8 @@ TEST(movegen_rook_basic, white_rook_friendly_blocker_bottom) {
 }
 
 TEST(movegen_rook_basic, black_rook_friendly_blocker_bottom) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   MoveTestReceiver receiver;
   const Board board =
       fen::parse("k6K/8/8/5R2/8/8/5P2/8 w - - 0 1").invertBoard();

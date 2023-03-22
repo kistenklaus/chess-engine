@@ -12,8 +12,8 @@
 #include "banmask_generation.h"
 
 TEST(banmaskgen_knight, black_knight_center) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3K4/8/8/7k/2N5/8/8/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -21,8 +21,8 @@ TEST(banmaskgen_knight, black_knight_center) {
 }
 
 TEST(banmaskgen_knight, black_knight_right) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3K4/8/8/8/k6N/8/8/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -30,8 +30,8 @@ TEST(banmaskgen_knight, black_knight_right) {
 }
 
 TEST(banmaskgen_knight, black_knight_bottom) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3K4/8/8/8/k7/8/8/4N3 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -39,8 +39,8 @@ TEST(banmaskgen_knight, black_knight_bottom) {
 }
 
 TEST(banmaskgen_knight, black_knight_left) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("3K4/8/8/N6k/8/8/8/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);
@@ -48,8 +48,8 @@ TEST(banmaskgen_knight, black_knight_left) {
 }
 
 TEST(banmaskgen_knight, black_knight_up) {
-  constexpr BoardState state =
-      BoardState(BLACK, false, false, false, false, false);
+  constexpr GameState state =
+      GameState(BLACK, false, false, false, false, false);
   const Board board =
       fen::parse("4N3/8/8/7k/8/2K5/8/8 w - - 0 1");
   const banmask_t banmask = generate_banmask<state>(board);

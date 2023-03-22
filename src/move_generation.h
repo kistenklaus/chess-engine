@@ -5,7 +5,7 @@
 #include <functional>
 
 #include "Board.h"
-#include "BoardState.h"
+#include "GameState.h"
 #include "banmask.h"
 #include "banmask_generation.h"
 #include "bitmap.h"
@@ -17,7 +17,7 @@
 #include "pinmask_generation.h"
 #include "x86utils.h"
 
-template <class BoardState state, typename MoveReceiver>
+template <class GameState state, typename MoveReceiver>
 inline void generate_moves(const Board &board, MoveReceiver &receiver) {
   const checkmask_t checkmask = generate_checkmask<state>(board);
   const pinmask_t pinmask = generate_pinmask<state>(board);
@@ -46,7 +46,7 @@ inline void generate_moves(const Board &board, MoveReceiver &receiver) {
  *  iterates over all moves the king from the player who's turn it is and
  *  calls move_callback to indicate a possible move.
  */
-template <class BoardState state, typename MoveReceiver>
+template <class GameState state, typename MoveReceiver>
 static inline void generate_king_moves(const Board &board,
                                        MoveReceiver &receiver,
                                        const bitmap_t checkmask,
@@ -77,7 +77,7 @@ static inline void generate_king_moves(const Board &board,
  *  iterates over all moves the pawn from the player who's turn it is and
  *  calls move_callback to indicate a possible move.
  */
-template <class BoardState state, typename MoveReceiver>
+template <class GameState state, typename MoveReceiver>
 static inline void generate_pawn_moves(const Board &board,
                                        MoveReceiver &receiver,
                                        const bitmap_t checkmask,
@@ -172,7 +172,7 @@ static inline void generate_pawn_moves(const Board &board,
  *  iterates over all moves the knight from the player who's turn it is and
  *  calls move_callback to indicate a possible move.
  */
-template <class BoardState state, typename MoveReceiver>
+template <class GameState state, typename MoveReceiver>
 static inline void generate_knight_moves(const Board &board,
                                          MoveReceiver &receiver,
                                          const bitmap_t checkmask,
@@ -192,7 +192,7 @@ static inline void generate_knight_moves(const Board &board,
   }
 }
 
-template <class BoardState state, typename MoveReceiver, figure_type figure>
+template <class GameState state, typename MoveReceiver, figure_type figure>
 static inline void generate_hvSliding_moves(const Board &board,
                                             MoveReceiver &receiver,
                                             const bitmap_t checkmask,
@@ -275,7 +275,7 @@ static inline void generate_hvSliding_moves(const Board &board,
   }
 }
 
-template <class BoardState state, typename MoveReceiver, figure_type figure>
+template <class GameState state, typename MoveReceiver, figure_type figure>
 static inline void generate_dSliding_moves(const Board &board,
                                            MoveReceiver &receiver,
                                            const bitmap_t checkmask,
@@ -378,7 +378,7 @@ static inline void generate_dSliding_moves(const Board &board,
  * call branches a fuck-ton.
  */
 template <typename MoveReceiver>
-inline void generate_moves(const Board &board, const BoardState &state,
+inline void generate_moves(const Board &board, const GameState &state,
                            MoveReceiver &receiver) {
   if (state.turn()) {
     if (state.hasEnPassant()) {
@@ -386,36 +386,36 @@ inline void generate_moves(const Board &board, const BoardState &state,
         if (state.whiteHasShortCastle()) {      //
           if (state.blackHasLongCastle()) {     //
             if (state.blackHasShortCastle()) {  //
-              generate_moves<BoardState(true, true, true, true, true, true)>(
+              generate_moves<GameState(true, true, true, true, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, true, true, true, true, false)>(
+              generate_moves<GameState(true, true, true, true, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, true, true, true, false, true)>(
+              generate_moves<GameState(true, true, true, true, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, true, true, true, false, false)>(
+              generate_moves<GameState(true, true, true, true, false, false)>(
                   board, receiver);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, true, true, false, true, true)>(
+              generate_moves<GameState(true, true, true, false, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, true, true, false, true, false)>(
+              generate_moves<GameState(true, true, true, false, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, true, true, false, false, true)>(
+              generate_moves<GameState(true, true, true, false, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, true, true, false, false, false)>(
+              generate_moves<GameState(true, true, true, false, false, false)>(
                   board, receiver);
             }
           }
@@ -424,36 +424,36 @@ inline void generate_moves(const Board &board, const BoardState &state,
         if (state.whiteHasShortCastle()) {      //
           if (state.blackHasLongCastle()) {     //
             if (state.blackHasShortCastle()) {  //
-              generate_moves<BoardState(true, true, false, true, true, true)>(
+              generate_moves<GameState(true, true, false, true, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, true, false, true, true, false)>(
+              generate_moves<GameState(true, true, false, true, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, true, false, true, false, true)>(
+              generate_moves<GameState(true, true, false, true, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, true, false, true, false, false)>(
+              generate_moves<GameState(true, true, false, true, false, false)>(
                   board, receiver);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, true, false, false, true, true)>(
+              generate_moves<GameState(true, true, false, false, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, true, false, false, true, false)>(
+              generate_moves<GameState(true, true, false, false, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, true, false, false, false, true)>(
+              generate_moves<GameState(true, true, false, false, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, true, false, false, false,
+              generate_moves<GameState(true, true, false, false, false,
                                         false)>(board, receiver);
             }
           }
@@ -464,36 +464,36 @@ inline void generate_moves(const Board &board, const BoardState &state,
         if (state.whiteHasShortCastle()) {      //
           if (state.blackHasLongCastle()) {     //
             if (state.blackHasShortCastle()) {  //
-              generate_moves<BoardState(true, false, true, true, true, true)>(
+              generate_moves<GameState(true, false, true, true, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, false, true, true, true, false)>(
+              generate_moves<GameState(true, false, true, true, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, false, true, true, false, true)>(
+              generate_moves<GameState(true, false, true, true, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, false, true, true, false, false)>(
+              generate_moves<GameState(true, false, true, true, false, false)>(
                   board, receiver);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, false, true, false, true, true)>(
+              generate_moves<GameState(true, false, true, false, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, false, true, false, true, false)>(
+              generate_moves<GameState(true, false, true, false, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, false, true, false, false, true)>(
+              generate_moves<GameState(true, false, true, false, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, false, true, false, false,
+              generate_moves<GameState(true, false, true, false, false,
                                         false)>(board, receiver);
             }
           }
@@ -502,36 +502,36 @@ inline void generate_moves(const Board &board, const BoardState &state,
         if (state.whiteHasShortCastle()) {      //
           if (state.blackHasLongCastle()) {     //
             if (state.blackHasShortCastle()) {  //
-              generate_moves<BoardState(true, false, false, true, true, true)>(
+              generate_moves<GameState(true, false, false, true, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, false, false, true, true, false)>(
+              generate_moves<GameState(true, false, false, true, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, false, false, true, false, true)>(
+              generate_moves<GameState(true, false, false, true, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, false, false, true, false,
+              generate_moves<GameState(true, false, false, true, false,
                                         false)>(board, receiver);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, false, false, false, true, true)>(
+              generate_moves<GameState(true, false, false, false, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(true, false, false, false, true,
+              generate_moves<GameState(true, false, false, false, true,
                                         false)>(board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(true, false, false, false, false,
+              generate_moves<GameState(true, false, false, false, false,
                                         true)>(board, receiver);
             } else {
-              generate_moves<BoardState(true, false, false, false, false,
+              generate_moves<GameState(true, false, false, false, false,
                                         false)>(board, receiver);
             }
           }
@@ -544,36 +544,36 @@ inline void generate_moves(const Board &board, const BoardState &state,
         if (state.whiteHasShortCastle()) {      //
           if (state.blackHasLongCastle()) {     //
             if (state.blackHasShortCastle()) {  //
-              generate_moves<BoardState(false, true, true, true, true, true)>(
+              generate_moves<GameState(false, true, true, true, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, true, true, true, true, false)>(
+              generate_moves<GameState(false, true, true, true, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, true, true, true, false, true)>(
+              generate_moves<GameState(false, true, true, true, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, true, true, true, false, false)>(
+              generate_moves<GameState(false, true, true, true, false, false)>(
                   board, receiver);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, true, true, false, true, true)>(
+              generate_moves<GameState(false, true, true, false, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, true, true, false, true, false)>(
+              generate_moves<GameState(false, true, true, false, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, true, true, false, false, true)>(
+              generate_moves<GameState(false, true, true, false, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, true, true, false, false,
+              generate_moves<GameState(false, true, true, false, false,
                                         false)>(board, receiver);
             }
           }
@@ -582,36 +582,36 @@ inline void generate_moves(const Board &board, const BoardState &state,
         if (state.whiteHasShortCastle()) {      //
           if (state.blackHasLongCastle()) {     //
             if (state.blackHasShortCastle()) {  //
-              generate_moves<BoardState(false, true, false, true, true, true)>(
+              generate_moves<GameState(false, true, false, true, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, true, false, true, true, false)>(
+              generate_moves<GameState(false, true, false, true, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, true, false, true, false, true)>(
+              generate_moves<GameState(false, true, false, true, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, true, false, true, false,
+              generate_moves<GameState(false, true, false, true, false,
                                         false)>(board, receiver);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, true, false, false, true, true)>(
+              generate_moves<GameState(false, true, false, false, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, true, false, false, true,
+              generate_moves<GameState(false, true, false, false, true,
                                         false)>(board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, true, false, false, false,
+              generate_moves<GameState(false, true, false, false, false,
                                         true)>(board, receiver);
             } else {
-              generate_moves<BoardState(false, true, false, false, false,
+              generate_moves<GameState(false, true, false, false, false,
                                         false)>(board, receiver);
             }
           }
@@ -622,36 +622,36 @@ inline void generate_moves(const Board &board, const BoardState &state,
         if (state.whiteHasShortCastle()) {      //
           if (state.blackHasLongCastle()) {     //
             if (state.blackHasShortCastle()) {  //
-              generate_moves<BoardState(false, false, true, true, true, true)>(
+              generate_moves<GameState(false, false, true, true, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, false, true, true, true, false)>(
+              generate_moves<GameState(false, false, true, true, true, false)>(
                   board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, false, true, true, false, true)>(
+              generate_moves<GameState(false, false, true, true, false, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, false, true, true, false,
+              generate_moves<GameState(false, false, true, true, false,
                                         false)>(board, receiver);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, false, true, false, true, true)>(
+              generate_moves<GameState(false, false, true, false, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, false, true, false, true,
+              generate_moves<GameState(false, false, true, false, true,
                                         false)>(board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, false, true, false, false,
+              generate_moves<GameState(false, false, true, false, false,
                                         true)>(board, receiver);
             } else {
-              generate_moves<BoardState(false, false, true, false, false,
+              generate_moves<GameState(false, false, true, false, false,
                                         false)>(board, receiver);
             }
           }
@@ -660,36 +660,36 @@ inline void generate_moves(const Board &board, const BoardState &state,
         if (state.whiteHasShortCastle()) {      //
           if (state.blackHasLongCastle()) {     //
             if (state.blackHasShortCastle()) {  //
-              generate_moves<BoardState(false, false, false, true, true, true)>(
+              generate_moves<GameState(false, false, false, true, true, true)>(
                   board, receiver);
             } else {
-              generate_moves<BoardState(false, false, false, true, true,
+              generate_moves<GameState(false, false, false, true, true,
                                         false)>(board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, false, false, true, false,
+              generate_moves<GameState(false, false, false, true, false,
                                         true)>(board, receiver);
             } else {
-              generate_moves<BoardState(false, false, false, true, false,
+              generate_moves<GameState(false, false, false, true, false,
                                         false)>(board, receiver);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, false, false, false, true,
+              generate_moves<GameState(false, false, false, false, true,
                                         true)>(board, receiver);
             } else {
-              generate_moves<BoardState(false, false, false, false, true,
+              generate_moves<GameState(false, false, false, false, true,
                                         false)>(board, receiver);
             }
           } else {
             if (state.blackHasShortCastle()) {
-              generate_moves<BoardState(false, false, false, false, false,
+              generate_moves<GameState(false, false, false, false, false,
                                         true)>(board, receiver);
             } else {
-              generate_moves<BoardState(false, false, false, false, false,
+              generate_moves<GameState(false, false, false, false, false,
                                         false)>(board, receiver);
             }
           }

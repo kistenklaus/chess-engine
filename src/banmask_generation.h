@@ -1,6 +1,6 @@
 #pragma once
 #include "Board.h"
-#include "BoardState.h"
+#include "GameState.h"
 #include "banmask.h"
 #include "checkmask.h"
 #include "lookup.h"
@@ -17,7 +17,7 @@
  * King from moving even if it is not possible for the Rook to move to the
  * square to capture the King.
  */
-template <class BoardState state>
+template <class GameState state>
 static inline banmask_t generate_banmask(const Board &board) {
   // Calculate king banmask.
   // NOTE: will probably create a branch in asm. Could be removed if, with the
