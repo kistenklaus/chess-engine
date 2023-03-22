@@ -5,16 +5,16 @@
 
 class GameState {
  public:
-  const color_t m_turn;
-  const bool m_has_ep_pawn;
-  const bool m_white_has_long_castle;
-  const bool m_white_has_short_castle;
-  const bool m_black_has_long_castle;
-  const bool m_black_has_short_castle;
+  color_t m_turn;
+  bool m_has_ep_pawn;
+  bool m_white_has_long_castle;
+  bool m_white_has_short_castle;
+  bool m_black_has_long_castle;
+  bool m_black_has_short_castle;
 
   constexpr GameState(color_t white_move, bool has_ep_pawn,
-                       bool white_has_long_castle, bool white_has_short_castle,
-                       bool black_has_long_castle, bool black_has_short_castle)
+                      bool white_has_long_castle, bool white_has_short_castle,
+                      bool black_has_long_castle, bool black_has_short_castle)
       : m_turn(white_move),
         m_has_ep_pawn(has_ep_pawn),
         m_white_has_long_castle(white_has_long_castle),
@@ -27,7 +27,6 @@ class GameState {
   }
 
   [[nodiscard]] inline constexpr color_t turn() const { return m_turn; }
-
 
   [[nodiscard]] inline constexpr bool isWhitesTurn() const {
     return (m_turn == WHITE);
@@ -70,4 +69,10 @@ class GameState {
     else
       return m_black_has_short_castle;
   };
+
+  [[nodiscard]] inline GameState applyMove(const runtime_move& move) {
+    return {!m_turn, false, m_white_has_long_castle,
+                     m_white_has_short_castle,
+                     m_black_has_long_castle, m_black_has_short_castle};
+  }
 };

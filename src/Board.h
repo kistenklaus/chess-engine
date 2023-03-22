@@ -212,17 +212,17 @@ class Board {
   Board applyMove(const compiletime_move<figure>& move) {
     if constexpr (figure == PAWN) {
       return applyPawnMove<state>(move);
-    } else if constexpr (figure == BISHOP){
+    } else if constexpr (figure == BISHOP) {
       return applyBishopMove<state>(move);
-    }else if constexpr (figure == KNIGHT){
+    } else if constexpr (figure == KNIGHT) {
       return applyKnightMove<state>(move);
-    }else if constexpr (figure == ROOK){
+    } else if constexpr (figure == ROOK) {
       return applyRookMove<state>(move);
-    }else if constexpr (figure == QUEEN){
+    } else if constexpr (figure == QUEEN) {
       return applyQueenMove<state>(move);
-    }else if constexpr (figure == KING){
+    } else if constexpr (figure == KING) {
       return applyKingMove<state>(move);
-    }else {
+    } else {
       throw std::runtime_error("failed to execute move");
     }
   }
@@ -246,39 +246,39 @@ class Board {
     }
   }
 
-  template<GameState state>
-  [[nodiscard]] Board applyKnightMove(const compiletime_move<KNIGHT> move)
-      const {
-    if constexpr (state.isWhitesTurn()){
+  template <GameState state>
+  [[nodiscard]] Board applyKnightMove(
+      const compiletime_move<KNIGHT> move) const {
+    if constexpr (state.isWhitesTurn()) {
       return applyKnightMoveWhite(move.m_origin, move.m_target);
-    }else{
+    } else {
       return applyKnightMoveBlack(move.m_origin, move.m_target);
     }
   }
 
-  template<GameState state>
+  template <GameState state>
   [[nodiscard]] Board applyRookMove(const compiletime_move<ROOK> move) const {
-    if constexpr (state.isWhitesTurn()){
+    if constexpr (state.isWhitesTurn()) {
       return applyRookMoveWhite(move.m_origin, move.m_target);
-    }else{
+    } else {
       return applyRookMoveBlack(move.m_origin, move.m_target);
     }
   }
 
-  template<GameState state>
-  [[nodiscard]] Board applyQueenMove(const compiletime_move<QUEEN> move) const{
-    if constexpr (state.isWhitesTurn()){
+  template <GameState state>
+  [[nodiscard]] Board applyQueenMove(const compiletime_move<QUEEN> move) const {
+    if constexpr (state.isWhitesTurn()) {
       return applyQueenMoveWhite(move.m_origin, move.m_target);
-    }else{
+    } else {
       return applyQueenMoveBlack(move.m_origin, move.m_target);
     }
   }
 
-  template<GameState state>
+  template <GameState state>
   [[nodiscard]] Board applyKingMove(const compiletime_move<KING> move) const {
-    if constexpr (state.isWhitesTurn()){
+    if constexpr (state.isWhitesTurn()) {
       return applyKingMoveWhite(move.m_origin, move.m_target);
-    }else{
+    } else {
       return applyKingMoveBlack(move.m_origin, move.m_target);
     }
   }
@@ -410,8 +410,8 @@ class Board {
   [[nodiscard]] inline Board applyKnightMoveWhite(bitmap_t origin,
                                                   bitmap_t target) const {
     bitmap_t mask = ~target;
-    return Board(b_pawns & mask, w_pawns, b_bishops & mask,
-                 (w_bishops & ~origin) | target, b_knights & mask, w_knights,
+    return Board(b_pawns & mask, w_pawns, b_bishops & mask, w_bishops,
+                 b_knights & mask, (w_knights & ~origin) | target,
                  b_rooks & mask, w_rooks, b_queen & mask, w_queen,
                  b_king & mask, w_king);
   }
