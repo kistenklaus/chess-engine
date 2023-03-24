@@ -7,6 +7,7 @@ project(${This} C CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(HEADERS
+        "src/Movemap.h"
         "src/bitmap.h"
         "src/Board.h"
         "src/GameState.h"
@@ -41,17 +42,17 @@ set(SOURCES
         "src/PvPConsole.cpp"
         )
 
-set(MAIN_SOURCE "src/main.cpp" src/tile_index.cpp src/move.cpp src/algebraic_notation.h src/algebraic_notation.cpp src/RuntimeMoveCollector.h)
+set(MAIN_SOURCE "src/main.cpp" src/tile_index.cpp src/move.cpp src/algebraic_notation.h src/algebraic_notation.cpp src/RuntimeMoveCollector.h src/PerfTRecurser.h src/MagicLookup.h)
 
 include_directories(src) #kinda sketchy but easier to code.
 add_compile_options(
         -march=native #required for x86 instructions
         -Wall
-        -g
         -O0
         -std=c++20
         )
 add_executable(${This} ${SOURCES} ${HEADERS} ${MAIN_SOURCE})
+#target_precompile_headers(${This} PUBLIC src/Movemap.h)
 
 
 #==================== TESTING ================

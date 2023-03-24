@@ -57,7 +57,7 @@ class PvPConsole {
       runtime_move move = parseAlgebraicNotation(m_board, m_state, in);
       //apply move.
       m_board = m_board.applyMove(m_state, move);
-      m_state = m_state.applyMove(move);
+      m_state = runtimeStateTransition(m_state, move);
     } catch (std::invalid_argument& err) {
       std::cout << "Not a valid move! try again" << std::endl;
     }

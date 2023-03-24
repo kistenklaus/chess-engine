@@ -55,24 +55,107 @@ class GameState {
   [[nodiscard]] inline constexpr bool blackHasLongCastle() const {
     return m_black_has_long_castle;
   }
-
-  [[nodiscard]] inline constexpr bool has_long_castle() const {
-    if (m_turn)
-      return m_white_has_long_castle;
-    else
-      return m_black_has_long_castle;
-  }
-
-  [[nodiscard]] inline constexpr bool has_short_castle() const {
-    if (m_turn)
-      return m_white_has_short_castle;
-    else
-      return m_black_has_short_castle;
-  };
-
-  [[nodiscard]] inline GameState applyMove(const runtime_move& move) {
-    return {!m_turn, false, m_white_has_long_castle,
-                     m_white_has_short_castle,
-                     m_black_has_long_castle, m_black_has_short_castle};
-  }
 };
+
+template<GameState state, compiletime_move_flag flag>
+inline constexpr GameState compiletimeStateTransition(){
+  if constexpr (flag == MOVE_COMPILETIME_FLAG_LOSE_SHORT_CASTLE) {
+    if constexpr (state.turn()) {
+      return {!state.turn(),
+              false,
+              state.whiteHasShortCastle(),
+              false,
+              state.blackHasLongCastle(),
+              state.blackHasShortCastle()};
+    } else {
+      return {!state.turn(),
+              false,
+              state.whiteHasLongCastle(),
+              state.whiteHasShortCastle(),
+              state.blackHasLongCastle(),
+              false};
+    }
+  } else if constexpr (flag == MOVE_COMPILETIME_FLAG_LOSE_LONG_CASTLE) {
+    if constexpr (state.turn()) {
+      return {!state.turn(),
+              false,
+              false,
+              state.whiteHasShortCastle(),
+              state.blackHasLongCastle(),
+              state.blackHasShortCastle()};
+    } else {
+      return {!state.turn(),
+              false,
+              state.whiteHasLongCastle(),
+              state.whiteHasLongCastle(),
+              false,
+              state.whiteHasShortCastle()};
+    }
+  } else if constexpr (flag == MOVE_COMPILETIME_FLAG_DOUBLE_PAWN_PUSH) {
+    return {!state.turn(),
+            true,
+            state.whiteHasLongCastle(),
+            state.whiteHasLongCastle(),
+            state.blackHasLongCastle(),
+            state.blackHasShortCastle()};
+  } else {
+    return {!state.turn(),
+            false,
+            state.whiteHasLongCastle(),
+            state.whiteHasLongCastle(),
+            state.blackHasLongCastle(),
+            state.blackHasShortCastle()};
+  }
+}
+
+inline constexpr GameState runtimeStateTransition(const GameState& state,
+                                                  runtime_move move){
+  const compiletime_move_flag& flag = move.m_compiletimeFlag;
+  if (flag == MOVE_COMPILETIME_FLAG_LOSE_SHORT_CASTLE) {
+    if (state.turn()) {
+      return {!state.turn(),
+              false,
+              state.whiteHasShortCastle(),
+              false,
+              state.blackHasLongCastle(),
+              state.blackHasShortCastle()};
+    } else {
+      return {!state.turn(),
+              false,
+              state.whiteHasLongCastle(),
+              state.whiteHasShortCastle(),
+              state.blackHasLongCastle(),
+              false};
+    }
+  } else if (flag == MOVE_COMPILETIME_FLAG_LOSE_LONG_CASTLE) {
+    if (state.turn()) {
+      return {!state.turn(),
+              false,
+              false,
+              state.whiteHasShortCastle(),
+              state.blackHasLongCastle(),
+              state.blackHasShortCastle()};
+    } else {
+      return {!state.turn(),
+              false,
+              state.whiteHasLongCastle(),
+              state.whiteHasLongCastle(),
+              false,
+              state.whiteHasShortCastle()};
+    }
+  } else if (flag == MOVE_COMPILETIME_FLAG_DOUBLE_PAWN_PUSH) {
+    return {!state.turn(),
+            true,
+            state.whiteHasLongCastle(),
+            state.whiteHasLongCastle(),
+            state.blackHasLongCastle(),
+            state.blackHasShortCastle()};
+  } else {
+    return {!state.turn(),
+            false,
+            state.whiteHasLongCastle(),
+            state.whiteHasLongCastle(),
+            state.blackHasLongCastle(),
+            state.blackHasShortCastle()};
+  }
+}

@@ -11,7 +11,7 @@
 
 class RuntimeMoveCollector {
  public:
-  template <figure_type figure>
+  template <figure_type figure, compiletime_move_flag cflag>
   void move(bitmap_t origin, bitmap_t target, move_flag flag) {
     runtime_move move{.m_origin = origin,
                       .m_target = target,

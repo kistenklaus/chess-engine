@@ -14,7 +14,7 @@ TEST(movegen_common_basic, white_starting_position) {
   const Board board =
       fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   MoveTestReceiver receiver;
-  generate_moves<GameState::Default()>(board, receiver);
+  enumerateMoves<GameState::Default()>(board, receiver);
   EXPECT_EQ(receiver.pawnMoveCount(), 16);
   EXPECT_BITBOARD(receiver.pawnTargets(), 0xFFFF0000, board);
   EXPECT_BITBOARD(receiver.pawnOrigins(), 0xFF00, board);
@@ -32,7 +32,7 @@ TEST(movegen_common_basic, black_starting_position) {
       fen::parse("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   constexpr GameState state = GameState(BLACK, false, true, true, true, true);
   MoveTestReceiver receiver;
-  generate_moves<state>(board, receiver);
+  enumerateMoves<state>(board, receiver);
   EXPECT_EQ(receiver.pawnMoveCount(), 16);
   EXPECT_BITBOARD(receiver.pawnTargets(), 0xFFFF00000000, board);
   EXPECT_BITBOARD(receiver.pawnOrigins(), 0xFF000000000000, board);

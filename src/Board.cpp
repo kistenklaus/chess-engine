@@ -7,33 +7,33 @@
 figure_t Board::get_figure_at(uint8_t tile_index) const {
   assert(tile_index <= 63);
   bitmap_t tile_mask = (((bitmap_t)0x1ULL) << tile_index);
-  if (tile_mask & occupied()) {
-    if (tile_mask & occupied_by<WHITE>()) {
-      if (tile_mask & pawns_of<WHITE>()) {
+  if (tile_mask & Occupied()) {
+    if (tile_mask & OccupiedBy<WHITE>()) {
+      if (tile_mask & Pawns<WHITE>()) {
         return figure_t(WHITE, PAWN);
-      } else if (tile_mask & bishops_of<WHITE>()) {
+      } else if (tile_mask & Bishops<WHITE>()) {
         return figure_t(WHITE, BISHOP);
-      } else if (tile_mask & knights_of<WHITE>()) {
+      } else if (tile_mask & Knights<WHITE>()) {
         return figure_t(WHITE, KNIGHT);
-      } else if (tile_mask & rooks_of<WHITE>()) {
+      } else if (tile_mask & Rooks<WHITE>()) {
         return figure_t(WHITE, ROOK);
-      } else if (tile_mask & queens_of<WHITE>()) {
+      } else if (tile_mask & Queens<WHITE>()) {
         return figure_t(WHITE, QUEEN);
-      } else if (tile_mask & king_of<WHITE>()) {
+      } else if (tile_mask & King<WHITE>()) {
         return figure_t(WHITE, KING);
       }
-    } else if (tile_mask & occupied_by<BLACK>()) {
-      if (tile_mask & pawns_of<BLACK>()) {
+    } else if (tile_mask & OccupiedBy<BLACK>()) {
+      if (tile_mask & Pawns<BLACK>()) {
         return figure_t(BLACK, PAWN);
-      } else if (tile_mask & bishops_of<BLACK>()) {
+      } else if (tile_mask & Bishops<BLACK>()) {
         return figure_t(BLACK, BISHOP);
-      } else if (tile_mask & knights_of<BLACK>()) {
+      } else if (tile_mask & Knights<BLACK>()) {
         return figure_t(BLACK, KNIGHT);
-      } else if (tile_mask & rooks_of<BLACK>()) {
+      } else if (tile_mask & Rooks<BLACK>()) {
         return figure_t(BLACK, ROOK);
-      } else if (tile_mask & queens_of<BLACK>()) {
+      } else if (tile_mask & Queens<BLACK>()) {
         return figure_t(BLACK, QUEEN);
-      } else if (tile_mask & king_of<BLACK>()) {
+      } else if (tile_mask & King<BLACK>()) {
         return figure_t(BLACK, KING);
       }
     }

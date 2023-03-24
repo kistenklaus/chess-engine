@@ -19,7 +19,7 @@ TEST(movegen_knight_pinmask, white_knight) {
       GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/1k6/6K1/8/4N3/8/2b5/8 w - - 0 1");
   MoveTestReceiver receiver;
-  generate_moves<state>(board, receiver);
+  enumerateMoves<state>(board, receiver);
   EXPECT_EQ(receiver.knightMoveCount(), 0);
   EXPECT_BITBOARD(receiver.knightOrigins(), 0, board);
   EXPECT_BITBOARD(receiver.knightTargets(), 0, board);

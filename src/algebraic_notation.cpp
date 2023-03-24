@@ -181,7 +181,7 @@ runtime_move parseAlgebraicNotation(const Board& board, const GameState& state,
   parseDescription(lex, &parsed_move);
   // finalize description of origin and validate flags.
   RuntimeMoveCollector collector;
-  generate_moves(board, state, collector);
+  //generate_moves(board, state, collector);
 
   for (const runtime_move& move : collector.moves()) {
     if (move.m_target == parsed_move.m_target &&
@@ -206,7 +206,7 @@ static char fileToChar(unsigned int file) {
 std::string toAlgebraicNotation(const Board& board, const GameState& state,
                                 const runtime_move& move) {
   RuntimeMoveCollector collector;
-  generate_moves(board, state, collector);
+  //generate_moves(board, state, collector);
   std::vector<runtime_move> similarMoves;
   for (const runtime_move& allowedMove : collector.moves()) {
     if (allowedMove.m_target == move.m_target &&

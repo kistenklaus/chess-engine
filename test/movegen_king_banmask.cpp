@@ -17,7 +17,7 @@ TEST(movegen_king_banmask, white_king) {
       GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/3k4/5b2/8/8/3K4/8/8 w - - 0 1");
   MoveTestReceiver receiver;
-  generate_moves<state>(board, receiver);
+  enumerateMoves<state>(board, receiver);
   EXPECT_EQ(receiver.kingMoveCount(), 6);
   EXPECT_BITBOARD(receiver.kingOrigins(), 524288, board);
   EXPECT_BITBOARD(receiver.kingTargets(), 336600064, board);

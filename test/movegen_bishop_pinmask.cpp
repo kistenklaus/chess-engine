@@ -18,7 +18,7 @@ TEST(movegen_bishop_pinmask, white_bishop_pinned_axial) {
       GameState(WHITE, false, false, false, false, false);
   const Board board = fen::parse("8/8/k7/8/2r1B1K1/8/8/8 w - - 0 1");
   MoveTestReceiver receiver;
-  generate_moves<state>(board, receiver);
+  enumerateMoves<state>(board, receiver);
   EXPECT_EQ(receiver.bishopMoveCount(), 0);
   EXPECT_BITBOARD(receiver.bishopOrigins(), 0, board);
   EXPECT_BITBOARD(receiver.bishopTargets(), 0, board);

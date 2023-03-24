@@ -18,15 +18,15 @@
  * square to capture the King.
  */
 template <class GameState state>
-static inline banmask_t generate_banmask(const Board &board) {
+inline banmask_t generate_banmask(const Board &board) {
   // Calculate king banmask.
   // NOTE: will probably create a branch in asm. Could be removed if, with the
   // tradeoff that only valid positions would be allowed.
   banmask_t banmask = 0;
-  if (board.king_of<not state.turn()>()) {
+  if (board.King<not state.turn()>()) {
     bitmap_t king_attacks =
-        KingLookUpTable::get()[SQUARE_OF(board.king_of<not state.turn()>())] &
-        ~board.occupied();
+        KingLookUpTable::get()[SQUARE_OF(board.King<not state.turn()>())] &
+        ~board.Occupied();
     banmask |= king_attacks;
   }
 
@@ -58,7 +58,7 @@ static inline banmask_t generate_banmask(const Board &board) {
   bitmap_t knights = board.enemy_knights_of<state.turn()>();
   iterate_bits(knight, knights) {
     bitmap_t lookup =
-        KnightLookUpTable::get()[SQUARE_OF(knight)] & board.not_occupied();
+        KnightLookUpTable::get()[SQUARE_OF(knight)] & board.NotOccupied();
     banmask |= lookup;
   }
 
@@ -69,28 +69,28 @@ static inline banmask_t generate_banmask(const Board &board) {
     const bitmap_t lookup1 =
         WestSlidingLookUpTable::get()[SQUARE_OF(hvSliding)];
     const bitmap_t hit1 =
-        (lookup1 & board.occupied()) &
-        (((bitmap_t)(-1)) << (-_lzcnt_u64(lookup1 & board.occupied()) - 1));
+        (lookup1 & board.Occupied()) &
+        (((bitmap_t)(-1)) << (-_lzcnt_u64(lookup1 & board.Occupied()) - 1));
     banmask |=
         lookup1 & ~((!!hit1) * WestSlidingLookUpTable::get()[SQUARE_OF(hit1)]);
 
     const bitmap_t lookup2 =
         SouthSlidingLookUpTable::get()[SQUARE_OF(hvSliding)];
-    const bitmap_t hit2 = (lookup2 & board.occupied()) &
+    const bitmap_t hit2 = (lookup2 & board.Occupied()) &
                           (((bitmap_t)-1))
-                              << (-_lzcnt_u64(lookup2 & board.occupied()) - 1);
+                              << (-_lzcnt_u64(lookup2 & board.Occupied()) - 1);
     banmask |=
         lookup2 & ~((!!hit2) * SouthSlidingLookUpTable::get()[SQUARE_OF(hit2)]);
 
     const bitmap_t lookup3 =
         NorthSlidingLookUpTable::get()[SQUARE_OF(hvSliding)];
-    const bitmap_t hit3 = _blsi_u64(lookup3 & board.occupied());
+    const bitmap_t hit3 = _blsi_u64(lookup3 & board.Occupied());
     banmask |=
         lookup3 & ~((!!hit3) * NorthSlidingLookUpTable::get()[SQUARE_OF(hit3)]);
 
     const bitmap_t lookup4 =
         EastSlidingLookUpTable::get()[SQUARE_OF(hvSliding)];
-    const bitmap_t hit4 = _blsi_u64(lookup4 & board.occupied());
+    const bitmap_t hit4 = _blsi_u64(lookup4 & board.Occupied());
     banmask |=
         lookup4 & ~((!!hit4) * EastSlidingLookUpTable::get()[SQUARE_OF(hit4)]);
   }
@@ -101,28 +101,28 @@ static inline banmask_t generate_banmask(const Board &board) {
     const bitmap_t lookup1 =
         SouthEastSlidingLookUpTable::get()[SQUARE_OF(dSliding)];
     const bitmap_t hit1 =
-        (lookup1 & board.occupied()) &
-        (((bitmap_t)-1) << (-_lzcnt_u64(lookup1 & board.occupied()) - 1));
+        (lookup1 & board.Occupied()) &
+        (((bitmap_t)-1) << (-_lzcnt_u64(lookup1 & board.Occupied()) - 1));
     banmask |= lookup1 & ~((!!hit1) *
                            SouthEastSlidingLookUpTable::get()[SQUARE_OF(hit1)]);
 
     const bitmap_t lookup2 =
         SouthWestSlidingLookUpTable::get()[SQUARE_OF(dSliding)];
     const bitmap_t hit2 =
-        (lookup2 & board.occupied()) &
-        (((bitmap_t)-1) << (-_lzcnt_u64(lookup2 & board.occupied()) - 1));
+        (lookup2 & board.Occupied()) &
+        (((bitmap_t)-1) << (-_lzcnt_u64(lookup2 & board.Occupied()) - 1));
     banmask |= lookup2 & ~((!!hit2) *
                            SouthWestSlidingLookUpTable::get()[SQUARE_OF(hit2)]);
 
     const bitmap_t lookup3 =
         NorthWestSlidingLookUpTable::get()[SQUARE_OF(dSliding)];
-    const bitmap_t hit3 = _blsi_u64(lookup3 & board.occupied());
+    const bitmap_t hit3 = _blsi_u64(lookup3 & board.Occupied());
     banmask |= lookup3 & ~((!!hit3) *
                            NorthWestSlidingLookUpTable::get()[SQUARE_OF(hit3)]);
 
     const bitmap_t lookup4 =
         NorthEastSlidingLookUpTable::get()[SQUARE_OF(dSliding)];
-    const bitmap_t hit4 = _blsi_u64(lookup4 & board.occupied());
+    const bitmap_t hit4 = _blsi_u64(lookup4 & board.Occupied());
     banmask |= lookup4 & ~((!!hit4) *
                            NorthEastSlidingLookUpTable::get()[SQUARE_OF(hit4)]);
   }

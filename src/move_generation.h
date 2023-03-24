@@ -6,6 +6,7 @@
 
 #include "Board.h"
 #include "GameState.h"
+#include "MagicLookup.h"
 #include "banmask.h"
 #include "banmask_generation.h"
 #include "bitmap.h"
@@ -17,684 +18,279 @@
 #include "pinmask_generation.h"
 #include "x86utils.h"
 
+namespace Movegen {
+namespace internal {
+
+compiletime bitmap_t PawnsNotLeft() { return ~Board::File1; }
+
+compiletime bitmap_t PawnsNotRight() { return ~Board::File8; }
+
+template <color_t turn>
+compiletime bitmap_t PawnForward(bitmap_t map) {
+  if constexpr (turn == WHITE)
+    return map << 8;
+  else
+    return map >> 8;
+}
+
+template <color_t turn>
+compiletime bitmap_t PawnForward2(bitmap_t map) {
+  if constexpr (turn == WHITE)
+    return map << 16;
+  else
+    return map >> 16;
+}
+
+template <color_t turn>
+compiletime bitmap_t PawnBackward(bitmap_t map) {
+  return PawnForward<!turn>(map);
+}
+
+template <color_t turn>
+compiletime bitmap_t PawnBackward2(bitmap_t map) {
+  return PawnForward2<!turn>(map);
+}
+
+template <color_t turn>
+compiletime bitmap_t PawnAttackLeft(bitmap_t map) {
+  if constexpr (turn == WHITE)
+    return map << 9;
+  else
+    return map >> 7;
+}
+
+template <color_t turn>
+compiletime bitmap_t PawnAttackRight(bitmap_t map) {
+  if constexpr (turn == WHITE)
+    return map << 7;
+  else
+    return map >> 9;
+}
+
+template <color_t turn>
+compiletime bitmap_t PawnUndoAttackLeft(bitmap_t map) {
+  return PawnAttackRight<!turn>(map);
+}
+
+template <color_t turn>
+compiletime bitmap_t PawnUndoAttackRight(bitmap_t map) {
+  return PawnAttackLeft<!turn>(map);
+}
+
+template <color_t turn>
+force_inline void pawnPruneLeft(bitmap_t &pawn, const bitmap_t pinD12) {
+  const bitmap_t pinned =
+      pawn & PawnUndoAttackLeft<turn>(pinD12 & PawnsNotRight());
+  const bitmap_t unpinned = pawn & ~pinD12;
+  pawn = (pinned | unpinned);
+}
+
+template <color_t turn>
+force_inline void pawnPruneRight(bitmap_t &pawn, const bitmap_t pinD12) {
+  const bitmap_t pinned =
+      pawn & PawnUndoAttackRight<turn>(pinD12 & PawnsNotLeft());
+  const bitmap_t unpinned = pawn & ~pinD12;
+  pawn = (pinned | unpinned);
+}
+
+template <color_t turn>
+force_inline void pawnPrunePush(bitmap_t &pawn, const bitmap_t pinHV) {
+  const bitmap_t pinned = pawn & PawnBackward<turn>(pinHV);
+  const bitmap_t unpinned = pawn & ~pinHV;
+  pawn = (pinned | unpinned);
+}
+
+template <color_t turn>
+force_inline void pawnPruneDoublePush(bitmap_t &pawn, const bitmap_t pinHV) {
+  const bitmap_t pinned = pawn & PawnBackward2<turn>(pinHV);
+  const bitmap_t unpinned = pawn & ~pinHV;
+  pawn = (pinned | unpinned);
+}
+
+template <color_t turn>
+compiletime bitmap_t RelativeFirstRank() {
+  if constexpr (turn == WHITE)
+    return Board::Rank2;
+  else
+    return Board::Rank7;
+}
+
+template <color_t turn>
+compiletime bitmap_t RelativeSecondLastRank() {
+  if constexpr (turn == WHITE)
+    return Board::Rank7;
+  else
+    return Board::Rank2;
+}
+
 template <class GameState state, typename MoveReceiver>
-inline void generate_moves(const Board &board, MoveReceiver &receiver) {
-  const checkmask_t checkmask = generate_checkmask<state>(board);
-  const pinmask_t pinmask = generate_pinmask<state>(board);
-  const banmask_t banmask = generate_banmask<state>(board);
-  generate_king_moves<state>(board, receiver, checkmask, banmask);
-  generate_pawn_moves<state>(board, receiver, checkmask, pinmask);
-  generate_knight_moves<state>(board, receiver, checkmask, pinmask);
-  generate_dSliding_moves<state, MoveReceiver, BISHOP>(
-      board, receiver, checkmask, pinmask, board.bishops_of<state.turn()>());
-  generate_dSliding_moves<state, MoveReceiver, QUEEN>(
-      board, receiver, checkmask, pinmask, board.queens_of<state.turn()>());
-  generate_hvSliding_moves<state, MoveReceiver, ROOK>(
-      board, receiver, checkmask, pinmask, board.rooks_of<state.turn()>());
-  generate_hvSliding_moves<state, MoveReceiver, QUEEN>(
-      board, receiver, checkmask, pinmask, board.queens_of<state.turn()>());
-}
+inline void enumerateMoves(const Board &board, MoveReceiver &receiver,
+                           checkmask_t checkmask, pinmask_t pinmask,
+                           banmask_t banmask) {
+  constexpr color_t turn = state.turn();
 
-/**
- *  Generate King moves.
- *
- *  @param <state> : the current state of the chess game.
- *  @param board : the chessboard including all the pieces.
- *  @param move_callback : a callback for moves.
- *  @param checkmask : the precalculated checkmask of the current turn.
- *
- *  iterates over all moves the king from the player who's turn it is and
- *  calls move_callback to indicate a possible move.
- */
-template <class GameState state, typename MoveReceiver>
-static inline void generate_king_moves(const Board &board,
-                                       MoveReceiver &receiver,
-                                       const bitmap_t checkmask,
-                                       const bitmap_t banmask) {
-  // NOT A CONSTEXPR
-  // NOTE will probably create a branch in asm.
-  if (!board.king_of<state.turn()>()) return;
-  bitmap_t king_squares =
-      KingLookUpTable::get()[SQUARE_OF(board.king_of<state.turn()>())] &
-      board.empty_or_occupied_by_enemy_of<state.turn()>() & checkmask &
-      ~banmask;
-  iterate_bits(i, king_squares) {
-    receiver.template move<KING>(board.king_of<state.turn()>(), i,
-                                 MOVE_FLAG_NONE);
-    // move_callback(move_t(board, board.king_of<state.turn()>(), i));
-  }
-}
-
-/**
- *  Generate pawn moves.
- *
- *  @param <state> : the current state of the chess game.
- *  @param board : the chessboard including all the pieces.
- *  @param move_callback : a callback for moves.
- *  @param checkmask : the precalculated checkmask of the current turn.
- *  @param pinmask : the precalculated pinmask of the current turn.
- *
- *  iterates over all moves the pawn from the player who's turn it is and
- *  calls move_callback to indicate a possible move.
- */
-template <class GameState state, typename MoveReceiver>
-static inline void generate_pawn_moves(const Board &board,
-                                       MoveReceiver &receiver,
-                                       const bitmap_t checkmask,
-                                       const pinmask_t pinmask) {
-  const bitmap_t pawns = board.pawns_of<state.turn()>();
-  if constexpr (state.turn()) {
-    // bitmap_t unpinned_pawns = (pawns & ~(pinmask.d | pinmask.hv));
-    //  pawns that can go forward.
-    bitmap_t pushable_pawns = (((pawns & ~(Board::Rank7 | Board::Rank8)) << 8) &
-                               board.not_occupied() & checkmask) >>
-                              8;
-    iterate_bits(pushable_pawn, pushable_pawns) {
-      receiver.template move<PAWN>(pushable_pawn, (pushable_pawn << 8),
-                                   MOVE_FLAG_NONE);
-      // move_callback(move_t(board, pushable_pawn, pushable_pawn << 8));
-    }
-    // pawns that can double push.
-    bitmap_t double_pushable_pawns =
-        (((((pawns & Board::Rank2) << 8) & board.not_occupied()) << 8) &
-         board.not_occupied() & checkmask) >>
-        16;
-    iterate_bits(pushable_pawn, double_pushable_pawns) {
-      receiver.template move<PAWN>(pushable_pawn, pushable_pawn << 16,
-                                   MOVE_FLAG_DOUBLE_PAWN_PUSH);
-    }
-    // pawn attack left.
-    bitmap_t left_attacking_pawns =
-        (((pawns & ~(Board::File1 | Board::Rank8)) << 7) &
-         board.occupied_by<!state.turn()>()) >>
-        7;
-    iterate_bits(attacking_pawn, left_attacking_pawns) {
-      receiver.template move<PAWN>(attacking_pawn, attacking_pawn << 7,
-                                   MOVE_FLAG_CAPTURE);
-    }
-    // pawn attack right.
-    bitmap_t right_attacking_pawns =
-        (((pawns & ~(Board::File1 | Board::Rank8)) << 9) &
-         board.occupied_by<!state.turn()>()) >>
-        9;
-    iterate_bits(attacking_pawn, right_attacking_pawns) {
-      receiver.template move<PAWN>(attacking_pawn, attacking_pawn << 9,
-                                   MOVE_FLAG_CAPTURE);
-    }
-  } else {
-    // pawns that can go forward.
-    bitmap_t pushable_pawns = (((pawns & ~(Board::Rank1 | Board::Rank2)) >> 8) &
-                               board.not_occupied() & checkmask)
-                              << 8;
-    iterate_bits(pushable_pawn, pushable_pawns) {
-      receiver.template move<PAWN>(pushable_pawn, pushable_pawn >> 8,
-                                   MOVE_FLAG_NONE);
-    }
-    // pawns that can double push.
-    bitmap_t double_pushable_pawns =
-        (((((pawns & Board::Rank7) >> 8) & board.not_occupied()) >> 8) &
-         board.not_occupied() & checkmask)
-        << 16;
-    iterate_bits(pushable_pawn, double_pushable_pawns) {
-      receiver.template move<PAWN>(pushable_pawn, pushable_pawn >> 16,
-                                   MOVE_FLAG_DOUBLE_PAWN_PUSH);
-    }
-    // pawns attack right.
-    bitmap_t right_attacking_pawn =
-        (((pawns & ~(Board::File8 | Board::Rank1)) >> 7) &
-         board.occupied_by<!state.turn()>())
-        << 7;
-    iterate_bits(attacking_pawn, right_attacking_pawn) {
-      receiver.template move<PAWN>(attacking_pawn, attacking_pawn >> 7,
-                                   MOVE_FLAG_CAPTURE);
-    }
-    // pawns attack left.
-    bitmap_t left_attacking_pawn =
-        (((pawns & ~(Board::File1 | Board::Rank1)) >> 9) &
-         board.occupied_by<!state.turn()>())
-        << 9;
-    iterate_bits(attacking_pawn, left_attacking_pawn) {
-      receiver.template move<PAWN>(attacking_pawn, attacking_pawn >> 9,
-                                   MOVE_FLAG_CAPTURE);
+  const bitmap_t movable = board.EnemyOrEmpty<turn>() & checkmask;
+  // generate_king_moves<state>(board, receiver, checkmask, banmask);
+  // Kingmoves
+  {
+    bitmap_t kingMap = board.King<turn>();
+    bitmap_t kingMoves =
+        KingLookUpTable::get()[SQUARE_OF(kingMap)] & movable & (~banmask);
+    WHILE_RESET_LSB(kingMoves) {
+      const bitmap_t targetTile = SQUARE_OF(kingMoves);
+      receiver.template move<KING, MOVE_COMPILETIME_FLAG_SILENT>(
+          kingMap, 1ull << targetTile, MOVE_FLAG_NONE);
     }
   }
-}
+  // Pawnmoves
+  {
+    const bitmap_t pawnsD12 = board.Pawns<turn>() & ~pinmask.hv;
+    const bitmap_t pawnsHV = board.Pawns<turn>() & ~pinmask.d12;
 
-/**
- *  Generate knight moves.
- *
- *  @param <state> : the current state of the chess game.
- *  @param board : the chessboard including all the pieces.
- *  @param move_callback : a callback for moves.
- *  @param checkmask : the precalculated checkmask of the current turn.
- *  @param pinmask : the precalculated pinmask of the current turn.
- *
- *  iterates over all moves the knight from the player who's turn it is and
- *  calls move_callback to indicate a possible move.
- */
-template <class GameState state, typename MoveReceiver>
-static inline void generate_knight_moves(const Board &board,
-                                         MoveReceiver &receiver,
-                                         const bitmap_t checkmask,
-                                         const pinmask_t pinmask) {
-  bitmap_t knights = board.knights_of<state.turn()>() &
-                     ~(pinmask.hv | pinmask.d);  // pinned knight can't move
-  iterate_bits(knight, knights) {
-    bitmap_t lookup = KnightLookUpTable::get()[SQUARE_OF(knight)] &
-                      board.empty_or_occupied_by_enemy_of<state.turn()>() &
-                      checkmask;
-    iterate_bits(att, lookup) {
-      // TODO determine MOVE_HINT_CAPTURE
-      // TODO add receiver back in
-      receiver.template move<KNIGHT>(knight, att, MOVE_FLAG_NONE);
-      // move_callback(move_t(board, knight, att));
+    bitmap_t leftAttackingPawns =
+        pawnsD12 & PawnUndoAttackLeft<turn>(board.OccupiedBy<!turn>() &
+                                            PawnsNotRight() & checkmask);
+    bitmap_t rightAttackingPawns =
+        pawnsD12 & PawnUndoAttackRight<turn>(board.OccupiedBy<!turn>() &
+                                             PawnsNotLeft() & checkmask);
+
+    bitmap_t pushablePawns = pawnsHV & PawnBackward<turn>(board.NotOccupied());
+
+    bitmap_t doublePushablePawns =
+        pushablePawns & RelativeFirstRank<turn>() &
+        PawnBackward2<turn>(board.NotOccupied() & checkmask);
+    pushablePawns &= PawnBackward<turn>(checkmask);
+
+    pawnPruneLeft<turn>(leftAttackingPawns, pinmask.d12);
+    pawnPruneRight<turn>(rightAttackingPawns, pinmask.d12);
+    pawnPrunePush<turn>(pushablePawns, pinmask.hv);
+    pawnPruneDoublePush<turn>(doublePushablePawns, pinmask.hv);
+
+    while (leftAttackingPawns) {
+      const bitmap_t pos = popBit(leftAttackingPawns);
+      receiver.template move<PAWN, MOVE_COMPILETIME_FLAG_SILENT>(
+          pos, PawnAttackLeft<turn>(pos), MOVE_FLAG_NONE);
+    }
+    while (rightAttackingPawns) {
+      const bitmap_t pos = popBit(rightAttackingPawns);
+      receiver.template move<PAWN, MOVE_COMPILETIME_FLAG_SILENT>(
+          pos, PawnAttackRight<turn>(pos), MOVE_FLAG_NONE);
+    }
+    while (pushablePawns) {
+      const bitmap_t pos = popBit(pushablePawns);
+      receiver.template move<PAWN, MOVE_COMPILETIME_FLAG_SILENT>(
+          pos, PawnForward<turn>(pos), MOVE_FLAG_NONE);
+    }
+    while (doublePushablePawns) {
+      const bitmap_t pos = popBit(doublePushablePawns);
+      receiver.template move<PAWN, MOVE_COMPILETIME_FLAG_SILENT>(
+          pos, PawnForward2<turn>(pos), MOVE_FLAG_NONE);
     }
   }
-}
-
-template <class GameState state, typename MoveReceiver, figure_type figure>
-static inline void generate_hvSliding_moves(const Board &board,
-                                            MoveReceiver &receiver,
-                                            const bitmap_t checkmask,
-                                            const pinmask_t pinmask,
-                                            const bitmap_t slidingPieces) {
-  const bitmap_t moveablePieces = slidingPieces & ~pinmask.d;
-  // Calculate sliding moves to the left.
-  bitmap_t itBits = moveablePieces;
-  iterate_bits(dsliding, itBits) {
-    const bitmap_t lookup = WestSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    const bitmap_t enemiesInPath =
-        lookup & board.occupied_by_enemy_of<state.turn()>();
-    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    const bitmap_t inPath = (aliesInPath << ((bitmap_t)1)) | enemiesInPath;
-    const bitmap_t hit =
-        inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
-    bitmap_t possibleMoves =
-        ~WestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup & checkmask;
-    iterate_bits(target, possibleMoves) {
-      // TODO add capture hint.
-      // TODO add check hint.
-      receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
-      // move_callback(move_t(board, dsliding, target));
-    }
-  }
-
-  // Calculate sliding moves to the right.
-  itBits = moveablePieces;
-  iterate_bits(dsliding, itBits) {
-    const bitmap_t lookup = EastSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    const bitmap_t enemiesInPath =
-        lookup & board.occupied_by_enemy_of<state.turn()>();
-    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    const bitmap_t inPath = (aliesInPath >> ((bitmap_t)1)) | enemiesInPath;
-    const bitmap_t hit = _blsi_u64(inPath);  // extract the lowest bit
-    bitmap_t possibleMoves =
-        ~EastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup & checkmask;
-    iterate_bits(target, possibleMoves) {
-      // TODO add capture hint
-      receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
-      // move_callback(move_t(board, dsliding, target));
-    }
-  }
-
-  // Calculate sliding moves upwards.
-  itBits = moveablePieces;
-  iterate_bits(dsliding, itBits) {
-    const bitmap_t lookup = NorthSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    const bitmap_t enemiesInPath =
-        lookup & board.occupied_by_enemy_of<state.turn()>();
-    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    const bitmap_t inPath = (aliesInPath >> ((bitmap_t)8)) | enemiesInPath;
-    const bitmap_t hit = _blsi_u64(inPath);  // extract the lowest bit
-    bitmap_t possibleMoves =
-        ~NorthSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup & checkmask;
-    iterate_bits(target, possibleMoves) {
-      // TODO add capture hint
-      receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
-      // move_callback(move_t(board, dsliding, target));
-    }
-  }
-
-  // Calculate sliding moves downwards.
-  itBits = moveablePieces;
-  iterate_bits(dsliding, itBits) {
-    const bitmap_t lookup = SouthSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    const bitmap_t enemiesInPath =
-        lookup & board.occupied_by_enemy_of<state.turn()>();
-    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    const bitmap_t inPath = (aliesInPath << ((bitmap_t)8)) | enemiesInPath;
-    const bitmap_t hit =
-        inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
-    bitmap_t possibleMoves =
-        ~SouthSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup & checkmask;
-    iterate_bits(target, possibleMoves) {
-      // TODO add capture hint.
-      receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
-      // move_callback(move_t(board, dsliding, target));
-    }
-  }
-}
-
-template <class GameState state, typename MoveReceiver, figure_type figure>
-static inline void generate_dSliding_moves(const Board &board,
-                                           MoveReceiver &receiver,
-                                           const bitmap_t checkmask,
-                                           const pinmask_t pinmask,
-                                           const bitmap_t slidingPieces) {
-  const bitmap_t moveablePieces = slidingPieces & ~pinmask.hv;
-  // Calculate sliding moves down right diagonal
-  bitmap_t itBits = moveablePieces;
-  iterate_bits(dsliding, itBits) {
-    const bitmap_t lookup =
-        SouthEastSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    const bitmap_t enemiesInPath =
-        lookup & board.occupied_by_enemy_of<state.turn()>();
-    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    const bitmap_t inPath = (aliesInPath << ((bitmap_t)7)) | enemiesInPath;
-    const bitmap_t hit =
-        inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
-    bitmap_t possibleMoves =
-        ~SouthEastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup &
-        checkmask;
-    iterate_bits(target, possibleMoves) {
-      // TODO add capture hint.
-      receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
-      // move_callback(move_t(board, dsliding, target));
-    }
-  }
-
-  // Calculate sliding moves down left diagonal
-  itBits = moveablePieces;
-  iterate_bits(dsliding, itBits) {
-    const bitmap_t lookup =
-        SouthWestSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    const bitmap_t enemiesInPath =
-        lookup & board.occupied_by_enemy_of<state.turn()>();
-    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    const bitmap_t inPath = (aliesInPath << ((bitmap_t)9)) | enemiesInPath;
-    const bitmap_t hit =
-        inPath & (((bitmap_t)(-1)) << (-_lzcnt_u64(inPath) - 1));
-    bitmap_t possibleMoves =
-        ~SouthWestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup &
-        checkmask;
-    iterate_bits(target, possibleMoves) {
-      // TODO add receiver callback.
-      receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
-      // move_callback(move_t(board, dsliding, target));
-    }
-  }
-
-  // Calculate sliding moves up left diagonal
-  itBits = moveablePieces;
-  iterate_bits(dsliding, itBits) {
-    const bitmap_t lookup =
-        NorthWestSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    const bitmap_t enemiesInPath =
-        lookup & board.occupied_by_enemy_of<state.turn()>();
-    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    const bitmap_t inPath = (aliesInPath >> ((bitmap_t)7)) | enemiesInPath;
-    const bitmap_t hit = _blsi_u64(inPath);  // extract the lowest bit
-    bitmap_t possibleMoves =
-        ~NorthWestSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup &
-        checkmask;
-    iterate_bits(target, possibleMoves) {
-      // TODO add capture hint.
-      receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
-      // move_callback(move_t(board, dsliding, target));
-    }
-  }
-
-  // Calculate sliding moves up right diagonal
-  itBits = moveablePieces;
-  iterate_bits(dsliding, itBits) {
-    const bitmap_t lookup =
-        NorthEastSlidingLookUpTable::get()[SQUARE_OF(dsliding)];
-    const bitmap_t enemiesInPath =
-        lookup & board.occupied_by_enemy_of<state.turn()>();
-    const bitmap_t aliesInPath = lookup & (board.occupied_by<state.turn()>());
-    const bitmap_t inPath = (aliesInPath >> ((bitmap_t)9)) | enemiesInPath;
-    const bitmap_t hit = _blsi_u64(inPath);  // extract the lowest bit
-    bitmap_t possibleMoves =
-        ~NorthEastSlidingLookUpTable::get()[SQUARE_OF(hit)] & lookup &
-        checkmask;
-    iterate_bits(target, possibleMoves) {
-      // TODO add capture hint.
-      receiver.template move<figure>(dsliding, target, MOVE_FLAG_NONE);
-      // move_callback(move_t(board, dsliding, target));
-    }
-  }
-}
-
-/*
- * This is slightly retarded it converts the
- * runtime BoardState into a compiletime constant BoardState.
- * To explain this fiasco further a compiletime constant BoardState
- * is required for move generation because this way the amount of
- * branching can be reduces greatly, but for usability a runtime BoardState
- * is much more powerful because it allows for dynamic changes.
- *
- * It should however be noted, that this should not be used for minimax
- * because it will to greatly impact the performance because this function
- * call branches a fuck-ton.
- */
-template <typename MoveReceiver>
-inline void generate_moves(const Board &board, const GameState &state,
-                           MoveReceiver &receiver) {
-  if (state.turn()) {
-    if (state.hasEnPassant()) {
-      if (state.whiteHasLongCastle()) {
-        if (state.whiteHasShortCastle()) {      //
-          if (state.blackHasLongCastle()) {     //
-            if (state.blackHasShortCastle()) {  //
-              generate_moves<GameState(true, true, true, true, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, true, true, true, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, true, true, true, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, true, true, true, false, false)>(
-                  board, receiver);
-            }
-          }
-        } else {
-          if (state.blackHasLongCastle()) {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, true, true, false, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, true, true, false, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, true, true, false, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, true, true, false, false, false)>(
-                  board, receiver);
-            }
-          }
-        }
-      } else {
-        if (state.whiteHasShortCastle()) {      //
-          if (state.blackHasLongCastle()) {     //
-            if (state.blackHasShortCastle()) {  //
-              generate_moves<GameState(true, true, false, true, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, true, false, true, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, true, false, true, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, true, false, true, false, false)>(
-                  board, receiver);
-            }
-          }
-        } else {
-          if (state.blackHasLongCastle()) {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, true, false, false, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, true, false, false, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, true, false, false, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, true, false, false, false,
-                                        false)>(board, receiver);
-            }
-          }
-        }
+  // Knightmoves
+  {
+    bitmap_t knights = board.Knights<turn>() & ~(pinmask.hv | pinmask.d12);
+    WHILE_RESET_LSB(knights) {
+      const bitmap_t tile = SQUARE_OF(knights);
+      bitmap_t origin = 1ull << tile;
+      bitmap_t moves = KnightLookUpTable::get()[tile] & movable;
+      while (moves) {
+        const bitmap_t target = popBit(moves);
+        receiver.template move<KNIGHT, MOVE_COMPILETIME_FLAG_SILENT>(
+            origin, target, MOVE_FLAG_NONE);
       }
-    } else {
-      if (state.whiteHasLongCastle()) {
-        if (state.whiteHasShortCastle()) {      //
-          if (state.blackHasLongCastle()) {     //
-            if (state.blackHasShortCastle()) {  //
-              generate_moves<GameState(true, false, true, true, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, false, true, true, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, false, true, true, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, false, true, true, false, false)>(
-                  board, receiver);
-            }
-          }
-        } else {
-          if (state.blackHasLongCastle()) {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, false, true, false, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, false, true, false, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, false, true, false, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, false, true, false, false,
-                                        false)>(board, receiver);
-            }
-          }
+    }
+  }
+  // Bishopmoves
+  const bitmap_t queens = board.Queens<turn>();
+  {
+    bitmap_t bishops = board.Bishops<turn>() & ~pinmask.hv;
+
+    bitmap_t bishopsPinned = (bishops | queens) & pinmask.d12;
+    bitmap_t bishopsUnpinned = bishops & ~pinmask.d12;
+    WHILE_RESET_LSB(bishopsPinned) {
+      const bitmap_t tile = SQUARE_OF(bishopsPinned);
+      bitmap_t move =
+          MagicLookup::Bishop(tile, board.Occupied()) & movable & pinmask.d12;
+      bitmap_t origin = 1ull << tile;
+      if (origin & queens) {
+        while (move) {
+          const bitmap_t target = popBit(move);
+          receiver.template move<QUEEN, MOVE_COMPILETIME_FLAG_SILENT>(
+              origin, target, MOVE_FLAG_NONE);
         }
       } else {
-        if (state.whiteHasShortCastle()) {      //
-          if (state.blackHasLongCastle()) {     //
-            if (state.blackHasShortCastle()) {  //
-              generate_moves<GameState(true, false, false, true, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, false, false, true, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, false, false, true, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, false, false, true, false,
-                                        false)>(board, receiver);
-            }
-          }
-        } else {
-          if (state.blackHasLongCastle()) {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, false, false, false, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(true, false, false, false, true,
-                                        false)>(board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(true, false, false, false, false,
-                                        true)>(board, receiver);
-            } else {
-              generate_moves<GameState(true, false, false, false, false,
-                                        false)>(board, receiver);
-            }
-          }
+        while (move) {
+          const bitmap_t target = popBit(move);
+          receiver.template move<BISHOP, MOVE_COMPILETIME_FLAG_SILENT>(
+              origin, target, MOVE_FLAG_NONE);
         }
       }
     }
-  } else {
-    if (state.hasEnPassant()) {
-      if (state.whiteHasLongCastle()) {
-        if (state.whiteHasShortCastle()) {      //
-          if (state.blackHasLongCastle()) {     //
-            if (state.blackHasShortCastle()) {  //
-              generate_moves<GameState(false, true, true, true, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, true, true, true, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, true, true, true, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, true, true, true, false, false)>(
-                  board, receiver);
-            }
-          }
-        } else {
-          if (state.blackHasLongCastle()) {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, true, true, false, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, true, true, false, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, true, true, false, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, true, true, false, false,
-                                        false)>(board, receiver);
-            }
-          }
-        }
-      } else {
-        if (state.whiteHasShortCastle()) {      //
-          if (state.blackHasLongCastle()) {     //
-            if (state.blackHasShortCastle()) {  //
-              generate_moves<GameState(false, true, false, true, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, true, false, true, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, true, false, true, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, true, false, true, false,
-                                        false)>(board, receiver);
-            }
-          }
-        } else {
-          if (state.blackHasLongCastle()) {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, true, false, false, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, true, false, false, true,
-                                        false)>(board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, true, false, false, false,
-                                        true)>(board, receiver);
-            } else {
-              generate_moves<GameState(false, true, false, false, false,
-                                        false)>(board, receiver);
-            }
-          }
-        }
+    WHILE_RESET_LSB(bishopsUnpinned) {
+      const bitmap_t tile = SQUARE_OF(bishopsUnpinned);
+      bitmap_t origin = 1ull << tile;
+      bitmap_t move = MagicLookup::Bishop(tile, board.Occupied()) & movable;
+      while (move) {
+        const bitmap_t target = popBit(move);
+        receiver.template move<BISHOP, MOVE_COMPILETIME_FLAG_SILENT>(
+            origin, target, MOVE_FLAG_NONE);
       }
-    } else {
-      if (state.whiteHasLongCastle()) {
-        if (state.whiteHasShortCastle()) {      //
-          if (state.blackHasLongCastle()) {     //
-            if (state.blackHasShortCastle()) {  //
-              generate_moves<GameState(false, false, true, true, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, false, true, true, true, false)>(
-                  board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, false, true, true, false, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, false, true, true, false,
-                                        false)>(board, receiver);
-            }
-          }
-        } else {
-          if (state.blackHasLongCastle()) {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, false, true, false, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, false, true, false, true,
-                                        false)>(board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, false, true, false, false,
-                                        true)>(board, receiver);
-            } else {
-              generate_moves<GameState(false, false, true, false, false,
-                                        false)>(board, receiver);
-            }
-          }
+    }
+  }
+  {
+    bitmap_t rooks = board.Rooks<turn>() & ~pinmask.d12;
+    bitmap_t rooksPinned = (rooks | queens) & pinmask.hv;
+    bitmap_t rooksUnpinned = rooks & ~pinmask.hv;
+    WHILE_RESET_LSB(rooksPinned) {
+      const bitmap_t tile = SQUARE_OF(rooksPinned);
+      bitmap_t move =
+          MagicLookup::Rook(tile, board.Occupied()) & movable & pinmask.hv;
+      bitmap_t origin = 1ull << tile;
+      if (origin & queens) {
+        while (move) {
+          const bitmap_t target = popBit(move);
+          receiver.template move<QUEEN, MOVE_COMPILETIME_FLAG_SILENT>(
+              origin, target, MOVE_FLAG_NONE);
         }
       } else {
-        if (state.whiteHasShortCastle()) {      //
-          if (state.blackHasLongCastle()) {     //
-            if (state.blackHasShortCastle()) {  //
-              generate_moves<GameState(false, false, false, true, true, true)>(
-                  board, receiver);
-            } else {
-              generate_moves<GameState(false, false, false, true, true,
-                                        false)>(board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, false, false, true, false,
-                                        true)>(board, receiver);
-            } else {
-              generate_moves<GameState(false, false, false, true, false,
-                                        false)>(board, receiver);
-            }
-          }
-        } else {
-          if (state.blackHasLongCastle()) {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, false, false, false, true,
-                                        true)>(board, receiver);
-            } else {
-              generate_moves<GameState(false, false, false, false, true,
-                                        false)>(board, receiver);
-            }
-          } else {
-            if (state.blackHasShortCastle()) {
-              generate_moves<GameState(false, false, false, false, false,
-                                        true)>(board, receiver);
-            } else {
-              generate_moves<GameState(false, false, false, false, false,
-                                        false)>(board, receiver);
-            }
-          }
-        }
+        const bitmap_t target = popBit(move);
+        receiver.template move<ROOK, MOVE_COMPILETIME_FLAG_SILENT>(
+            origin, target, MOVE_FLAG_NONE);
+      }
+    }
+    WHILE_RESET_LSB(rooksUnpinned) {
+      const bitmap_t tile = SQUARE_OF(rooksUnpinned);
+      bitmap_t move = MagicLookup::Rook(tile, board.Occupied()) & movable;
+      bitmap_t origin = 1ull << tile;
+      while (move) {
+        const bitmap_t target = popBit(move);
+        receiver.template move<ROOK, MOVE_COMPILETIME_FLAG_SILENT>(
+            origin, target, MOVE_FLAG_NONE);
+      }
+    }
+  }
+  {
+    bitmap_t unpinnedQueens = queens & ~(pinmask.hv | pinmask.d12);
+    WHILE_RESET_LSB(unpinnedQueens) {
+      const bitmap_t tile = SQUARE_OF(unpinnedQueens);
+      const bitmap_t origin = 1ull << tile;
+      bitmap_t move = MagicLookup::Queen(tile, board.Occupied()) & movable;
+      while (move) {
+        const bitmap_t target = popBit(move);
+        receiver.template move<QUEEN, MOVE_COMPILETIME_FLAG_SILENT>(
+            origin, target, MOVE_FLAG_NONE);
       }
     }
   }
 }
+
+}  // namespace internal
+
+template<GameState state, typename MoveReceiver>
+void Enumerate(Board& board){
+  bitmap_t checkmask;
+
+}
+
+}  // namespace Movegen

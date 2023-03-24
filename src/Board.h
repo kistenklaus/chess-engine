@@ -60,12 +60,12 @@ class Board {
         b_queen(b_queen)  // probably doesn't work
   {}
 
-  [[nodiscard]] constexpr inline bitmap_t occupied() const { return occ; }
+  [[nodiscard]] constexpr inline bitmap_t Occupied() const { return occ; }
 
-  [[nodiscard]] constexpr inline bitmap_t not_occupied() const { return ~occ; }
+  [[nodiscard]] constexpr inline bitmap_t NotOccupied() const { return ~occ; }
 
   template <color_t current_player>
-  [[nodiscard]] constexpr inline bitmap_t empty_or_occupied_by_enemy_of()
+  [[nodiscard]] constexpr inline bitmap_t EnemyOrEmpty()
       const {
     if constexpr (current_player)
       return ~w_occ;
@@ -106,7 +106,7 @@ class Board {
   }
 
   template <color_t current_player>
-  [[nodiscard]] constexpr inline bitmap_t occupied_by() const {
+  [[nodiscard]] constexpr inline bitmap_t OccupiedBy() const {
     if constexpr (current_player)
       return w_occ;
     else
@@ -122,7 +122,7 @@ class Board {
   }
 
   template <color_t current_player>
-  [[nodiscard]] constexpr inline bitmap_t pawns_of() const {
+  [[nodiscard]] constexpr inline bitmap_t Pawns() const {
     if constexpr (current_player)
       return w_pawns;
     else
@@ -131,11 +131,11 @@ class Board {
 
   template <color_t current_player>
   [[nodiscard]] constexpr inline bitmap_t enemy_pawns_of() const {
-    return this->pawns_of<!current_player>();
+    return this->Pawns<!current_player>();
   }
 
   template <color_t current_player>
-  [[nodiscard]] constexpr inline bitmap_t bishops_of() const {
+  [[nodiscard]] constexpr inline bitmap_t Bishops() const {
     if constexpr (current_player)
       return w_bishops;
     else
@@ -144,11 +144,11 @@ class Board {
 
   template <color_t current_player>
   [[nodiscard]] constexpr inline bitmap_t enemy_bishops_of() const {
-    return this->bishops_of<!current_player>();
+    return this->Bishops<!current_player>();
   }
 
   template <color_t current_player>
-  [[nodiscard]] constexpr inline bitmap_t knights_of() const {
+  [[nodiscard]] constexpr inline bitmap_t Knights() const {
     if constexpr (current_player)
       return w_knights;
     else
@@ -157,11 +157,11 @@ class Board {
 
   template <color_t current_player>
   [[nodiscard]] constexpr inline bitmap_t enemy_knights_of() const {
-    return this->knights_of<!current_player>();
+    return this->Knights<!current_player>();
   }
 
   template <color_t current_player>
-  [[nodiscard]] constexpr inline bitmap_t rooks_of() const {
+  [[nodiscard]] constexpr inline bitmap_t Rooks() const {
     if constexpr (current_player)
       return w_rooks;
     else
@@ -170,11 +170,11 @@ class Board {
 
   template <color_t current_player>
   [[nodiscard]] constexpr inline bitmap_t enemy_rooks_of() const {
-    return this->rooks_of<!current_player>();
+    return this->Rooks<!current_player>();
   }
 
   template <color_t current_player>
-  [[nodiscard]] constexpr inline bitmap_t queens_of() const {
+  [[nodiscard]] constexpr inline bitmap_t Queens() const {
     if constexpr (current_player)
       return w_queen;
     else
@@ -183,11 +183,11 @@ class Board {
 
   template <color_t current_player>
   [[nodiscard]] constexpr inline bitmap_t enemy_queens_of() const {
-    return this->queens_of<!current_player>();
+    return this->Queens<!current_player>();
   }
 
   template <color_t current_player>
-  [[nodiscard]] constexpr inline bitmap_t king_of() const {
+  [[nodiscard]] constexpr inline bitmap_t King() const {
     if constexpr (current_player)
       return w_king;
     else
@@ -196,7 +196,7 @@ class Board {
 
   template <color_t current_player>
   [[nodiscard]] constexpr inline bitmap_t enemy_king_of() const {
-    return this->king_of<!current_player>();
+    return this->King<!current_player>();
   }
 
   [[nodiscard]] Board invertBoard() const {
@@ -208,8 +208,8 @@ class Board {
   [[nodiscard]] figure_t get_figure_at(uint8_t tile_index) const;
   [[nodiscard]] figure_t get_figure_at(uint8_t row, uint8_t column) const;
 
-  template <GameState state, figure_type figure>
-  Board applyMove(const compiletime_move<figure>& move) {
+  template <GameState state, figure_type figure, compiletime_move_flag flag>
+  Board applyMove(const compiletime_move<figure, flag>& move) const {
     if constexpr (figure == PAWN) {
       return applyPawnMove<state>(move);
     } else if constexpr (figure == BISHOP) {
@@ -227,8 +227,9 @@ class Board {
     }
   }
 
-  template <GameState state>
-  [[nodiscard]] Board applyPawnMove(const compiletime_move<PAWN> move) const {
+  template <GameState state, compiletime_move_flag flag>
+  [[nodiscard]] Board applyPawnMove(
+      const compiletime_move<PAWN, flag> move) const {
     if constexpr (state.isWhitesTurn()) {
       return applyPawnMoveWhite(move.m_origin, move.m_target);
     } else {
@@ -236,9 +237,9 @@ class Board {
     }
   }
 
-  template <GameState state>
+  template <GameState state, compiletime_move_flag flag>
   [[nodiscard]] Board applyBishopMove(
-      const compiletime_move<BISHOP> move) const {
+      const compiletime_move<BISHOP, flag> move) const {
     if constexpr (state.isWhitesTurn()) {
       return applyBishopMoveWhite(move.m_origin, move.m_target);
     } else {
@@ -246,9 +247,9 @@ class Board {
     }
   }
 
-  template <GameState state>
+  template <GameState state, compiletime_move_flag flag>
   [[nodiscard]] Board applyKnightMove(
-      const compiletime_move<KNIGHT> move) const {
+      const compiletime_move<KNIGHT, flag> move) const {
     if constexpr (state.isWhitesTurn()) {
       return applyKnightMoveWhite(move.m_origin, move.m_target);
     } else {
@@ -256,8 +257,9 @@ class Board {
     }
   }
 
-  template <GameState state>
-  [[nodiscard]] Board applyRookMove(const compiletime_move<ROOK> move) const {
+  template <GameState state, compiletime_move_flag flag>
+  [[nodiscard]] Board applyRookMove(
+      const compiletime_move<ROOK, flag> move) const {
     if constexpr (state.isWhitesTurn()) {
       return applyRookMoveWhite(move.m_origin, move.m_target);
     } else {
@@ -265,8 +267,9 @@ class Board {
     }
   }
 
-  template <GameState state>
-  [[nodiscard]] Board applyQueenMove(const compiletime_move<QUEEN> move) const {
+  template <GameState state, compiletime_move_flag flag>
+  [[nodiscard]] Board applyQueenMove(
+      const compiletime_move<QUEEN, flag> move) const {
     if constexpr (state.isWhitesTurn()) {
       return applyQueenMoveWhite(move.m_origin, move.m_target);
     } else {
@@ -274,8 +277,9 @@ class Board {
     }
   }
 
-  template <GameState state>
-  [[nodiscard]] Board applyKingMove(const compiletime_move<KING> move) const {
+  template <GameState state, compiletime_move_flag flag>
+  [[nodiscard]] Board applyKingMove(
+      const compiletime_move<KING, flag> move) const {
     if constexpr (state.isWhitesTurn()) {
       return applyKingMoveWhite(move.m_origin, move.m_target);
     } else {
@@ -303,8 +307,10 @@ class Board {
     }
   }
 
-  template <GameState state>
-  [[nodiscard]] Board applyPawnMove(const compiletime_move<PAWN>& move) {
+  template <GameState state, compiletime_move_flag flag>
+  [[nodiscard]] Board applyPawnMove(const compiletime_move<PAWN,
+                                                           flag>&
+      move) {
     bitmap_t mask = ~move.m_target;
     if constexpr (state.isWhitesTurn()) {
       return applyPawnMoveWhite(move.m_origin, move.m_target);

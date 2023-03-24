@@ -2,7 +2,7 @@
 #include "bitmap.h"
 
 struct pinmask_t {
-  pinmask_t() : hv(0),d(0){}
+  pinmask_t() : hv(0), d12(0){}
   bitmap_t hv;
-  bitmap_t d;
+  bitmap_t d12;
 };
