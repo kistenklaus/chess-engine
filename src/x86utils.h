@@ -15,17 +15,17 @@
 
 
 #ifdef _MSC_VER
-#define Bitcount(X) __popcnt64(X)
 #define compiletime __forceinline static constexpr
 #define force_inline __forceinline
+#define never_inline __declspec(noinline)
 #elif defined(__clang__)
-#define Bitcount(X) static_cast<uint64_t>(__builtin_popcountll(X))
 #define compiletime __attribute__((always_inline)) static constexpr
 #define force_inline __attribute__((always_inline)) inline
+#define never_inline __attribute__((noinline))
 #elif defined(__GNUC__)
 #define compiletime __attribute__((always_inline)) static constexpr
 #define force_inline __attribute__((always_inline))
-#define BitCount(X) static_cast<uint64_t>(__builtin_popcountll(X))
+#define never_inline __attribute__ ((noinline))
 #else
 #define compiletime static constexpr
 #define force_inline inline

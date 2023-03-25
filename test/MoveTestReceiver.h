@@ -11,7 +11,7 @@ class MoveTestReceiver {
   MoveBitmapAccumulator m_bitmapAccumulator;
 
  public:
-  template <figure_type type, compiletime_move_flag cflag>
+  template <figure_type type, move_flag cflag>
   inline void move(bitmap_t origin, bitmap_t target, move_flag flag) {
     m_counterReceiver.move<type>(origin, target, flag);
     m_bitmapAccumulator.move<type>(origin, target, flag);

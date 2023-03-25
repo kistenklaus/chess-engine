@@ -92,8 +92,7 @@ inline pinmask_t generate_pinmask(const Board &board) {
       NorthSlidingLookUpTable::get()[SQUARE_OF(board.King<state.turn()>())];
   const bitmap_t kingLookupEast =
       EastSlidingLookUpTable::get()[SQUARE_OF(board.King<state.turn()>())];
-  bitmap_t enemyRooksAndQueens =
-      board.enemy_rooks_and_queens_of<state.turn()>();
+  bitmap_t enemyRooksAndQueens = board.EnemyHVSliders<state.turn()>();
   iterate_bits(hvSliding, enemyRooksAndQueens) {
     const bitmap_t c0 =
         SouthSlidingLookUpTable::get()[SQUARE_OF(hvSliding)] & ~kingLookupSouth;
@@ -132,8 +131,7 @@ inline pinmask_t generate_pinmask(const Board &board) {
       NorthWestSlidingLookUpTable::get()[SQUARE_OF(board.King<state.turn()>())];
   const bitmap_t kingLookupNorthEast =
       NorthEastSlidingLookUpTable::get()[SQUARE_OF(board.King<state.turn()>())];
-  bitmap_t enemyBishopsAndQueens =
-      board.enemy_bishop_and_queens_of<state.turn()>();
+  bitmap_t enemyBishopsAndQueens = board.EnemyD12Sliders<state.turn()>();
   iterate_bits(dSliding, enemyBishopsAndQueens) {
     const bitmap_t c0 =
         SouthEastSlidingLookUpTable::get()[SQUARE_OF(dSliding)] &

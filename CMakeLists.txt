@@ -29,7 +29,6 @@ set(HEADERS
         "src/MoveCounter.h"
         "src/MoveBitmapAccumulator.h"
         "src/MoveAccumulator.h"
-        "src/PvPConsole.h"
         )
 
 set(SOURCES
@@ -39,10 +38,9 @@ set(SOURCES
         "src/fen.cpp"
         "src/figure.cpp"
         "src/lookup.cpp"
-        "src/PvPConsole.cpp"
         )
 
-set(MAIN_SOURCE "src/main.cpp" src/tile_index.cpp src/move.cpp src/algebraic_notation.h src/algebraic_notation.cpp src/RuntimeMoveCollector.h src/PerfTRecurser.h src/MagicLookup.h)
+set(MAIN_SOURCE "src/main.cpp" src/tile_index.cpp src/move.cpp src/RuntimeMoveCollector.h src/PerfTRecurser.h src/MagicLookup.h src/perfT.h src/perfT.cpp)
 
 include_directories(src) #kinda sketchy but easier to code.
 add_compile_options(
