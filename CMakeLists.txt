@@ -40,14 +40,16 @@ set(SOURCES
         "src/lookup.cpp"
         )
 
-set(MAIN_SOURCE "src/main.cpp" src/tile_index.cpp src/move.cpp src/RuntimeMoveCollector.h src/PerfTRecurser.h src/MagicLookup.h src/perfT.h src/perfT.cpp)
+set(MAIN_SOURCE "src/main.cpp" src/tile_index.cpp src/move.cpp src/RuntimeMoveCollector.h src/PerfTRecurser.h src/MagicLookup.h src/perfT.h src/perfT.cpp src/notation.h src/notation.cpp)
 
 include_directories(src) #kinda sketchy but easier to code.
 add_compile_options(
-        -march=native #required for x86 instructions
-        -Wall
-        -O0
+        -W
         -std=c++20
+        -march=native #required for x86 instructions
+        -O3
+        -fomit-frame-pointer
+        -foptimize-sibling-calls
         )
 add_executable(${This} ${SOURCES} ${HEADERS} ${MAIN_SOURCE})
 #target_precompile_headers(${This} PUBLIC src/Movemap.h)

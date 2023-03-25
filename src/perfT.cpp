@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include "move_generation.h"
+#include "notation.h"
 
 namespace perfT {
 namespace internal {
@@ -77,15 +78,28 @@ class RecursiveProfiler {
       auto t2 = high_resolution_clock::now();
       auto ms_int = duration_cast<milliseconds>(t2 - t1);
       m_count += count;
-      std::cout << count << "   took : " << ms_int << std::endl;
+      std::cout << notation::toString(m_board, state, move.m_origin,
+                                      move.m_target, figure, flag)
+                << " : " << count << "   took : " << ms_int << std::endl;
     }
   }
 
   unsigned long run() {
+    using std::chrono::duration;
+    using std::chrono::duration_cast;
+    using std::chrono::high_resolution_clock;
+    using std::chrono::milliseconds;
+    std::cout << "=========DEPTH[" << depth << "]=============" << std::endl;
+    auto t1 = high_resolution_clock::now();
     Movegen::internal::initMovegen(0);
     Movegen::internal::Movestack::init<state, depth>(m_board);
     Movegen::Enumerate<state, depth, RecursiveProfiler<state, depth>>(m_board,
                                                                       *this);
+    auto t2 = high_resolution_clock::now();
+    auto ms_int = duration_cast<milliseconds>(t2 - t1);
+    std::cout << std::endl;
+    std::cout << "Total : " << m_count << "   took : " << ms_int<< std::endl;
+    std::cout << "================================" << std::endl;
     return m_count;
   }
 
@@ -117,8 +131,7 @@ unsigned long perfT(const Board& board, int depth) {
   }
 }
 
-unsigned long perfT(const Board& board, const GameState& state,
-                                     int depth) {
+unsigned long perfT(const Board& board, const GameState& state, int depth) {
   if (state.turn()) {
     if (state.hasEnPassant()) {
       if (state.whiteHasLongCastle()) {

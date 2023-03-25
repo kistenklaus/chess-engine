@@ -173,13 +173,12 @@ compiletime bitmap_t canCastleLeft(bitmap_t attacked, bitmap_t occupied,
     if (occupied & Board::WhiteShortCastleMoveMask) return false;
     if (attacked & Board::WhiteShortCastleAttackMask) return false;
     if (rook & Board::WhiteShortCastleRookMask) return true;
-    return false;
   } else if (state.blackHasShortCastle()) {
     if (occupied & Board::BlackShortCastleMoveMask) return false;
     if (attacked & Board::BlackShortCastleAttackMask) return false;
     if (rook & Board::BlackShortCastleRookMask) return true;
-    return false;
   }
+  return false;
 }
 
 template <GameState state>
@@ -204,7 +203,7 @@ static inline bitmap_t g_EnemyKingAttack[MAX_DEPTH];
 static inline checkmask_t g_Checkmask[MAX_DEPTH];
 
 template <GameState state, int depth>
-force_inline void init(const Board &board) {
+void init(const Board &board) {
   constexpr auto turn = state.turn();
 
   const bitmap_t king = board.King<turn>();

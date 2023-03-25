@@ -1,0 +1,5 @@
+if(EXISTS "/home/karl/Development/chess-engine/chess-engine.test[1]_tests.cmake")
+  include("/home/karl/Development/chess-engine/chess-engine.test[1]_tests.cmake")
+else()
+  add_test(chess-engine.test_NOT_BUILT chess-engine.test_NOT_BUILT)
+endif()
