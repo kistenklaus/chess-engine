@@ -1,7 +1,6 @@
 #include "fen.h"
 
 #include <cassert>
-
 #include <iostream>
 #include <string>
 
@@ -93,10 +92,10 @@ Board fen::parse(const std::string& FEN) {
   assert(white_turn || turn_str == "b");
 
   const std::string rochade_str = split[2];
-  //const bool white_short_castle = rochade_str.find('K') != std::string::npos;
-  //const bool black_short_castle = rochade_str.find('k') != std::string::npos;
-  //const bool white_long_castle = rochade_str.find('Q') != std::string::npos;
-  //const bool black_long_castle = rochade_str.find('q') != std::string::npos;
+  // const bool white_short_castle = rochade_str.find('K') != std::string::npos;
+  // const bool black_short_castle = rochade_str.find('k') != std::string::npos;
+  // const bool white_long_castle = rochade_str.find('Q') != std::string::npos;
+  // const bool black_long_castle = rochade_str.find('q') != std::string::npos;
 
   const std::string en_passant_str = split[3];
   const bool has_en_passant = en_passant_str != "-";
@@ -104,15 +103,15 @@ Board fen::parse(const std::string& FEN) {
     if (en_passant_str.size() == 2) {
       std::cerr << "INVALID FEN ENPASSANT" << std::endl;
     }
-    //const int file = en_passant_str[0] - 'a';
-    //const int rank = en_passant_str[1] - '0';
+    // const int file = en_passant_str[0] - 'a';
+    // const int rank = en_passant_str[1] - '0';
   }
 
   const std::string half_turns_str = split[4];
-  //const int half_turns = std::stoi(half_turns_str);
+  // const int half_turns = std::stoi(half_turns_str);
 
   const std::string next_turn_str = split[5];
-  //const int next_turn = std::stoi(next_turn_str);
+  // const int next_turn = std::stoi(next_turn_str);
 
   return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights, w_knights,
                b_rooks, w_rooks, b_queen, w_queen, b_king, w_king);

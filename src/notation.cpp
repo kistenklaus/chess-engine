@@ -45,7 +45,7 @@ std::string toString(const Board& board, const GameState& state,
   }
 
   ss << ((char) ('a' + targetFile));
-  ss << ((char) ('0' + targetRank));
+  ss << ((char) ('1' + targetRank));
 
   return ss.str();
 }

@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "bitmap.h"
-#include "tile_index.h"
 #include "x86utils.h"
 #include "figure.h"
 
@@ -19,17 +18,8 @@ enum move_flag {
   MOVE_FLAG_PROMOTE
 };
 
-struct runtime_move {
-  bitmap_t m_origin;
-  bitmap_t m_target;
-  figure_type m_figure;
-  move_flag m_compiletimeFlag;
-};
-
 template<figure_type figure, move_flag flag>
 struct compiletime_move{
   bitmap_t m_origin;
   bitmap_t m_target;
 };
-
-std::ostream& operator<<(std::ostream& cout, const runtime_move& move);

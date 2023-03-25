@@ -78,7 +78,7 @@ class GameState {
 
 template <GameState state, figure_type figure, move_flag flag>
 compiletime GameState compiletimeStateTransition() {
-  if(figure == PAWN && flag == MOVE_FLAG_DOUBLE_PAWN_PUSH){
+  if (figure == PAWN && flag == MOVE_FLAG_DOUBLE_PAWN_PUSH) {
     return {!state.turn(),
             true,
             state.whiteHasLongCastle(),
@@ -86,24 +86,23 @@ compiletime GameState compiletimeStateTransition() {
             state.blackHasLongCastle(),
             state.blackHasShortCastle()};
   }
-  if(figure == KING){
-    if constexpr (state.turn() == WHITE){
+  if (figure == KING) {
+    if constexpr (state.turn() == WHITE) {
       return {!state.turn(),
               false,
               false,
               false,
               state.blackHasLongCastle(),
               state.blackHasShortCastle()};
-    }else{
+    } else {
       return {!state.turn(),
               false,
               state.whiteHasLongCastle(),
               state.whiteHasShortCastle(),
               false,
-              false
-      };
+              false};
     }
-    if(figure == ROOK && flag == MOVE_FLAG_LEFT_ROOK){
+    if (figure == ROOK && flag == MOVE_FLAG_LEFT_ROOK) {
       if constexpr (state.turn() == WHITE) {
         return {!state.turn(),
                 false,
@@ -111,25 +110,24 @@ compiletime GameState compiletimeStateTransition() {
                 state.whiteHasLongCastle(),
                 state.blackHasLongCastle(),
                 state.blackHasShortCastle()};
-      }else{
+      } else {
         return {!state.turn(),
                 false,
                 state.whiteHasLongCastle(),
                 state.whiteHasLongCastle(),
                 false,
                 state.blackHasShortCastle()};
-
       }
     }
-    if constexpr (figure == ROOK && flag == MOVE_FLAG_RIGHT_ROOK){
-      if constexpr(state.turn() == WHITE){
+    if constexpr (figure == ROOK && flag == MOVE_FLAG_RIGHT_ROOK) {
+      if constexpr (state.turn() == WHITE) {
         return {!state.turn(),
                 false,
                 state.whiteHasLongCastle(),
                 false,
                 state.blackHasLongCastle(),
                 state.blackHasShortCastle()};
-      }else{
+      } else {
         return {!state.turn(),
                 false,
                 state.whiteHasLongCastle(),
@@ -138,7 +136,6 @@ compiletime GameState compiletimeStateTransition() {
                 false};
       }
     }
-
   }
 
   return {!state.turn(),
@@ -147,56 +144,4 @@ compiletime GameState compiletimeStateTransition() {
           state.whiteHasShortCastle(),
           state.blackHasLongCastle(),
           state.blackHasShortCastle()};
-}
-
-inline constexpr GameState runtimeStateTransition(const GameState& state,
-                                                  runtime_move move) {
-  const move_flag& flag = move.m_compiletimeFlag;
-  if (flag == MOVE_FLAG_SHORT_CASTLE) {
-    if (state.turn()) {
-      return {!state.turn(),
-              false,
-              state.whiteHasShortCastle(),
-              false,
-              state.blackHasLongCastle(),
-              state.blackHasShortCastle()};
-    } else {
-      return {!state.turn(),
-              false,
-              state.whiteHasLongCastle(),
-              state.whiteHasShortCastle(),
-              state.blackHasLongCastle(),
-              false};
-    }
-  } else if (flag == MOVE_FLAG_LONG_CASTLE) {
-    if (state.turn()) {
-      return {!state.turn(),
-              false,
-              false,
-              state.whiteHasShortCastle(),
-              state.blackHasLongCastle(),
-              state.blackHasShortCastle()};
-    } else {
-      return {!state.turn(),
-              false,
-              state.whiteHasLongCastle(),
-              state.whiteHasLongCastle(),
-              false,
-              state.whiteHasShortCastle()};
-    }
-  } else if (flag == MOVE_FLAG_DOUBLE_PAWN_PUSH) {
-    return {!state.turn(),
-            true,
-            state.whiteHasLongCastle(),
-            state.whiteHasLongCastle(),
-            state.blackHasLongCastle(),
-            state.blackHasShortCastle()};
-  } else {
-    return {!state.turn(),
-            false,
-            state.whiteHasLongCastle(),
-            state.whiteHasLongCastle(),
-            state.blackHasLongCastle(),
-            state.blackHasShortCastle()};
-  }
 }

@@ -8,14 +8,10 @@
 #include "GameState.h"
 #include "MagicLookup.h"
 #include "banmask.h"
-#include "banmask_generation.h"
 #include "bitmap.h"
 #include "checkmask.h"
-#include "checkmask_generation.h"
-#include "lookup.h"
 #include "move.h"
 #include "pinmask.h"
-#include "pinmask_generation.h"
 #include "x86utils.h"
 
 namespace Movegen {
@@ -328,8 +324,12 @@ inline void enumerateMoves(const Board &board, MoveReceiver &receiver,
         if (epLeftPawn) {
           receiver.template move<PAWN, MOVE_FLAG_EN_PASSANT>(
               epLeftPawn, PawnAttackLeft<turn>(epLeftPawn));
+          Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
+        }
+        if (epRightPawn) {
           receiver.template move<PAWN, MOVE_FLAG_EN_PASSANT>(
               epRightPawn, PawnAttackRight<turn>(epRightPawn));
+          Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
         }
       }
     }
@@ -351,6 +351,7 @@ inline void enumerateMoves(const Board &board, MoveReceiver &receiver,
         const bitmap_t pos = popBit(promoteLeft);
         receiver.template move<KNIGHT, MOVE_FLAG_PROMOTE>(
             pos, PawnAttackLeft<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
         receiver.template move<BISHOP, MOVE_FLAG_PROMOTE>(
             pos, PawnAttackLeft<turn>(pos));
         receiver.template move<ROOK, MOVE_FLAG_PROMOTE>(
@@ -362,6 +363,7 @@ inline void enumerateMoves(const Board &board, MoveReceiver &receiver,
         const bitmap_t pos = popBit(promoteRight);
         receiver.template move<KNIGHT, MOVE_FLAG_PROMOTE>(
             pos, PawnAttackRight<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
         receiver.template move<BISHOP, MOVE_FLAG_PROMOTE>(
             pos, PawnAttackRight<turn>(pos));
         receiver.template move<ROOK, MOVE_FLAG_PROMOTE>(
@@ -373,6 +375,7 @@ inline void enumerateMoves(const Board &board, MoveReceiver &receiver,
         const bitmap_t pos = popBit(promotePush);
         receiver.template move<KNIGHT, MOVE_FLAG_PROMOTE>(
             pos, PawnForward<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
         receiver.template move<BISHOP, MOVE_FLAG_PROMOTE>(
             pos, PawnForward<turn>(pos));
         receiver.template move<ROOK, MOVE_FLAG_PROMOTE>(pos,
@@ -384,21 +387,25 @@ inline void enumerateMoves(const Board &board, MoveReceiver &receiver,
         const bitmap_t pos = popBit(noPromoteLeft);
         receiver.template move<PAWN, MOVE_FLAG_CAPTURE>(
             pos, PawnAttackLeft<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
       }
       while (noPromoteRight) {
         const bitmap_t pos = popBit(noPromoteRight);
         receiver.template move<PAWN, MOVE_FLAG_CAPTURE>(
             pos, PawnAttackRight<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
       }
       while (noPromotePush) {
         const bitmap_t pos = popBit(noPromotePush);
         receiver.template move<PAWN, MOVE_FLAG_SILENT>(pos,
                                                        PawnForward<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
       }
       while (doublePushablePawns) {
         const bitmap_t pos = popBit(doublePushablePawns);
         receiver.template move<PAWN, MOVE_FLAG_DOUBLE_PAWN_PUSH>(
             pos, PawnForward2<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
       }
 
     } else {
@@ -406,21 +413,25 @@ inline void enumerateMoves(const Board &board, MoveReceiver &receiver,
         const bitmap_t pos = popBit(leftAttackingPawns);
         receiver.template move<PAWN, MOVE_FLAG_CAPTURE>(
             pos, PawnAttackLeft<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
       }
       while (rightAttackingPawns) {
         const bitmap_t pos = popBit(rightAttackingPawns);
         receiver.template move<PAWN, MOVE_FLAG_CAPTURE>(
             pos, PawnAttackRight<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
       }
       while (pushablePawns) {
         const bitmap_t pos = popBit(pushablePawns);
         receiver.template move<PAWN, MOVE_FLAG_SILENT>(pos,
                                                        PawnForward<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
       }
       while (doublePushablePawns) {
         const bitmap_t pos = popBit(doublePushablePawns);
         receiver.template move<PAWN, MOVE_FLAG_DOUBLE_PAWN_PUSH>(
             pos, PawnForward2<turn>(pos));
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
       }
     }
   }
@@ -430,7 +441,7 @@ inline void enumerateMoves(const Board &board, MoveReceiver &receiver,
     WHILE_RESET_LSB(knights) {
       const bitmap_t tile = SQUARE_OF(knights);
       bitmap_t origin = 1ull << tile;
-      bitmap_t moves = KnightLookUpTable::get()[tile] & movable;
+      bitmap_t moves = MagicLookup::King(tile) & movable;
       while (moves) {
         const bitmap_t target = popBit(moves);
         if (target & board.OccupiedBy<!turn>()) {
@@ -438,6 +449,7 @@ inline void enumerateMoves(const Board &board, MoveReceiver &receiver,
         } else {
           receiver.template move<KNIGHT, MOVE_FLAG_SILENT>(origin, target);
         }
+        Movestack::g_Checkmask[depth - 1] = 0xFFFFFFFFFFFFFFFFull;
       }
     }
   }

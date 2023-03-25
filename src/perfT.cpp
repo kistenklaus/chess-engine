@@ -59,13 +59,15 @@ class RecursiveProfiler {
     using std::chrono::high_resolution_clock;
     using std::chrono::milliseconds;
 
+    compiletime_move<figure, flag> move = {.m_origin = origin,
+        .m_target = target};
+
     if constexpr (depth == 0) {
       m_count++;
-      std::cout << 1 << std::endl;
+      std::cout << notation::toString(m_board, state, move.m_origin,
+                                      move.m_target, figure, flag)
+                << " : 1   took : 0ms" << std::endl;
     } else {
-      compiletime_move<figure, flag> move = {.m_origin = origin,
-                                             .m_target = target};
-
       Board nextBoard = m_board.applyMove<state>(move);
       constexpr GameState nextState =
           compiletimeStateTransition<state, figure, flag>();
@@ -80,7 +82,8 @@ class RecursiveProfiler {
       m_count += count;
       std::cout << notation::toString(m_board, state, move.m_origin,
                                       move.m_target, figure, flag)
-                << " : " << count << "   took : " << ms_int << std::endl;
+                << " : " << count << "   took : " << ms_int << "ms"
+                << std::endl;
     }
   }
 
@@ -98,7 +101,7 @@ class RecursiveProfiler {
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 - t1);
     std::cout << std::endl;
-    std::cout << "Total : " << m_count << "   took : " << ms_int<< std::endl;
+    std::cout << "Total : " << m_count << "   took : " << ms_int << std::endl;
     std::cout << "================================" << std::endl;
     return m_count;
   }

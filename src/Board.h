@@ -1,12 +1,12 @@
 #pragma once
 #include <cassert>
+#include <cinttypes>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 
 #include "GameState.h"
 #include "bitmap.h"
-#include "cinttypes"
 #include "figure.h"
 #include "move.h"
 
@@ -214,10 +214,6 @@ class Board {
     return Board(w_pawns, b_pawns, w_bishops, b_bishops, w_knights, b_knights,
                  w_rooks, b_rooks, w_queen, b_queen, w_king, b_king);
   }
-
-  // this is not to most efficient method. SHOULD BE AVOIDED IN MOVE-GEN.
-  [[nodiscard]] figure_t get_figure_at(uint8_t tile_index) const;
-  [[nodiscard]] figure_t get_figure_at(uint8_t row, uint8_t column) const;
 
   template <GameState state, figure_type figure, move_flag flag>
   force_inline Board
