@@ -23,3 +23,10 @@ struct compiletime_move{
   bitmap_t m_origin;
   bitmap_t m_target;
 };
+
+struct runtime_move {
+  bitmap_t m_origin;
+  bitmap_t m_target;
+  figure_type m_figure;
+  move_flag m_flag;
+};

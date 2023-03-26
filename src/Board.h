@@ -408,7 +408,7 @@ class Board {
         assert((move.m_target & b_occ) == 0 &&
                "Cannot move to square of same"
                " color");
-        if constexpr (figure == PAWN) {
+        if (figure == PAWN) {
           return Board(b_pawns ^ mov, w_pawns, b_bishops, w_bishops, b_knights,
                        w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
                        w_king);
@@ -435,6 +435,231 @@ class Board {
         }
       }
     }
+    throw std::runtime_error("Unimplemented Exception");
+  }
+
+  [[nodiscard]] Board applyMove(const GameState& state,
+                                const runtime_move& move) const {
+    const move_flag flag = move.m_flag;
+    const figure_type figure = move.m_figure;
+    const bitmap_t mov = move.m_origin | move.m_target;
+    if (flag == MOVE_FLAG_CAPTURE || flag == MOVE_FLAG_LEFT_ROOK ||
+        flag == MOVE_FLAG_RIGHT_ROOK) {
+      const bitmap_t rem = ~move.m_target;
+      if (state.turn()) {
+        assert((b_king & mov) == 0 && "Taking Black King is not legal");
+        assert((move.m_target & w_occ) == 0 &&
+               "Cannot move to square of same"
+               " color");
+        if (figure == PAWN) {
+          return Board(b_pawns & rem, w_pawns ^ mov, b_bishops & rem, w_bishops,
+                       b_knights & rem, w_knights, b_rooks & rem, w_rooks,
+                       b_queen & rem, w_queen, b_king, w_king);
+        } else if (figure == KNIGHT) {
+          return Board(b_pawns & rem, w_pawns, b_bishops & rem, w_bishops,
+                       b_knights & rem, w_knights ^ mov, b_rooks & rem, w_rooks,
+                       b_queen & rem, w_queen, b_king, w_king);
+        } else if (figure == BISHOP) {
+          return Board(b_pawns & rem, w_pawns, b_bishops & rem, w_bishops ^ mov,
+                       b_knights & rem, w_knights, b_rooks & rem, w_rooks,
+                       b_queen & rem, w_queen, b_king, w_king);
+        } else if (figure == ROOK) {
+          return Board(b_pawns & rem, w_pawns, b_bishops & rem, w_bishops,
+                       b_knights & rem, w_knights, b_rooks & rem, w_rooks ^ mov,
+                       b_queen & rem, w_queen, b_king, w_king);
+        } else if (figure == QUEEN) {
+          return Board(b_pawns & rem, w_pawns, b_bishops & rem, w_bishops,
+                       b_knights & rem, w_knights, b_rooks & rem, w_rooks,
+                       b_queen & rem, w_queen ^ mov, b_king, w_king);
+        } else if (figure == KING) {
+          return Board(b_pawns & rem, w_pawns, b_bishops & rem, w_bishops,
+                       b_knights & rem, w_knights, b_rooks & rem, w_rooks,
+                       b_queen & rem, w_queen, b_king, w_king ^ mov);
+        }
+      } else {
+        assert((w_king & mov) == 0 && "Taking White King is not legal");
+        assert((move.m_target & b_occ) == 0 &&
+               "Cannot move to square of same"
+               " color");
+        if (figure == PAWN) {
+          return Board(b_pawns ^ mov, w_pawns & rem, b_bishops, w_bishops & rem,
+                       b_knights, w_knights & rem, b_rooks, w_rooks & rem,
+                       b_queen, w_queen & rem, b_king, w_king);
+        } else if (figure == KNIGHT) {
+          return Board(b_pawns, w_pawns & rem, b_bishops, w_bishops & rem,
+                       b_knights ^ mov, w_knights & rem, b_rooks, w_rooks & rem,
+                       b_queen, w_queen & rem, b_king, w_king);
+        } else if (figure == BISHOP) {
+          return Board(b_pawns, w_pawns & rem, b_bishops ^ mov, w_bishops & rem,
+                       b_knights, w_knights & rem, b_rooks, w_rooks & rem,
+                       b_queen, w_queen & rem, b_king, w_king);
+        } else if (figure == ROOK) {
+          return Board(b_pawns, w_pawns & rem, b_bishops, w_bishops & rem,
+                       b_knights, w_knights & rem, b_rooks ^ mov, w_rooks & rem,
+                       b_queen, w_queen & rem, b_king, w_king);
+        } else if (figure == QUEEN) {
+          return Board(b_pawns, w_pawns & rem, b_bishops, w_bishops & rem,
+                       b_knights, w_knights & rem, b_rooks, w_rooks & rem,
+                       b_queen ^ mov, w_queen & rem, b_king, w_king);
+        } else if (figure == KING) {
+          return Board(b_pawns, w_pawns & rem, b_bishops, w_bishops & rem,
+                       b_knights, w_knights & rem, b_rooks, w_rooks & rem,
+                       b_queen, w_queen & rem, b_king ^ mov, w_king);
+        }
+      }
+    } else if (flag == MOVE_FLAG_SHORT_CASTLE) {
+      if (state.turn()) {
+        const bitmap_t kingSwitch = 0x50ull;
+        const bitmap_t rookSwitch = 0xA0ull;
+        return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                     w_knights, b_rooks, w_rooks ^ rookSwitch, b_queen, w_queen,
+                     b_king, w_king ^ kingSwitch);
+      } else {
+        const bitmap_t kingSwitch = 0x50ull << 56ull;
+        const bitmap_t rookSwitch = 0xA0ull << 56ull;
+        return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                     w_knights, b_rooks ^ rookSwitch, w_rooks, b_queen, w_queen,
+                     b_king ^ kingSwitch, w_king);
+      }
+    } else if (flag == MOVE_FLAG_LONG_CASTLE) {
+      if (state.turn()) {
+        const bitmap_t kingSwitch = 0x14ull;
+        const bitmap_t rookSwitch = 0x9ull;
+        return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                     w_knights, b_rooks, w_rooks ^ rookSwitch, b_queen, w_queen,
+                     b_king, w_king ^ kingSwitch);
+      } else {
+        const bitmap_t kingSwitch = 0x14ull << 56ull;
+        const bitmap_t rookSwitch = 0x9ull << 56ull;
+        return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                     w_knights, b_rooks ^ rookSwitch, w_rooks, b_queen, w_queen,
+                     b_king ^ kingSwitch, w_king);
+      }
+    } else if (flag == MOVE_FLAG_EN_PASSANT) {
+      if (state.turn()) {
+        const bitmap_t rem = ~(move.m_target >> 8);
+        return Board(b_pawns & rem, w_pawns ^ mov, b_bishops & rem, w_bishops,
+                     b_knights & rem, w_knights, b_rooks & rem, w_rooks,
+                     b_queen & rem, w_queen, b_king, w_king);
+
+      } else {
+        const bitmap_t rem = ~(move.m_target << 8);
+        return Board(b_pawns ^ mov, w_pawns & rem, b_bishops, w_bishops & rem,
+                     b_knights, w_knights & rem, b_rooks, w_rooks & rem,
+                     b_queen, w_queen & rem, b_king, w_king);
+      }
+    } else if (flag == MOVE_FLAG_PROMOTE) {
+      const bitmap_t rem = ~move.m_target;
+      if (state.turn()) {
+        if (figure == KNIGHT) {
+          return Board(b_pawns & rem, w_pawns ^ move.m_origin, b_bishops & rem,
+                       w_bishops, b_knights & rem, w_knights ^ move.m_target,
+                       b_rooks & rem, w_rooks, b_queen & rem, w_queen, b_king,
+                       w_king);
+        } else if (figure == BISHOP) {
+          return Board(b_pawns & rem, w_pawns ^ move.m_origin, b_bishops & rem,
+                       w_bishops ^ move.m_target, b_knights & rem, w_knights,
+                       b_rooks & rem, w_rooks, b_queen & rem, w_queen, b_king,
+                       w_king);
+        } else if (figure == ROOK) {
+          return Board(b_pawns & rem, w_pawns ^ move.m_origin, b_bishops & rem,
+                       w_bishops, b_knights & rem, w_knights, b_rooks & rem,
+                       w_rooks ^ move.m_target, b_queen & rem, w_queen, b_king,
+                       w_king);
+        } else if (figure == QUEEN) {
+          return Board(b_pawns & rem, w_pawns ^ move.m_origin, b_bishops & rem,
+                       w_bishops, b_knights & rem, w_knights, b_rooks & rem,
+                       w_rooks, b_queen & rem, w_queen ^ move.m_target, b_king,
+                       w_king);
+        }
+      } else {
+        if (figure == KNIGHT) {
+          return Board(b_pawns ^ move.m_origin, w_pawns & rem, b_bishops,
+                       w_bishops & rem, b_knights ^ move.m_target,
+                       w_knights & rem, b_rooks, w_rooks & rem, b_queen,
+                       w_queen & rem, b_king, w_king);
+        } else if (figure == BISHOP) {
+          return Board(b_pawns ^ move.m_origin, w_pawns & rem,
+                       b_bishops ^ move.m_target, w_bishops & rem, b_knights,
+                       w_knights & rem, b_rooks, w_rooks & rem, b_queen,
+                       w_queen & rem, b_king, w_king);
+        } else if (figure == ROOK) {
+          return Board(b_pawns ^ move.m_origin, w_pawns & rem, b_bishops,
+                       w_bishops & rem, b_knights, w_knights & rem,
+                       b_rooks ^ move.m_target, w_rooks & rem, b_queen,
+                       w_queen & rem, b_king, w_king);
+        } else if (figure == QUEEN) {
+          return Board(b_pawns ^ move.m_origin, w_pawns & rem, b_bishops,
+                       w_bishops & rem, b_knights, w_knights & rem, b_rooks,
+                       w_rooks & rem, b_queen ^ move.m_target, w_queen & rem,
+                       b_king, w_king);
+        }
+      }
+
+    } else {
+      if (state.turn()) {
+        assert((b_king & mov) == 0 && "Taking Black King is not legal");
+        assert((move.m_target & w_occ) == 0 &&
+               "Cannot move to square of same"
+               " color");
+        if (figure == PAWN) {
+          return Board(b_pawns, w_pawns ^ mov, b_bishops, w_bishops, b_knights,
+                       w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
+                       w_king);
+        } else if (figure == KNIGHT) {
+          return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                       w_knights ^ mov, b_rooks, w_rooks, b_queen, w_queen,
+                       b_king, w_king);
+        } else if (figure == BISHOP) {
+          return Board(b_pawns, w_pawns, b_bishops, w_bishops ^ mov, b_knights,
+                       w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
+                       w_king);
+        } else if (figure == ROOK) {
+          return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                       w_knights, b_rooks, w_rooks ^ mov, b_queen, w_queen,
+                       b_king, w_king);
+        } else if (figure == QUEEN) {
+          return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                       w_knights, b_rooks, w_rooks, b_queen, w_queen ^ mov,
+                       b_king, w_king);
+        } else if (figure == KING) {
+          return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                       w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
+                       w_king ^ mov);
+        }
+      } else {
+        assert((w_king & mov) == 0 && "Taking White King is not legal");
+        assert((move.m_target & b_occ) == 0 &&
+               "Cannot move to square of same"
+               " color");
+        if (figure == PAWN) {
+          return Board(b_pawns ^ mov, w_pawns, b_bishops, w_bishops, b_knights,
+                       w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
+                       w_king);
+        } else if (figure == KNIGHT) {
+          return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights ^ mov,
+                       w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
+                       w_king);
+        } else if (figure == BISHOP) {
+          return Board(b_pawns, w_pawns, b_bishops ^ mov, w_bishops, b_knights,
+                       w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
+                       w_king);
+        } else if (figure == ROOK) {
+          return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                       w_knights, b_rooks ^ mov, w_rooks, b_queen, w_queen,
+                       b_king, w_king);
+        } else if (figure == QUEEN) {
+          return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                       w_knights, b_rooks, w_rooks, b_queen ^ mov, w_queen,
+                       b_king, w_king);
+        } else if (figure == KING) {
+          return Board(b_pawns, w_pawns, b_bishops, w_bishops, b_knights,
+                       w_knights, b_rooks, w_rooks, b_queen, w_queen,
+                       b_king ^ mov, w_king);
+        }
+      }
+    }
+    throw std::runtime_error("Unimplemented Exception");
   }
 };
 

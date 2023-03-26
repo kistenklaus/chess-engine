@@ -5,7 +5,7 @@
 
 #include <chrono>
 
-#include "move_generation.h"
+#include "movegen_constant_enumeration.h"
 #include "notation.h"
 
 namespace perfT {
@@ -28,14 +28,15 @@ class RecursiveMoveCounter {
       constexpr GameState nextState =
           compiletimeStateTransition<state, figure, flag>();
 
-      Movegen::PrepareEnumeration<state, figure, flag, depth>(m_board, move);
       auto recursion = RecursiveMoveCounter<nextState, depth - 1>(nextBoard);
+      movegen::constant_enumeration::prepare<state, figure, flag, depth>(
+          m_board, move);
       m_count += recursion.run();
     }
   }
 
   unsigned long run() {
-    Movegen::Enumerate<state, depth, RecursiveMoveCounter<state, depth>>(
+    movegen::enumerate<state, depth, RecursiveMoveCounter<state, depth>>(
         m_board, *this);
     return m_count;
   }
@@ -50,7 +51,8 @@ class RecursiveMoveCounter {
 template <GameState state, int depth>
 class RecursiveProfiler {
  public:
-  explicit RecursiveProfiler(const Board& board) : m_board(board) {}
+  explicit RecursiveProfiler(const Board& board, bitmap_t epTarget)
+      : m_board(board), m_epTarget(epTarget) {}
 
   template <figure_type figure, move_flag flag>
   void move(bitmap_t origin, bitmap_t target) {
@@ -60,11 +62,11 @@ class RecursiveProfiler {
     using std::chrono::milliseconds;
 
     compiletime_move<figure, flag> move = {.m_origin = origin,
-        .m_target = target};
+                                           .m_target = target};
 
     if constexpr (depth == 0) {
       m_count++;
-      std::cout << notation::toString(m_board, state, move.m_origin,
+      std::cout << notation::toString(m_board, state, m_epTarget, move.m_origin,
                                       move.m_target, figure, flag)
                 << " : 1   took : 0ms" << std::endl;
     } else {
@@ -72,7 +74,8 @@ class RecursiveProfiler {
       constexpr GameState nextState =
           compiletimeStateTransition<state, figure, flag>();
 
-      Movegen::PrepareEnumeration<state, figure, flag, depth>(m_board, move);
+      movegen::constant_enumeration::prepare<state, figure, flag, depth>(
+          m_board, move);
       auto recursion = RecursiveMoveCounter<nextState, depth - 1>(nextBoard);
 
       auto t1 = high_resolution_clock::now();
@@ -80,7 +83,7 @@ class RecursiveProfiler {
       auto t2 = high_resolution_clock::now();
       auto ms_int = duration_cast<milliseconds>(t2 - t1);
       m_count += count;
-      std::cout << notation::toString(m_board, state, move.m_origin,
+      std::cout << notation::toString(m_board, state, m_epTarget, move.m_origin,
                                       move.m_target, figure, flag)
                 << " : " << count << "   took : " << ms_int << "ms"
                 << std::endl;
@@ -92,49 +95,50 @@ class RecursiveProfiler {
     using std::chrono::duration_cast;
     using std::chrono::high_resolution_clock;
     using std::chrono::milliseconds;
-    std::cout << "=========DEPTH[" << depth << "]=============" << std::endl;
+    std::cout << "=========DEPTH[" << (depth + 1)
+              << "]=============" << std::endl;
     auto t1 = high_resolution_clock::now();
-    Movegen::internal::initMovegen(0);
-    Movegen::internal::Movestack::init<state, depth>(m_board);
-    Movegen::Enumerate<state, depth, RecursiveProfiler<state, depth>>(m_board,
+    movegen::Movestack::init<state, depth>(m_board, m_epTarget);
+    movegen::enumerate<state, depth, RecursiveProfiler<state, depth>>(m_board,
                                                                       *this);
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 - t1);
     std::cout << std::endl;
     std::cout << "Total : " << m_count << "   took : " << ms_int << std::endl;
-    std::cout << "================================" << std::endl;
     return m_count;
   }
 
  private:
   const Board m_board;
+  const bitmap_t m_epTarget;
   unsigned long m_count = 0;
 };
 
 template <GameState state>
-unsigned long perfT(const Board& board, int depth) {
+unsigned long perfT(const Board& board, bitmap_t epTarget, int depth) {
   switch (depth) {
     case 0:
-      return RecursiveProfiler<state, 0>(board).run();
+      return RecursiveProfiler<state, 0>(board, epTarget).run();
     case 1:
-      return RecursiveProfiler<state, 1>(board).run();
+      return RecursiveProfiler<state, 1>(board, epTarget).run();
     case 2:
-      return RecursiveProfiler<state, 2>(board).run();
+      return RecursiveProfiler<state, 2>(board, epTarget).run();
     case 3:
-      return RecursiveProfiler<state, 3>(board).run();
+      return RecursiveProfiler<state, 3>(board, epTarget).run();
     case 4:
-      return RecursiveProfiler<state, 4>(board).run();
+      return RecursiveProfiler<state, 4>(board, epTarget).run();
     case 5:
-      return RecursiveProfiler<state, 5>(board).run();
+      return RecursiveProfiler<state, 5>(board, epTarget).run();
     case 6:
-      return RecursiveProfiler<state, 6>(board).run();
+      return RecursiveProfiler<state, 6>(board, epTarget).run();
     default:
       throw std::runtime_error(
           "[Unimplemented] depth compiletime invocation is not implemented");
   }
 }
 
-unsigned long perfT(const Board& board, const GameState& state, int depth) {
+unsigned long perfT(const Board& board, const GameState& state,
+                    bitmap_t epTarget, int depth) {
   if (state.turn()) {
     if (state.hasEnPassant()) {
       if (state.whiteHasLongCastle()) {
@@ -142,36 +146,36 @@ unsigned long perfT(const Board& board, const GameState& state, int depth) {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, true, true, true, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, true, true, true, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, true, true, true, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, true, true, true, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, true, true, false, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, true, true, false, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, true, true, false, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, true, true, false, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         }
@@ -180,36 +184,36 @@ unsigned long perfT(const Board& board, const GameState& state, int depth) {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, true, false, true, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, true, false, true, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, true, false, true, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, true, false, true, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, true, false, false, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, true, false, false, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, true, false, false, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, true, false, false, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         }
@@ -220,36 +224,36 @@ unsigned long perfT(const Board& board, const GameState& state, int depth) {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, false, true, true, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, false, true, true, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, false, true, true, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, false, true, true, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, false, true, false, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, false, true, false, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, false, true, false, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, false, true, false, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         }
@@ -258,36 +262,36 @@ unsigned long perfT(const Board& board, const GameState& state, int depth) {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, false, false, true, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, false, false, true, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, false, false, true, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, false, false, true, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, false, false, false, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, false, false, false, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(true, false, false, false, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(true, false, false, false, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         }
@@ -300,36 +304,36 @@ unsigned long perfT(const Board& board, const GameState& state, int depth) {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, true, true, true, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, true, true, true, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, true, true, true, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, true, true, true, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, true, true, false, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, true, true, false, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, true, true, false, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, true, true, false, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         }
@@ -338,36 +342,36 @@ unsigned long perfT(const Board& board, const GameState& state, int depth) {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, true, false, true, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, true, false, true, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, true, false, true, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, true, false, true, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, true, false, false, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, true, false, false, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, true, false, false, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, true, false, false, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         }
@@ -378,36 +382,36 @@ unsigned long perfT(const Board& board, const GameState& state, int depth) {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, false, true, true, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, false, true, true, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, false, true, true, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, false, true, true, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, false, true, false, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, false, true, false, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, false, true, false, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, false, true, false, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         }
@@ -416,36 +420,36 @@ unsigned long perfT(const Board& board, const GameState& state, int depth) {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, false, false, true, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, false, false, true, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, false, false, true, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, false, false, true, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         } else {
           if (state.blackHasLongCastle()) {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, false, false, false, true, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, false, false, false, true, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           } else {
             if (state.blackHasShortCastle()) {
               return perfT<GameState(false, false, false, false, false, true)>(
-                  board, depth);
+                  board, epTarget, depth);
             } else {
               return perfT<GameState(false, false, false, false, false, false)>(
-                  board, depth);
+                  board, epTarget, depth);
             }
           }
         }
@@ -455,10 +459,9 @@ unsigned long perfT(const Board& board, const GameState& state, int depth) {
 }
 }  // namespace internal
 
-unsigned long run(const std::string& fen, int depth) {
-  const Board& board = fen::parse(fen);
-  const GameState state = GameState::Default();
-  return internal::perfT(board, state, depth);
+unsigned long run(const ChessPosition& position, int depth) {
+  return internal::perfT(position.board(), position.state(),
+                         position.epTarget(), depth);
 }
 
 }  // namespace perfT

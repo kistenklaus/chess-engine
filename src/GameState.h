@@ -145,3 +145,73 @@ compiletime GameState compiletimeStateTransition() {
           state.blackHasLongCastle(),
           state.blackHasShortCastle()};
 }
+
+inline GameState runtimeStateTransition(const GameState& state,
+                                        figure_type figure, move_flag flag) {
+  if (figure == PAWN && flag == MOVE_FLAG_DOUBLE_PAWN_PUSH) {
+    return {!state.turn(),
+            true,
+            state.whiteHasLongCastle(),
+            state.whiteHasShortCastle(),
+            state.blackHasLongCastle(),
+            state.blackHasShortCastle()};
+  }
+  if (figure == KING) {
+    if (state.turn() == WHITE) {
+      return {!state.turn(),
+              false,
+              false,
+              false,
+              state.blackHasLongCastle(),
+              state.blackHasShortCastle()};
+    } else {
+      return {!state.turn(),
+              false,
+              state.whiteHasLongCastle(),
+              state.whiteHasShortCastle(),
+              false,
+              false};
+    }
+    if (figure == ROOK && flag == MOVE_FLAG_LEFT_ROOK) {
+      if (state.turn() == WHITE) {
+        return {!state.turn(),
+                false,
+                false,
+                state.whiteHasLongCastle(),
+                state.blackHasLongCastle(),
+                state.blackHasShortCastle()};
+      } else {
+        return {!state.turn(),
+                false,
+                state.whiteHasLongCastle(),
+                state.whiteHasLongCastle(),
+                false,
+                state.blackHasShortCastle()};
+      }
+    }
+    if (figure == ROOK && flag == MOVE_FLAG_RIGHT_ROOK) {
+      if (state.turn() == WHITE) {
+        return {!state.turn(),
+                false,
+                state.whiteHasLongCastle(),
+                false,
+                state.blackHasLongCastle(),
+                state.blackHasShortCastle()};
+      } else {
+        return {!state.turn(),
+                false,
+                state.whiteHasLongCastle(),
+                state.whiteHasShortCastle(),
+                state.blackHasLongCastle(),
+                false};
+      }
+    }
+  }
+
+  return {!state.turn(),
+          false,
+          state.whiteHasLongCastle(),
+          state.whiteHasShortCastle(),
+          state.blackHasLongCastle(),
+          state.blackHasShortCastle()};
+}

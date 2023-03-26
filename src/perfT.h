@@ -5,6 +5,7 @@
 #include "Board.h"
 #include "GameState.h"
 #include "fen.h"
+#include "ChessPosition.h"
 
 namespace perfT {
 
@@ -12,6 +13,6 @@ namespace internal {
 unsigned long perfT(const Board& board, const GameState& state, int depth);
 }
 
-unsigned long run(const std::string& fen, int depth);
+unsigned long run(const ChessPosition& position, int depth);
 
 }  // namespace perfT
