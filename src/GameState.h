@@ -76,7 +76,7 @@ class GameState {
   }
 };
 
-template <GameState state, figure_type figure, move_flag flag>
+template <GameState state, figure figure, move_flag flag>
 compiletime GameState compiletimeStateTransition() {
   if (figure == PAWN && flag == MOVE_FLAG_DOUBLE_PAWN_PUSH) {
     return {!state.turn(),
@@ -146,8 +146,7 @@ compiletime GameState compiletimeStateTransition() {
           state.blackHasShortCastle()};
 }
 
-inline GameState runtimeStateTransition(const GameState& state,
-                                        figure_type figure, move_flag flag) {
+inline GameState runtimeStateTransition(const GameState& state, figure figure, move_flag flag) {
   if (figure == PAWN && flag == MOVE_FLAG_DOUBLE_PAWN_PUSH) {
     return {!state.turn(),
             true,

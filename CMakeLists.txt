@@ -26,7 +26,6 @@ set(HEADERS
         src/movegen_util.h
         src/movegen_movestack.h
         src/movegen_constant_enumeration.h
-        src/movegen_const_collection.h
         src/ChessPosition.h
         src/cli.h
         )
@@ -39,7 +38,7 @@ set(SOURCES
         src/perfT.cpp
         src/cli.cpp
         src/ChessPosition.cpp
-        src/movegen_collection.h)
+        src/movegen_constant_collection.h src/movegen_constant_collection.cpp src/movegen_constant_collection_decl.h)
 
 
 include_directories(src) #kinda sketchy but easier to code.

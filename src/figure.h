@@ -5,7 +5,7 @@
 
 #include "color.h"
 
-enum figure_type : uint8_t {
+enum figure : uint8_t {
   PAWN = 1,
   BISHOP = 2,
   KNIGHT = 3,

@@ -130,7 +130,7 @@ force_inline void registerEnPassantPin(bitmap_t kingTile, bitmap_t king,
   }
 }
 
-force_inline void checkBySlider(bitmap_t kingTile, bitmap_t enemyTile,
+inline void checkBySlider(bitmap_t kingTile, bitmap_t enemyTile,
                                 banmask_t &banmask, checkmask_t &checkmask) {
   if (checkmask == 0xFFFFFFFFFFFFFFFFull) {
     checkmask = MagicLookup::PinBetween(kingTile, enemyTile);

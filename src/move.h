@@ -18,7 +18,7 @@ enum move_flag {
   MOVE_FLAG_PROMOTE
 };
 
-template<figure_type figure, move_flag flag>
+template<figure figure, move_flag flag>
 struct compiletime_move{
   bitmap_t m_origin;
   bitmap_t m_target;
@@ -27,6 +27,6 @@ struct compiletime_move{
 struct runtime_move {
   bitmap_t m_origin;
   bitmap_t m_target;
-  figure_type m_figure;
+  figure m_figure;
   move_flag m_flag;
 };

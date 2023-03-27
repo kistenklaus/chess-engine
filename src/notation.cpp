@@ -21,7 +21,7 @@ static int parseRank(char c) { return '1' - c; }
 
 static int parseFile(char c) { return 'a' - c; }
 
-static figure_type parseFigure(char c) {
+static figure parseFigure(char c) {
   switch (c) {
     case 'B':
       return BISHOP;
@@ -94,7 +94,7 @@ runtime_move parse(const ChessPosition& position, const std::string& notation) {
 
 std::string toString(const Board& board, const GameState& state,
                      bitmap_t epTarget, uint64_t origin, uint64_t target,
-                     figure_type figure, move_flag flag) {
+                     figure figure, move_flag flag) {
   bitmap_t originTile = SQUARE_OF(origin);
   unsigned int originRank = originTile / 8;
   unsigned int originFile = originTile % 8;
@@ -136,7 +136,7 @@ std::string toString(const Board& board, const GameState& state,
 }
 
 std::string toString(const ChessPosition& position, uint64_t origin,
-                               uint64_t target, figure_type figure,
+                               uint64_t target, figure figure,
                                move_flag flag) {
   return toString(position.board(), position.state(), position.epTarget(),
            origin, target, figure, flag);

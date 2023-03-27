@@ -16,7 +16,7 @@ class RecursiveMoveCounter {
  public:
   explicit RecursiveMoveCounter(const Board board) : m_board(board) {}
 
-  template <figure_type figure, move_flag flag>
+  template <figure figure, move_flag flag>
   void move(bitmap_t origin, bitmap_t target) {
     if constexpr (depth == 0) {
       m_count++;
@@ -29,15 +29,17 @@ class RecursiveMoveCounter {
           compiletimeStateTransition<state, figure, flag>();
 
       auto recursion = RecursiveMoveCounter<nextState, depth - 1>(nextBoard);
+
       movegen::constant_enumeration::prepare<state, figure, flag, depth>(
           m_board, move);
       m_count += recursion.run();
     }
   }
 
-  unsigned long run() {
-    movegen::enumerate<state, depth, RecursiveMoveCounter<state, depth>>(
-        m_board, *this);
+  force_inline unsigned long run() {
+    movegen::constant_enumeration::recursive_call<
+        state, depth, RecursiveMoveCounter<state, depth> >(m_board, *this);
+
     return m_count;
   }
 
@@ -54,7 +56,7 @@ class RecursiveProfiler {
   explicit RecursiveProfiler(const Board& board, bitmap_t epTarget)
       : m_board(board), m_epTarget(epTarget) {}
 
-  template <figure_type figure, move_flag flag>
+  template <figure figure, move_flag flag>
   void move(bitmap_t origin, bitmap_t target) {
     using std::chrono::duration;
     using std::chrono::duration_cast;
@@ -74,18 +76,21 @@ class RecursiveProfiler {
       constexpr GameState nextState =
           compiletimeStateTransition<state, figure, flag>();
 
-      movegen::constant_enumeration::prepare<state, figure, flag, depth>(
-          m_board, move);
       auto recursion = RecursiveMoveCounter<nextState, depth - 1>(nextBoard);
 
       auto t1 = high_resolution_clock::now();
+
+      movegen::constant_enumeration::prepare<state, figure, flag, depth>(
+          m_board, move);
       unsigned long count = recursion.run();
+
       auto t2 = high_resolution_clock::now();
       auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
       m_count += count;
       std::cout << notation::toString(m_board, state, m_epTarget, move.m_origin,
                                       move.m_target, figure, flag)
-                << " : " << count << "   took : " << ms_int << "ms"
+                << " : " << count << "   took : " << ms_int
                 << std::endl;
     }
   }
@@ -95,14 +100,16 @@ class RecursiveProfiler {
     using std::chrono::duration_cast;
     using std::chrono::high_resolution_clock;
     using std::chrono::milliseconds;
+
     std::cout << "=========DEPTH[" << (depth + 1)
               << "]=============" << std::endl;
     auto t1 = high_resolution_clock::now();
-    movegen::Movestack::init<state, depth>(m_board, m_epTarget);
-    movegen::enumerate<state, depth, RecursiveProfiler<state, depth>>(m_board,
-                                                                      *this);
+    movegen::constant_enumeration::entry_call<state, depth, RecursiveProfiler>(
+        m_board, m_epTarget, *this);
+
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
     std::cout << std::endl;
     std::cout << "Total : " << m_count << "   took : " << ms_int << std::endl;
     return m_count;

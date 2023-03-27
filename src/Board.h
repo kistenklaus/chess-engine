@@ -215,7 +215,7 @@ class Board {
                  w_rooks, b_rooks, w_queen, b_queen, w_king, b_king);
   }
 
-  template <GameState state, figure_type figure, move_flag flag>
+  template <GameState state, figure figure, move_flag flag>
   force_inline Board
   applyMove(const compiletime_move<figure, flag>& move) const {
     const bitmap_t mov = move.m_origin | move.m_target;
@@ -441,7 +441,7 @@ class Board {
   [[nodiscard]] Board applyMove(const GameState& state,
                                 const runtime_move& move) const {
     const move_flag flag = move.m_flag;
-    const figure_type figure = move.m_figure;
+    const figure figure = move.m_figure;
     const bitmap_t mov = move.m_origin | move.m_target;
     if (flag == MOVE_FLAG_CAPTURE || flag == MOVE_FLAG_LEFT_ROOK ||
         flag == MOVE_FLAG_RIGHT_ROOK) {
