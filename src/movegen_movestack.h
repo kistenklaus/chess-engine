@@ -14,20 +14,20 @@
 #include "bitmap.h"
 #include "checkmask.h"
 #include "move.h"
+#include "movegen_shift.h"
 #include "pinmask.h"
 #include "x86utils.h"
-#include "movegen_shift.h"
 
 namespace movegen::Movestack {
 
-static const int MAX_DEPTH = 32;
-static inline bitmap_t g_KingAttack[MAX_DEPTH];
-static inline bitmap_t g_EnemyKingAttack[MAX_DEPTH];
-static inline checkmask_t g_Checkmask[MAX_DEPTH];
+const int MAX_DEPTH = 32;
+inline bitmap_t g_KingAttack[MAX_DEPTH];
+inline bitmap_t g_EnemyKingAttack[MAX_DEPTH];
+inline checkmask_t g_Checkmask[MAX_DEPTH];
 
-static inline bitmap_t g_EnPassantTarget = {};
-static inline bitmap_t g_RookPin = {};
-static inline bitmap_t g_BishopPin = {};
+inline bitmap_t g_EnPassantTarget = {};
+inline bitmap_t g_RookPin = {};
+inline bitmap_t g_BishopPin = {};
 
 template <GameState state, int depth>
 void init(const Board &board, bitmap_t epTarget) {
@@ -105,11 +105,10 @@ force_inline void registerEnPassantPin(bitmap_t kingTile, bitmap_t king,
   if ((RelativeEnPassantRank<turn>() & king) &&
       (RelativeEnPassantRank<turn>() & enemyHVSliders) &&
       (RelativeEnPassantRank<turn>() & pawns)) {
-    bitmap_t epLeftPawn = pawns & ((g_EnPassantTarget & shift::PawnsNotRight()
-    ) >> 1);
-    bitmap_t epRightPawn = pawns & ((g_EnPassantTarget & shift::PawnsNotLeft()
-    ) <<
-      1);
+    bitmap_t epLeftPawn =
+        pawns & ((g_EnPassantTarget & shift::PawnsNotRight()) >> 1);
+    bitmap_t epRightPawn =
+        pawns & ((g_EnPassantTarget & shift::PawnsNotLeft()) << 1);
 
     if (epLeftPawn) {
       bitmap_t afterEpOcc =
@@ -131,7 +130,7 @@ force_inline void registerEnPassantPin(bitmap_t kingTile, bitmap_t king,
 }
 
 inline void checkBySlider(bitmap_t kingTile, bitmap_t enemyTile,
-                                banmask_t &banmask, checkmask_t &checkmask) {
+                          banmask_t &banmask, checkmask_t &checkmask) {
   if (checkmask == 0xFFFFFFFFFFFFFFFFull) {
     checkmask = MagicLookup::PinBetween(kingTile, enemyTile);
   } else {
@@ -231,4 +230,4 @@ force_inline bitmap_t refreshStack(const Board &board, banmask_t &banmask,
   return kingAttack & ~banmask;
 }
 
-}
+}  // namespace movegen::Movestack

@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.8)
 set(This chess-engine)
 
 project(${This} C CXX)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(HEADERS
@@ -38,14 +37,14 @@ set(SOURCES
         src/perfT.cpp
         src/cli.cpp
         src/ChessPosition.cpp
-        src/movegen_constant_collection.h src/movegen_constant_collection.cpp src/movegen_constant_collection_decl.h)
+        src/movegen_constant_collection.h src/movegen_constant_collection.cpp src/movegen_constant_collection_decl.h src/movegen_movestack.cpp)
 
 
 include_directories(src) #kinda sketchy but easier to code.
 add_compile_options(
         -std=c++20
         -march=native        #required for x86 instructions
-        -O0
+        -O3
         -fomit-frame-pointer
         -foptimize-sibling-calls
 )

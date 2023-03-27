@@ -27,7 +27,7 @@ unsigned long runtime_entry_call(const ChessPosition& position,
 }
 
 std::vector<runtime_move> runtime_entry_call(const ChessPosition& position) {
-  const unsigned long count = runtime_entry_call(position, g_moveCache);
+  const unsigned long count = runtime_entry_call(position, &(g_moveCache[0]));
   std::vector<runtime_move> moveVector(g_moveCache, g_moveCache + count);
   return moveVector;
 }

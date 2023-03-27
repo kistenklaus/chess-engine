@@ -71,6 +71,7 @@ class Board {
         w_queen(w_queen),
         b_queen(b_queen)  // probably doesn't work
   {}
+  Board(const Board&) = default;
 
   [[nodiscard]] constexpr inline bitmap_t Occupied() const { return occ; }
 

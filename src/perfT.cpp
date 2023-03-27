@@ -39,7 +39,6 @@ class RecursiveMoveCounter {
   force_inline unsigned long run() {
     movegen::constant_enumeration::recursive_call<
         state, depth, RecursiveMoveCounter<state, depth> >(m_board, *this);
-
     return m_count;
   }
 
@@ -58,19 +57,12 @@ class RecursiveProfiler {
 
   template <figure figure, move_flag flag>
   void move(bitmap_t origin, bitmap_t target) {
-    using std::chrono::duration;
-    using std::chrono::duration_cast;
-    using std::chrono::high_resolution_clock;
-    using std::chrono::milliseconds;
-
     compiletime_move<figure, flag> move = {.m_origin = origin,
                                            .m_target = target};
 
+    int count = 0;
     if constexpr (depth == 0) {
-      m_count++;
-      std::cout << notation::toString(m_board, state, m_epTarget, move.m_origin,
-                                      move.m_target, figure, flag)
-                << " : 1   took : 0ms" << std::endl;
+      count = 1;
     } else {
       Board nextBoard = m_board.applyMove<state>(move);
       constexpr GameState nextState =
@@ -78,40 +70,26 @@ class RecursiveProfiler {
 
       auto recursion = RecursiveMoveCounter<nextState, depth - 1>(nextBoard);
 
-      auto t1 = high_resolution_clock::now();
-
       movegen::constant_enumeration::prepare<state, figure, flag, depth>(
           m_board, move);
-      unsigned long count = recursion.run();
-
-      auto t2 = high_resolution_clock::now();
-      auto ms_int = duration_cast<milliseconds>(t2 - t1);
-
-      m_count += count;
-      std::cout << notation::toString(m_board, state, m_epTarget, move.m_origin,
-                                      move.m_target, figure, flag)
-                << " : " << count << "   took : " << ms_int
-                << std::endl;
+      count = recursion.run();
     }
+    m_count += count;
+
+    std::string moveNotation = notation::toString(
+        m_board, state, m_epTarget, move.m_origin, move.m_target, figure, flag);
+    if(7 > moveNotation.size()){
+      moveNotation.insert(0, 7 - moveNotation.size(),' ');
+    }
+    std::cout << moveNotation << ": " << count << std::endl;
   }
 
   unsigned long run() {
-    using std::chrono::duration;
-    using std::chrono::duration_cast;
-    using std::chrono::high_resolution_clock;
-    using std::chrono::milliseconds;
-
-    std::cout << "=========DEPTH[" << (depth + 1)
-              << "]=============" << std::endl;
-    auto t1 = high_resolution_clock::now();
     movegen::constant_enumeration::entry_call<state, depth, RecursiveProfiler>(
         m_board, m_epTarget, *this);
-
-    auto t2 = high_resolution_clock::now();
-    auto ms_int = duration_cast<milliseconds>(t2 - t1);
-
     std::cout << std::endl;
-    std::cout << "Total : " << m_count << "   took : " << ms_int << std::endl;
+    std::cout << "        Nodes searched: " << m_count << std::endl;
+    std::cout << std::endl;
     return m_count;
   }
 
@@ -138,6 +116,14 @@ unsigned long perfT(const Board& board, bitmap_t epTarget, int depth) {
       return RecursiveProfiler<state, 5>(board, epTarget).run();
     case 6:
       return RecursiveProfiler<state, 6>(board, epTarget).run();
+    case 7:
+      return RecursiveProfiler<state, 7>(board, epTarget).run();
+    case 8:
+      return RecursiveProfiler<state, 8>(board, epTarget).run();
+    case 9:
+      return RecursiveProfiler<state, 9>(board, epTarget).run();
+    case 10:
+      return RecursiveProfiler<state, 10>(board, epTarget).run();
     default:
       throw std::runtime_error(
           "[Unimplemented] depth compiletime invocation is not implemented");
@@ -468,7 +454,7 @@ unsigned long perfT(const Board& board, const GameState& state,
 
 unsigned long run(const ChessPosition& position, int depth) {
   return internal::perfT(position.board(), position.state(),
-                         position.epTarget(), depth);
+                         position.epTarget(), depth - 1);
 }
 
 }  // namespace perfT

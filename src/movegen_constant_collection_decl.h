@@ -2,10 +2,11 @@
 // Created by karl on 27/03/23.
 //
 #pragma once
-#include "Board.h"
-#include "GameState.h"
-#include "ChessPosition.h"
 #include <vector>
+
+#include "Board.h"
+#include "ChessPosition.h"
+#include "GameState.h"
 #include "move.h"
 
 namespace movegen::constant_collection {
@@ -17,9 +18,9 @@ class MoveCollector {
   template <figure figure, move_flag flag>
   force_inline void move(bitmap_t origin, bitmap_t target) {
     *m_moves++ = runtime_move{.m_origin = origin,
-        .m_target = target,
-        .m_figure = figure,
-        .m_flag = flag};
+                              .m_target = target,
+                              .m_figure = figure,
+                              .m_flag = flag};
   }
 
   force_inline void prepare(runtime_move* moves);
@@ -42,4 +43,4 @@ unsigned long runtime_entry_call(const ChessPosition& position,
 
 std::vector<runtime_move> runtime_entry_call(const ChessPosition& position);
 
-}
+}  // namespace movegen::constant_collection

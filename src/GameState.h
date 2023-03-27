@@ -5,12 +5,12 @@
 
 class GameState {
  public:
-  const color_t m_turn;
-  const bool m_has_ep_pawn;
-  const bool m_white_has_long_castle;
-  const bool m_white_has_short_castle;
-  const bool m_black_has_long_castle;
-  const bool m_black_has_short_castle;
+  color_t m_turn;
+  bool m_has_ep_pawn;
+  bool m_white_has_long_castle;
+  bool m_white_has_short_castle;
+  bool m_black_has_long_castle;
+  bool m_black_has_short_castle;
 
   constexpr GameState(color_t white_move, bool has_ep_pawn,
                       bool white_has_long_castle, bool white_has_short_castle,
@@ -27,14 +27,6 @@ class GameState {
   }
 
   [[nodiscard]] inline constexpr color_t turn() const { return m_turn; }
-
-  [[nodiscard]] inline constexpr bool isWhitesTurn() const {
-    return (m_turn == WHITE);
-  }
-
-  [[nodiscard]] inline constexpr bool isBlacksTurn() const {
-    return (m_turn == BLACK);
-  }
 
   [[nodiscard]] inline constexpr bool hasEnPassant() const {
     return m_has_ep_pawn;
@@ -146,7 +138,8 @@ compiletime GameState compiletimeStateTransition() {
           state.blackHasShortCastle()};
 }
 
-inline GameState runtimeStateTransition(const GameState& state, figure figure, move_flag flag) {
+inline GameState runtimeStateTransition(const GameState& state, figure figure,
+                                        move_flag flag) {
   if (figure == PAWN && flag == MOVE_FLAG_DOUBLE_PAWN_PUSH) {
     return {!state.turn(),
             true,

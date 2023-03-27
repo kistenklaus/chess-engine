@@ -4,8 +4,10 @@
 #include "notation.h"
 
 #include <sstream>
+#include <vector>
 
 #include "ChessPosition.h"
+#include "movegen_constant_collection_decl.h"
 #include "x86utils.h"
 
 namespace notation {
@@ -17,9 +19,9 @@ static bool isFigure(char c) {
   return (c == 'B') || (c == 'N') || (c == 'R') || (c == 'Q') || (c == 'K');
 }
 
-static int parseRank(char c) { return '1' - c; }
+static int parseRank(char c) { return c - '1'; }
 
-static int parseFile(char c) { return 'a' - c; }
+static int parseFile(char c) { return c - 'a'; }
 
 static figure parseFigure(char c) {
   switch (c) {
@@ -47,9 +49,9 @@ runtime_move parse(const ChessPosition& position, const std::string& notation) {
         " string");
   bool capture = false;
 
-  runtime_move move{};
+  runtime_move move{.m_origin = 0xFFFFFFFFFFFFFFFF};
   // ignore + and # flags
-  unsigned int e = notation.length() - 1;
+  int e = notation.length() - 1;
   if (notation[e] == '#' || notation[e] == '+') {
     e -= 1;
   }
@@ -59,7 +61,7 @@ runtime_move parse(const ChessPosition& position, const std::string& notation) {
         "square can't be determined");
   } else {
     int targetRank = parseRank(notation[e]);
-    int targetFile = parseRank(notation[e - 1]);
+    int targetFile = parseFile(notation[e - 1]);
     move.m_target = 1ull << (targetRank * 8 + targetFile);
     e -= 2;
   }
@@ -88,8 +90,25 @@ runtime_move parse(const ChessPosition& position, const std::string& notation) {
       move.m_origin = 0x101010101010101ull << originFile;
     }
   }
-  //TODO match move to actually possible moves.
-  return move;
+  // TODO match move to actually possible moves.
+  std::vector<runtime_move> allowedMoves =
+      movegen::constant_collection::runtime_entry_call(position);
+
+  std::vector<runtime_move> matchingMoves;
+  for (const runtime_move& allowedMove : allowedMoves) {
+    if (allowedMove.m_target == move.m_target &&
+        allowedMove.m_figure == move.m_figure &&
+        (allowedMove.m_origin & move.m_origin) != 0) {
+      matchingMoves.push_back(allowedMove);
+    }
+  }
+  if(matchingMoves.size() > 1){
+    throw std::invalid_argument("move is ambiguous");
+  }else if(matchingMoves.empty()){
+    throw std::invalid_argument("move not allowed");
+  }else{
+    return matchingMoves[0];
+  }
 }
 
 std::string toString(const Board& board, const GameState& state,
@@ -136,10 +155,9 @@ std::string toString(const Board& board, const GameState& state,
 }
 
 std::string toString(const ChessPosition& position, uint64_t origin,
-                               uint64_t target, figure figure,
-                               move_flag flag) {
+                     uint64_t target, figure figure, move_flag flag) {
   return toString(position.board(), position.state(), position.epTarget(),
-           origin, target, figure, flag);
+                  origin, target, figure, flag);
 }
 
 std::string toString(const ChessPosition& position, const runtime_move& move) {
