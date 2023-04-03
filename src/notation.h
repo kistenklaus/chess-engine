@@ -22,6 +22,8 @@ std::string toString(const Board& board, const GameState& state,
 
 std::string toString(const ChessPosition& position, const runtime_move& move);
 
+std::string toString(bitmap_t tile);
+
 template <figure figure, move_flag flag>
 std::string toString(const ChessPosition& position,
                      const compiletime_move<figure, flag>& move) {

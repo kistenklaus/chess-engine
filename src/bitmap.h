@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 
-#define bitmap_t uint64_t
+typedef uint64_t bitmap_t;
 
-std::string bitmap_to_bitboard_string(bitmap_t bitmap);
+namespace bitmap {
+std::string toString(bitmap_t map);
+} // namespace bitmap

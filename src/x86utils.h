@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <immintrin.h>
 
 #define SQUARE_OF(X) _tzcnt_u64(X)
@@ -36,3 +37,7 @@ inline static uint64_t popBit(uint64_t& val){
   val ^= lsb;
   return lsb;
 }
+
+
+
+

@@ -15,47 +15,47 @@
 namespace cli {
 
 struct result {
- private:
+private:
   bool m_failed;
   std::string m_message;
   result(bool failed, std::string message)
       : m_failed(failed), m_message(std::move(message)) {}
 
- public:
+public:
   result() = default;
   [[nodiscard]] bool isError() const { return m_failed; }
-  [[nodiscard]] const std::string& message() const { return m_message; }
+  [[nodiscard]] const std::string &message() const { return m_message; }
   static result succ() { return {false, ""}; }
-  static result error(const std::string& message) { return {true, message}; }
+  static result error(const std::string &message) { return {true, message}; }
 };
 
 struct state {
- public:
-  static state& get() {
+public:
+  static state &get() {
     static state instance;
     return instance;
   }
 
- private:
+private:
   explicit state() = default;
 
- public:
-  state(state const&) = delete;
-  void operator=(const state&) = delete;
+public:
+  state(state const &) = delete;
+  void operator=(const state &) = delete;
 
-  [[nodiscard]] const ChessPosition& position() const { return m_position; }
-  void setPosition(const ChessPosition& position) { m_position = position; }
-  void setPosition(const ChessPosition&& position) { m_position = position; }
+  [[nodiscard]] const ChessPosition &position() const { return m_position; }
+  void setPosition(const ChessPosition &position) { m_position = position; }
+  void setPosition(const ChessPosition &&position) { m_position = position; }
   [[nodiscard]] bool isRunning() const { return m_running; }
   void stop() { m_running = false; }
   void start() { m_running = true; }
 
- private:
+private:
   ChessPosition m_position;
   bool m_running = false;
 };
 
-static result parseLine(std::vector<std::string>& input);
+static result parseLine(std::vector<std::string> &input);
 
 void initState() {
   state::get().setPosition(ChessPosition::StartPosition());
@@ -77,37 +77,15 @@ static void processInput() {
   }
 }
 
-static result commandGo(const std::vector<std::string>& args) {
-  const std::string& subcommand = args[0];
-  if (subcommand == "perft") {
-    int depth;
-    if (args.size() > 1) {
-      std::stringstream ss;
-      ss << args[1];
-      ss >> depth;
-    } else {
-      depth = 6;
-    }
-    try {
-      perfT::run(state::get().position(), depth);
-    } catch (const std::exception& e) {
-      return result::error("failed while executing perft");
-    }
-  } else {
-    return result::error("perft required 1 argument");
-  }
-  return result::succ();
-}
-
-static result commandMove(const std::vector<std::string>& args) {
+static result commandMove(const std::vector<std::string> &args) {
   if (args.empty()) {
     return result::error("move requires 1 argument at least");
   }
-  for (const std::string& moveNotation : args) {
+  for (const std::string &moveNotation : args) {
     runtime_move move{};
     try {
       move = notation::parse(state::get().position(), moveNotation);
-    }catch(const std::exception& e){
+    } catch (const std::exception &e) {
       std::string msg = std::string(e.what());
       return result::error(msg);
     }
@@ -126,8 +104,149 @@ static result commandMove(const std::vector<std::string>& args) {
   return result::succ();
 }
 
-static void printBoardMoveHelper(const std::vector<runtime_move>& moves,
-                                 int& current, int maxLength) {
+static result commandPosition(const std::vector<std::string> &args) {
+  if (args.empty()) {
+    return result::error("position required at least one argument");
+  }
+  ChessPosition position;
+  unsigned int index = 0;
+  if (args[0] == "startpos") {
+    position = ChessPosition::StartPosition();
+    index += 1;
+  } else if(args[0] == "kiwi" || args[0] == "kiwipete"){
+    position = fen::parsePosition("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+    index += 1;
+  } else if(args[0] == "cp3"){
+    position = fen::parsePosition("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1");
+    index += 1;
+  } else if(args[0] == "cp4"){
+    position = fen::parsePosition("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
+
+    index += 1;
+  }else if(args.size() >= 6){
+    std::stringstream ss;
+    for(unsigned int i=0;i<6;i++){
+      ss << args[i];
+      if(i != 5)ss << ' ';
+    }
+    position = fen::parsePosition(ss.str());
+    index += 6;
+  }else{
+    return result::error("not a valid position");
+  }
+  state::get().setPosition(position);
+  if (index < args.size() && args[index] == "move") {
+    return commandMove(std::vector<std::string>(args.begin() + index + 1, args.end()));
+  }
+  return result::succ();
+}
+
+static result commandGo(const std::vector<std::string> &args) {
+  const std::string &subcommand = args[0];
+  if (subcommand == "perft") {
+    int depth;
+    if (args.size() > 1) {
+      std::stringstream ss;
+      ss << args[1];
+      ss >> depth;
+    } else {
+      depth = 6;
+    }
+    try {
+      perfT::run(state::get().position(), depth);
+    } catch (const std::exception &e) {
+      return result::error("failed while executing perft");
+    }
+  } else {
+    return result::error("perft required 1 argument");
+  }
+  return result::succ();
+}
+
+static result subCommandDebugMovegen() {
+  const std::vector<runtime_move> moves =
+      movegen::constant_collection::runtime_entry_call(state::get().position());
+  for (const runtime_move &move : moves) {
+    const std::string notation =
+        notation::toString(state::get().position(), move);
+    // TODO pad notation to 7 chars.
+    std::cout << notation;
+    std::cout << " [";
+    std::cout << "origin = ";
+    std::cout << notation::toString(move.m_origin);
+    std::cout << ",";
+    std::cout << "figure = ";
+    switch (move.m_figure) {
+    case PAWN:
+      std::cout << "PAWN";
+      break;
+    case BISHOP:
+      std::cout << "BISHOP";
+      break;
+    case KNIGHT:
+      std::cout << "KNIGHT";
+      break;
+    case ROOK:
+      std::cout << "ROOK";
+      break;
+    case QUEEN:
+      std::cout << "QUEEN";
+      break;
+    case KING:
+      std::cout << "KING";
+      break;
+    }
+    std::cout << ",";
+    std::cout << "flag = ";
+    switch (move.m_flag) {
+    case MOVE_FLAG_SILENT:
+      std::cout << "SILENT";
+      break;
+    case MOVE_FLAG_SHORT_CASTLE:
+      std::cout << "SHORT_CASTLE";
+      break;
+    case MOVE_FLAG_LONG_CASTLE:
+      std::cout << "LONG_CASTLE";
+      break;
+    case MOVE_FLAG_DOUBLE_PAWN_PUSH:
+      std::cout << "DOUBLE_PAWN_PUSH";
+      break;
+    case MOVE_FLAG_LEFT_ROOK:
+      std::cout << "LEFT_ROOK_MOVED";
+      break;
+    case MOVE_FLAG_RIGHT_ROOK:
+      std::cout << "RIGHT_ROOK_MOVED";
+      break;
+    case MOVE_FLAG_CAPTURE:
+      std::cout << "CAPTURE";
+      break;
+    case MOVE_FLAG_EN_PASSANT:
+      std::cout << "EN_PASSANT";
+      break;
+    case MOVE_FLAG_PROMOTE:
+      std::cout << "PROMOTE";
+      break;
+    }
+    std::cout << "]";
+    std::cout << std::endl;
+  }
+  return result::succ();
+}
+
+static result commandDebug(const std::vector<std::string> &args) {
+  if (args.empty()) {
+    return result::error("debug command requires one argument at least");
+  }
+  const std::string &subcommand = args[0];
+  if (subcommand == "movegen") {
+    return subCommandDebugMovegen();
+  }
+
+  return result::error("not a valid debug subcommand");
+}
+
+static void printBoardMoveHelper(const std::vector<runtime_move> &moves,
+                                 int &current, int maxLength) {
   unsigned int c = 0;
   while (c < maxLength && current < moves.size()) {
     std::string notation =
@@ -147,15 +266,15 @@ static void printBoardMoveHelper(const std::vector<runtime_move>& moves,
 
 static result commandPrintBoard() {
   int cols = 80;
-  struct winsize ws{};
+  struct winsize ws {};
   if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != 0 &&
       ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) != 0 &&
       ioctl(STDERR_FILENO, TIOCGWINSZ, &ws) != 0) {
     std::cout << "failed to get window width" << std::endl;
-  }else{
+  } else {
     cols = ws.ws_col;
   }
-  if(cols < 60){
+  if (cols < 60) {
     cols = 60;
   }
 
@@ -166,9 +285,9 @@ static result commandPrintBoard() {
   int maxMoveLength = cols - 40;
 
   std::cout << " +---+---+---+---+---+---+---+---+     ";
-  if(state::get().position().state().turn() == WHITE){
+  if (state::get().position().state().turn() == WHITE) {
     std::cout << "\033[47m";
-  }else{
+  } else {
     std::cout << "\033[40m";
   }
   std::cout << " ";
@@ -231,9 +350,9 @@ static result commandPrintBoard() {
       std::cout << "|";
     }
     std::cout << " " << (rank + 1) << "   ";
-    if(state::get().position().state().turn() == WHITE){
+    if (state::get().position().state().turn() == WHITE) {
       std::cout << "\033[47m";
-    }else{
+    } else {
       std::cout << "\033[40m";
     }
     std::cout << " ";
@@ -243,9 +362,9 @@ static result commandPrintBoard() {
     printBoardMoveHelper(moves, moveIndex, maxMoveLength);
     std::cout << std::endl;
     std::cout << " +---+---+---+---+---+---+---+---+     ";
-    if(state::get().position().state().turn() == WHITE){
+    if (state::get().position().state().turn() == WHITE) {
       std::cout << "\033[47m";
-    }else{
+    } else {
       std::cout << "\033[40m";
     }
     std::cout << " ";
@@ -255,9 +374,9 @@ static result commandPrintBoard() {
     std::cout << std::endl;
   }
   std::cout << "   a   b   c   d   e   f   g   h       ";
-  if(state::get().position().state().turn() == WHITE){
+  if (state::get().position().state().turn() == WHITE) {
     std::cout << "\033[47m";
-  }else{
+  } else {
     std::cout << "\033[40m";
   }
   std::cout << " ";
@@ -267,7 +386,7 @@ static result commandPrintBoard() {
 }
 
 static result commandPrintState() {
-  const GameState& state = state::get().position().state();
+  const GameState &state = state::get().position().state();
   std::cout << "=========Game-State=========" << std::endl;
   std::cout << "-turn               : "
             << ((state.turn() == WHITE) ? "white" : "black") << std::endl;
@@ -309,20 +428,27 @@ void run() {
   }
 }
 
-static result parseLine(std::vector<std::string>& input) {
-  if (input.empty()) return result::succ();
+static result parseLine(std::vector<std::string> &input) {
+  if (input.empty())
+    return result::succ();
   std::string command = input[0];
   result result;
   if (command == "d" || command == "display") {
     result = commandPrintBoard();
   } else if (command == "s") {
     result = commandPrintState();
+  } else if (command == "position") {
+    result = commandPosition(
+        std::vector<std::string>(input.begin() + 1, input.end()));
   } else if (command == "go") {
     result =
         commandGo(std::vector<std::string>(input.begin() + 1, input.end()));
   } else if (command == "move") {
     result =
         commandMove(std::vector<std::string>(input.begin() + 1, input.end()));
+  } else if (command == "debug") {
+    result =
+        commandDebug(std::vector<std::string>(input.begin() + 1, input.end()));
   } else if (command == "time") {
     result =
         commandTime(std::vector<std::string>(input.begin() + 1, input.end()));
@@ -334,4 +460,4 @@ static result parseLine(std::vector<std::string>& input) {
   }
   return result;
 }
-}  // namespace cli
+} // namespace cli

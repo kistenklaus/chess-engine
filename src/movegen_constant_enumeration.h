@@ -41,31 +41,37 @@ force_inline void _knightCheck(bitmap_t enemyKing, bitmap_t target) {
 }
 
 template <GameState state, figure figure, move_flag flag, int depth>
-force_inline void prepare(const Board& board,
-                          const compiletime_move<figure, flag>& move) {
+force_inline void prepare(const Board &board,
+                          const compiletime_move<figure, flag> &move) {
   constexpr auto turn = state.turn();
-  if constexpr (figure == KING) return;  // Kings can't give checks.
+  if constexpr (figure == KING)
+    return; // Kings can't give checks.
   if constexpr (figure == PAWN) {
     if constexpr (flag == MOVE_FLAG_DOUBLE_PAWN_PUSH) {
       Movestack::g_EnPassantTarget = move.m_target;
     }
     _pawnCheck<state, depth>(board.King<!turn>(), move.m_target);
   }
+  /*
   if constexpr (flag == MOVE_FLAG_PROMOTE && figure == KNIGHT) {
+    _knightCheck<state, depth>(board.King<!turn>(), move.m_target);
+  }
+  */
+  if (figure == KNIGHT) {
     _knightCheck<state, depth>(board.King<!turn>(), move.m_target);
   }
 }
 
 template <GameState state, int depth, typename MoveReceiver>
-never_inline void recursive_call(const Board& board, MoveReceiver& receiver) {
-  checkmask_t checkmask = Movestack::g_Checkmask[depth];
+never_inline void recursive_call(const Board &board, MoveReceiver &receiver) {
+  bitmap_t checkmask = Movestack::g_Checkmask[depth];
   banmask_t banmask = Movestack::g_KingAttack[depth - 1] =
       Movestack::g_EnemyKingAttack[depth];
   bitmap_t kingAttack =
       Movestack::refreshStack<state, depth>(board, banmask, checkmask);
   if (checkmask != 0) {
     constexpr color_t turn = state.turn();
-    const bool noCheck = (checkmask == 0xFFFFFFFFFFFFFFFFull);
+    bool noCheck = (checkmask == 0xFFFFFFFFFFFFFFFFull);
 
     const pinmask_t pinmask(Movestack::g_RookPin, Movestack::g_BishopPin);
     const bitmap_t movable = board.EnemyOrEmpty<turn>() & checkmask;
@@ -86,19 +92,19 @@ never_inline void recursive_call(const Board& board, MoveReceiver& receiver) {
       }
       // Castling
       if constexpr (state.canCastleLong()) {
-        if (noCheck && util::canCastleLeft<state>(banmask, board.Occupied(),
-                                                  board.Rooks<turn>(), board)) {
+        if (noCheck && util::canCastleLong<state>(banmask, board.Occupied(),
+                                                  board.Rooks<turn>())) {
           Movestack::g_EnemyKingAttack[depth - 1] =
-              MagicLookup::King(SQUARE_OF(king << 2));
-          receiver.template move<KING, MOVE_FLAG_LONG_CASTLE>(turn, turn << 2);
+              MagicLookup::King(SQUARE_OF(king >> 2));
+          receiver.template move<KING, MOVE_FLAG_LONG_CASTLE>(king, king >> 2);
         }
       }
       if constexpr (state.canCastleShort()) {
-        if (noCheck && util::canCastleRight<state>(banmask, board.Occupied(),
-                                                   board.Occupied(), board)) {
+        if (noCheck && util::canCastleShort<state>(banmask, board.Occupied(),
+                                                   board.Rooks<turn>())) {
           Movestack::g_EnemyKingAttack[depth - 1] =
-              MagicLookup::King(king >> 2);
-          receiver.template move<KING, MOVE_FLAG_SHORT_CASTLE>(king, king >> 2);
+              MagicLookup::King(SQUARE_OF(king << 2));
+          receiver.template move<KING, MOVE_FLAG_SHORT_CASTLE>(king, king << 2);
         }
       }
       Movestack::g_EnemyKingAttack[depth - 1] = Movestack::g_KingAttack[depth];
@@ -112,6 +118,8 @@ never_inline void recursive_call(const Board& board, MoveReceiver& receiver) {
           pawnsD12 &
           shift::PawnUndoAttackLeft<turn>(board.OccupiedBy<!turn>() &
                                           shift::PawnsNotRight() & checkmask);
+
+
       bitmap_t rightAttackingPawns =
           pawnsD12 &
           shift::PawnUndoAttackRight<turn>(board.OccupiedBy<!turn>() &
@@ -121,8 +129,9 @@ never_inline void recursive_call(const Board& board, MoveReceiver& receiver) {
           pawnsHV & shift::PawnBackward<turn>(board.NotOccupied());
 
       bitmap_t doublePushablePawns =
-          pushablePawns & shift::RelativeFirstRank<turn>() &
+          pushablePawns & shift::RelativeSecondRank<turn>() &
           shift::PawnBackward2<turn>(board.NotOccupied() & checkmask);
+
       pushablePawns &= shift::PawnBackward<turn>(checkmask);
 
       shift::PawnPruneLeft<turn>(leftAttackingPawns, pinmask.d12);
@@ -135,7 +144,6 @@ never_inline void recursive_call(const Board& board, MoveReceiver& receiver) {
             pawnsD12 & shift::PawnsNotLeft() & ((epTarget & checkmask) >> 1);
         bitmap_t epRightPawn =
             pawnsD12 & shift::PawnsNotRight() & ((epTarget & checkmask) << 1);
-
         if (epLeftPawn | epRightPawn) {
           shift::PawnPruneLeftEP<turn>(epLeftPawn, pinmask.d12);
           shift::PawnPruneRightEP<turn>(epRightPawn, pinmask.d12);
@@ -152,20 +160,19 @@ never_inline void recursive_call(const Board& board, MoveReceiver& receiver) {
         }
       }
       if ((leftAttackingPawns | rightAttackingPawns | pushablePawns) &
-          shift::RelativeSecondLastRank<turn>()) {
+          shift::RelativeSevenRank<turn>()) {
         bitmap_t promoteLeft =
-            leftAttackingPawns & shift::RelativeSecondLastRank<turn>();
+            leftAttackingPawns & shift::RelativeSevenRank<turn>();
         bitmap_t promoteRight =
-            rightAttackingPawns & shift::RelativeSecondLastRank<turn>();
-        bitmap_t promotePush =
-            pushablePawns & shift::RelativeSecondLastRank<turn>();
+            rightAttackingPawns & shift::RelativeSevenRank<turn>();
+        bitmap_t promotePush = pushablePawns & shift::RelativeSevenRank<turn>();
 
         bitmap_t noPromoteLeft =
-            leftAttackingPawns & shift::RelativeSecondLastRank<turn>();
+            leftAttackingPawns & ~shift::RelativeSevenRank<turn>();
         bitmap_t noPromoteRight =
-            rightAttackingPawns & shift::RelativeSecondLastRank<turn>();
+            rightAttackingPawns & ~shift::RelativeSevenRank<turn>();
         bitmap_t noPromotePush =
-            pushablePawns & shift::RelativeSecondLastRank<turn>();
+            pushablePawns & ~shift::RelativeSevenRank<turn>();
 
         while (promoteLeft) {
           const bitmap_t pos = popBit(promoteLeft);
@@ -341,9 +348,9 @@ never_inline void recursive_call(const Board& board, MoveReceiver& receiver) {
           while (move) {
             const bitmap_t target = popBit(move);
             if (target & board.OccupiedBy<!turn>()) {
-              receiver.template move<QUEEN, MOVE_FLAG_CAPTURE>(origin, target);
+              receiver.template move<ROOK, MOVE_FLAG_CAPTURE>(origin, target);
             } else {
-              receiver.template move<QUEEN, MOVE_FLAG_SILENT>(origin, target);
+              receiver.template move<ROOK, MOVE_FLAG_SILENT>(origin, target);
             }
           }
         }
@@ -355,13 +362,13 @@ never_inline void recursive_call(const Board& board, MoveReceiver& receiver) {
         while (move) {
           const bitmap_t target = popBit(move);
           if (origin & shift::RelativeLeftRookMask<turn>()) {
-            receiver.template move<QUEEN, MOVE_FLAG_LEFT_ROOK>(origin, target);
+            receiver.template move<ROOK, MOVE_FLAG_LEFT_ROOK>(origin, target);
           } else if (origin & shift::RelativeRightRookMask<turn>()) {
-            receiver.template move<QUEEN, MOVE_FLAG_RIGHT_ROOK>(origin, target);
+            receiver.template move<ROOK, MOVE_FLAG_RIGHT_ROOK>(origin, target);
           } else if (target & board.OccupiedBy<!turn>()) {
-            receiver.template move<QUEEN, MOVE_FLAG_CAPTURE>(origin, target);
+            receiver.template move<ROOK, MOVE_FLAG_CAPTURE>(origin, target);
           } else {
-            receiver.template move<QUEEN, MOVE_FLAG_SILENT>(origin, target);
+            receiver.template move<ROOK, MOVE_FLAG_SILENT>(origin, target);
           }
         }
       }
@@ -398,16 +405,16 @@ never_inline void recursive_call(const Board& board, MoveReceiver& receiver) {
 }
 
 template <GameState state, int depth, typename MoveReceiver>
-force_inline void entry_call(const Board& board, bitmap_t epTarget,
-                             MoveReceiver& receiver) {
+force_inline void entry_call(const Board &board, bitmap_t epTarget,
+                             MoveReceiver &receiver) {
   movegen::Movestack::init<state, depth>(board, epTarget);
   recursive_call<state, depth>(board, receiver);
 }
 
 template <typename MoveReceiver>
-never_inline void runtime_entry_call(const Board& board, const GameState& state,
+never_inline void runtime_entry_call(const Board &board, const GameState &state,
                                      bitmap_t epTarget,
-                                     MoveReceiver& receiver) {
+                                     MoveReceiver &receiver) {
   if (state.turn()) {
     if (state.hasEnPassant()) {
       if (state.whiteHasLongCastle()) {
@@ -728,10 +735,10 @@ never_inline void runtime_entry_call(const Board& board, const GameState& state,
 }
 
 template <typename MoveReceiver>
-force_inline void runtime_entry_call(const ChessPosition& position,
-                                     MoveReceiver& receiver) {
+force_inline void runtime_entry_call(const ChessPosition &position,
+                                     MoveReceiver &receiver) {
   runtime_entry_call(position.board(), position.state(), position.epTarget(),
                      receiver);
 }
 
-}  // namespace movegen::constant_enumeration
+} // namespace movegen::constant_enumeration

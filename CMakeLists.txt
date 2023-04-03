@@ -1,52 +1,53 @@
 cmake_minimum_required(VERSION 3.8)
 
 set(This chess-engine)
-
 project(${This} C CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(HEADERS
-        src/Movemap.h
-        src/bitmap.h
-        src/Board.h
-        src/GameState.h
-        src/color.h
-        src/fen.h
-        src/figure.h
-        src/move.h
-        src/x86utils.h
-        src/pinmask.h
-        src/checkmask.h
-        src/banmask.h
-        src/MagicLookup.h
-        src/perfT.h
-        src/notation.h
-        src/movegen_shift.h
-        src/movegen_util.h
-        src/movegen_movestack.h
-        src/movegen_constant_enumeration.h
-        src/ChessPosition.h
-        src/cli.h
-        )
+    src/Movemap.h
+    src/bitmap.h
+    src/Board.h
+    src/GameState.h
+    src/color.h
+    src/fen.h
+    src/figure.h
+    src/move.h
+    src/x86utils.h
+    src/pinmask.h
+    src/checkmask.h
+    src/banmask.h
+    src/MagicLookup.h
+    src/perfT.h
+    src/notation.h
+    src/movegen_shift.h
+    src/movegen_util.h
+    src/movegen_movestack.h
+    src/movegen_constant_enumeration.h
+    src/ChessPosition.h
+    src/cli.h)
 
 set(MAIN_SOURCE src/main.cpp)
 
 set(SOURCES
-        src/fen.cpp
-        src/notation.cpp
-        src/perfT.cpp
-        src/cli.cpp
-        src/ChessPosition.cpp
-        src/movegen_constant_collection.h src/movegen_constant_collection.cpp src/movegen_constant_collection_decl.h src/movegen_movestack.cpp)
+    src/fen.cpp
+    src/notation.cpp
+    src/perfT.cpp
+    src/cli.cpp
+    src/ChessPosition.cpp
+    src/movegen_constant_collection.h
+    src/movegen_constant_collection.cpp
+    src/movegen_constant_collection_decl.h
+    src/movegen_movestack.cpp
+    src/bitmap.cpp)
 
-
-include_directories(src) #kinda sketchy but easier to code.
+include_directories(src) # kinda sketchy but easier to code.
+include_directories(/usr/lib/gcc/x86_64-pc-linux-gnu/11.3.0/include/
+                    /usr/lib/gcc/x86_64-pc-linux-gnu/12.2.1/include/)
 add_compile_options(
-        -std=c++20
-        -march=native        #required for x86 instructions
-        -O3
-        -fomit-frame-pointer
-        -foptimize-sibling-calls
+  -std=c++20 -march=native # required for x86 instructions
+  -Wno-attributes -g -O0
+  # -fomit-frame-pointer -foptimize-sibling-calls
 )
 add_executable(${This} ${SOURCES} ${HEADERS} ${MAIN_SOURCE})
-#target_precompile_headers(${This} PUBLIC src/Movemap.h)
+# target_precompile_headers(${This} PUBLIC src/Movemap.h)

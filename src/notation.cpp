@@ -164,5 +164,14 @@ std::string toString(const ChessPosition& position, const runtime_move& move) {
   return toString(position, move.m_origin, move.m_target, move.m_figure,
                   move.m_flag);
 }
+std::string toString(bitmap_t map) {
+  bitmap_t tile = SQUARE_OF(map);
+  unsigned int rank = tile / 8;
+  unsigned int file = tile % 8;
+  std::stringstream ss;
+  ss << ((char) ('a' + file));
+  ss << ((char) ('1' + rank));
+  return ss.str();
+}
 
 }  // namespace notation

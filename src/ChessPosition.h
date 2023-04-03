@@ -3,7 +3,6 @@
 #include "Board.h"
 #include "GameState.h"
 #include "bitmap.h"
-#include "fen.h"
 
 class ChessPosition {
  private:
@@ -13,7 +12,7 @@ class ChessPosition {
  public:
 
   explicit ChessPosition()
-      : m_board(fen::parse(fen::DEFAULT)),
+      : m_board(Board::StartPosition()),
         m_state(GameState::Default()),
         m_epTarget(0) {}
 

@@ -19,59 +19,52 @@
 
 namespace movegen::shift {
 
-compiletime bitmap_t PawnsNotLeft() { return ~Board::File1; }
+compiletime bitmap_t PawnsNotLeft() { return ~Board::File8; }
 
-compiletime bitmap_t PawnsNotRight() { return ~Board::File8; }
+compiletime bitmap_t PawnsNotRight() { return ~Board::File1; }
 
-template <color_t turn>
-compiletime bitmap_t PawnForward(bitmap_t map) {
+template <color_t turn> compiletime bitmap_t PawnForward(bitmap_t map) {
   if constexpr (turn == WHITE)
     return map << 8;
   else
     return map >> 8;
 }
 
-template <color_t turn>
-compiletime bitmap_t PawnForward2(bitmap_t map) {
+template <color_t turn> compiletime bitmap_t PawnForward2(bitmap_t map) {
   if constexpr (turn == WHITE)
     return map << 16;
   else
     return map >> 16;
 }
 
-template <color_t turn>
-compiletime bitmap_t PawnBackward(bitmap_t map) {
+template <color_t turn> compiletime bitmap_t PawnBackward(bitmap_t map) {
   return PawnForward<!turn>(map);
 }
 
-template <color_t turn>
-compiletime bitmap_t PawnBackward2(bitmap_t map) {
+template <color_t turn> compiletime bitmap_t PawnBackward2(bitmap_t map) {
   return PawnForward2<!turn>(map);
 }
 
-template <color_t turn>
-compiletime bitmap_t PawnAttackLeft(bitmap_t map) {
+template <color_t turn> compiletime bitmap_t PawnAttackLeft(bitmap_t map) {
   if constexpr (turn == WHITE)
     return map << 9;
   else
     return map >> 7;
 }
 
-template <color_t turn>
-compiletime bitmap_t PawnAttackRight(bitmap_t map) {
-  if constexpr (turn == WHITE)
+template <color_t turn> compiletime bitmap_t PawnAttackRight(bitmap_t map) {
+  if constexpr (turn == WHITE) {
     return map << 7;
-  else
+  }else {
     return map >> 9;
+  }
 }
 
-template <color_t turn>
-compiletime bitmap_t PawnUndoAttackLeft(bitmap_t map) {
+template <color_t turn> compiletime bitmap_t PawnUndoAttackLeft(bitmap_t map) {
   return PawnAttackRight<!turn>(map);
 }
 
-template <color_t turn>
-compiletime bitmap_t PawnUndoAttackRight(bitmap_t map) {
+template <color_t turn> compiletime bitmap_t PawnUndoAttackRight(bitmap_t map) {
   return PawnAttackLeft<!turn>(map);
 }
 
@@ -121,32 +114,28 @@ force_inline void PawnPruneRightEP(bitmap_t &pawn, const bitmap_t pinD12) {
   pawn = (pinned | unpinned);
 }
 
-template <color_t turn>
-compiletime bitmap_t RelativeFirstRank() {
+template <color_t turn> compiletime bitmap_t RelativeSecondRank() {
   if constexpr (turn == WHITE)
     return Board::Rank2;
   else
     return Board::Rank7;
 }
 
-template <color_t turn>
-compiletime bitmap_t RelativeSecondLastRank() {
+template <color_t turn> compiletime bitmap_t RelativeSevenRank() {
   if constexpr (turn == WHITE)
     return Board::Rank7;
   else
     return Board::Rank2;
 }
 
-template <color_t turn>
-compiletime bitmap_t RelativeEnPassantRank() {
+template <color_t turn> compiletime bitmap_t RelativeEnPassantRank() {
   if constexpr (turn == WHITE)
     return 0xFFull << 32;
   else
     return 0xFFull << 24;
 }
 
-template <color_t turn>
-compiletime bitmap_t RelativeLeftRookMask() {
+template <color_t turn> compiletime bitmap_t RelativeLeftRookMask() {
   if constexpr (turn == WHITE) {
     return Board::WhiteLongCastleRookMask;
   } else {
@@ -154,12 +143,11 @@ compiletime bitmap_t RelativeLeftRookMask() {
   }
 }
 
-template <color_t turn>
-compiletime bitmap_t RelativeRightRookMask() {
+template <color_t turn> compiletime bitmap_t RelativeRightRookMask() {
   if constexpr (turn == WHITE) {
     return Board::WhiteShortCastleRookMask;
   } else {
     return Board::BlackShortCastleRookMask;
   }
 }
-}
+} // namespace movegen::shift

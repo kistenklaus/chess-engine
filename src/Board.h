@@ -11,7 +11,7 @@
 #include "move.h"
 
 class Board {
- public:
+public:
   static constexpr bitmap_t Rank7 = 0xFF000000000000;
   static constexpr bitmap_t Rank8 = 0xFF00000000000000;
   static constexpr bitmap_t Rank1 = 0xFF;
@@ -20,20 +20,23 @@ class Board {
   static constexpr bitmap_t File7 = File8 >> 1;
   static constexpr bitmap_t File2 = File7 >> 5;
   static constexpr bitmap_t File1 = File2 >> 1;
-  static constexpr bitmap_t WhiteShortCastleMoveMask = 0b01110000ull;
-  static constexpr bitmap_t WhiteShortCastleAttackMask = 0b00111000ull;
-  static constexpr bitmap_t WhiteShortCastleRookMask = 0b10000000ull;
-  static constexpr bitmap_t WhiteLongCastleMoveMask = 0b00000110ull;
-  static constexpr bitmap_t WhiteLongCastleAttackMask = 0b00001110ull;
-  static constexpr bitmap_t WhiteLongCastleRookMask = 0b00000001ull;
-  static constexpr bitmap_t BlackShortCastleMoveMask = 0b01110000ull << 56ull;
-  static constexpr bitmap_t BlackShortCastleAttackMask = 0b00111000ull << 56ull;
-  static constexpr bitmap_t BlackShortCastleRookMask = 0000000001ull << 56ull;
-  static constexpr bitmap_t BlackLongCastleMoveMask = 0b00000110ull << 56ull;
-  static constexpr bitmap_t BlackLongCastleAttackMask = 0b00001110ull << 56ull;
-  static constexpr bitmap_t BlackLongCastleRookMask = 0b10000000ull << 56ul;
+  static constexpr bitmap_t WhiteShortCastleMoveMask =   0b01100000ull;
+  static constexpr bitmap_t WhiteShortCastleAttackMask = 0b01110000ull;
+  static constexpr bitmap_t WhiteShortCastleRookMask =   0b10000000ull;
+  static constexpr bitmap_t WhiteLongCastleMoveMask =    0b00001110ull;
+  static constexpr bitmap_t WhiteLongCastleAttackMask =  0b00011100ull;
+  static constexpr bitmap_t WhiteLongCastleRookMask =    0b00000001ull;
 
- private:
+
+  static constexpr bitmap_t BlackShortCastleMoveMask =   0b01100000ull << 56ull;
+  static constexpr bitmap_t BlackShortCastleAttackMask = 0b01110000ull << 56ull;
+  static constexpr bitmap_t BlackShortCastleRookMask =   0b10000000ull << 56ull;
+  static constexpr bitmap_t BlackLongCastleMoveMask =    0b00001110ull << 56ull;
+  static constexpr bitmap_t BlackLongCastleAttackMask =  0b00011100ull << 56ull;
+  static constexpr bitmap_t BlackLongCastleRookMask =    0b00000001ull << 56ull;
+
+
+private:
   bitmap_t b_occ;
   bitmap_t w_occ;
   bitmap_t occ;
@@ -50,28 +53,20 @@ class Board {
   bitmap_t w_queen;
   bitmap_t b_queen;
 
- public:
+public:
   explicit Board(bitmap_t b_pawns, bitmap_t w_pawns, bitmap_t b_bishops,
                  bitmap_t w_bishops, bitmap_t b_knights, bitmap_t w_knights,
                  bitmap_t b_rooks, bitmap_t w_rooks, bitmap_t b_queen,
                  bitmap_t w_queen, bitmap_t b_king, bitmap_t w_king)
       : b_occ(b_pawns | b_bishops | b_knights | b_rooks | b_queen | b_king),
         w_occ(w_pawns | w_bishops | w_knights | w_rooks | w_queen | w_king),
-        occ(w_occ | b_occ),
-        b_pawns(b_pawns),
-        w_pawns(w_pawns),
-        b_bishops(b_bishops),
-        w_bishops(w_bishops),
-        b_knights(b_knights),
-        w_knights(w_knights),
-        b_rooks(b_rooks),
-        w_rooks(w_rooks),
-        w_king(w_king),
-        b_king(b_king),
-        w_queen(w_queen),
-        b_queen(b_queen)  // probably doesn't work
+        occ(w_occ | b_occ), b_pawns(b_pawns), w_pawns(w_pawns),
+        b_bishops(b_bishops), w_bishops(w_bishops), b_knights(b_knights),
+        w_knights(w_knights), b_rooks(b_rooks), w_rooks(w_rooks),
+        w_king(w_king), b_king(b_king), w_queen(w_queen),
+        b_queen(b_queen) // probably doesn't work
   {}
-  Board(const Board&) = default;
+  Board(const Board &) = default;
 
   [[nodiscard]] constexpr inline bitmap_t Occupied() const { return occ; }
 
@@ -218,16 +213,15 @@ class Board {
 
   template <GameState state, figure figure, move_flag flag>
   force_inline Board
-  applyMove(const compiletime_move<figure, flag>& move) const {
+  applyMove(const compiletime_move<figure, flag> &move) const {
     const bitmap_t mov = move.m_origin | move.m_target;
     if constexpr (flag == MOVE_FLAG_CAPTURE || flag == MOVE_FLAG_LEFT_ROOK ||
                   flag == MOVE_FLAG_RIGHT_ROOK) {
       const bitmap_t rem = ~move.m_target;
       if constexpr (state.turn()) {
         assert((b_king & mov) == 0 && "Taking Black King is not legal");
-        assert((move.m_target & w_occ) == 0 &&
-               "Cannot move to square of same"
-               " color");
+        assert((move.m_target & w_occ) == 0 && "Cannot move to square of same"
+                                               " color");
         if constexpr (figure == PAWN) {
           return Board(b_pawns & rem, w_pawns ^ mov, b_bishops & rem, w_bishops,
                        b_knights & rem, w_knights, b_rooks & rem, w_rooks,
@@ -255,9 +249,8 @@ class Board {
         }
       } else {
         assert((w_king & mov) == 0 && "Taking White King is not legal");
-        assert((move.m_target & b_occ) == 0 &&
-               "Cannot move to square of same"
-               " color");
+        assert((move.m_target & b_occ) == 0 && "Cannot move to square of same"
+                                               " color");
         if constexpr (figure == PAWN) {
           return Board(b_pawns ^ mov, w_pawns & rem, b_bishops, w_bishops & rem,
                        b_knights, w_knights & rem, b_rooks, w_rooks & rem,
@@ -376,9 +369,8 @@ class Board {
     } else {
       if constexpr (state.turn()) {
         assert((b_king & mov) == 0 && "Taking Black King is not legal");
-        assert((move.m_target & w_occ) == 0 &&
-               "Cannot move to square of same"
-               " color");
+        assert((move.m_target & w_occ) == 0 && "Cannot move to square of same"
+                                               " color");
         if constexpr (figure == PAWN) {
           return Board(b_pawns, w_pawns ^ mov, b_bishops, w_bishops, b_knights,
                        w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
@@ -406,9 +398,8 @@ class Board {
         }
       } else {
         assert((w_king & mov) == 0 && "Taking White King is not legal");
-        assert((move.m_target & b_occ) == 0 &&
-               "Cannot move to square of same"
-               " color");
+        assert((move.m_target & b_occ) == 0 && "Cannot move to square of same"
+                                               " color");
         if (figure == PAWN) {
           return Board(b_pawns ^ mov, w_pawns, b_bishops, w_bishops, b_knights,
                        w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
@@ -439,8 +430,8 @@ class Board {
     throw std::runtime_error("Unimplemented Exception");
   }
 
-  [[nodiscard]] Board applyMove(const GameState& state,
-                                const runtime_move& move) const {
+  [[nodiscard]] Board applyMove(const GameState &state,
+                                const runtime_move &move) const {
     const move_flag flag = move.m_flag;
     const figure figure = move.m_figure;
     const bitmap_t mov = move.m_origin | move.m_target;
@@ -449,9 +440,8 @@ class Board {
       const bitmap_t rem = ~move.m_target;
       if (state.turn()) {
         assert((b_king & mov) == 0 && "Taking Black King is not legal");
-        assert((move.m_target & w_occ) == 0 &&
-               "Cannot move to square of same"
-               " color");
+        assert((move.m_target & w_occ) == 0 && "Cannot move to square of same"
+                                               " color");
         if (figure == PAWN) {
           return Board(b_pawns & rem, w_pawns ^ mov, b_bishops & rem, w_bishops,
                        b_knights & rem, w_knights, b_rooks & rem, w_rooks,
@@ -479,9 +469,8 @@ class Board {
         }
       } else {
         assert((w_king & mov) == 0 && "Taking White King is not legal");
-        assert((move.m_target & b_occ) == 0 &&
-               "Cannot move to square of same"
-               " color");
+        assert((move.m_target & b_occ) == 0 && "Cannot move to square of same"
+                                               " color");
         if (figure == PAWN) {
           return Board(b_pawns ^ mov, w_pawns & rem, b_bishops, w_bishops & rem,
                        b_knights, w_knights & rem, b_rooks, w_rooks & rem,
@@ -600,9 +589,8 @@ class Board {
     } else {
       if (state.turn()) {
         assert((b_king & mov) == 0 && "Taking Black King is not legal");
-        assert((move.m_target & w_occ) == 0 &&
-               "Cannot move to square of same"
-               " color");
+        assert((move.m_target & w_occ) == 0 && "Cannot move to square of same"
+                                               " color");
         if (figure == PAWN) {
           return Board(b_pawns, w_pawns ^ mov, b_bishops, w_bishops, b_knights,
                        w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
@@ -630,9 +618,8 @@ class Board {
         }
       } else {
         assert((w_king & mov) == 0 && "Taking White King is not legal");
-        assert((move.m_target & b_occ) == 0 &&
-               "Cannot move to square of same"
-               " color");
+        assert((move.m_target & b_occ) == 0 && "Cannot move to square of same"
+                                               " color");
         if (figure == PAWN) {
           return Board(b_pawns ^ mov, w_pawns, b_bishops, w_bishops, b_knights,
                        w_knights, b_rooks, w_rooks, b_queen, w_queen, b_king,
@@ -662,6 +649,12 @@ class Board {
     }
     throw std::runtime_error("Unimplemented Exception");
   }
+
+  static Board StartPosition() {
+    return Board(0xFF000000000000ull, 0xFF00ull, 0x2400000000000000ull, 0x24ull,
+                 0x4200000000000000ull, 0x42ull, 0x8100000000000000ull, 0x81ull,
+                 0x8ull << 56, 0x8, 0x10ull << 56, 0x10);
+  }
 };
 
-std::ostream& operator<<(std::ostream& cout, const Board& board);
+std::ostream &operator<<(std::ostream &cout, const Board &board);

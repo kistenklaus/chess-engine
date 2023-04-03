@@ -20,23 +20,8 @@
 namespace movegen::util {
 
 template <GameState state>
-compiletime bitmap_t canCastleLeft(bitmap_t attacked, bitmap_t occupied,
-                                   bitmap_t rook, const Board &board) {
-  if (state.turn() && state.whiteHasShortCastle()) {
-    if (occupied & Board::WhiteShortCastleMoveMask) return false;
-    if (attacked & Board::WhiteShortCastleAttackMask) return false;
-    if (rook & Board::WhiteShortCastleRookMask) return true;
-  } else if (state.blackHasShortCastle()) {
-    if (occupied & Board::BlackShortCastleMoveMask) return false;
-    if (attacked & Board::BlackShortCastleAttackMask) return false;
-    if (rook & Board::BlackShortCastleRookMask) return true;
-  }
-  return false;
-}
-
-template <GameState state>
-compiletime bitmap_t canCastleRight(bitmap_t attacked, bitmap_t occupied,
-                                    bitmap_t rook, const Board &board) {
+compiletime bitmap_t canCastleLong(bitmap_t attacked, bitmap_t occupied,
+                                   bitmap_t rook) {
   if (state.turn() && state.whiteHasLongCastle()) {
     if (occupied & Board::WhiteLongCastleMoveMask) return false;
     if (attacked & Board::WhiteLongCastleAttackMask) return false;
@@ -45,6 +30,21 @@ compiletime bitmap_t canCastleRight(bitmap_t attacked, bitmap_t occupied,
     if (occupied & Board::BlackLongCastleMoveMask) return false;
     if (attacked & Board::BlackLongCastleAttackMask) return false;
     if (rook & Board::BlackLongCastleRookMask) return true;
+  }
+  return false;
+}
+
+template <GameState state>
+compiletime bitmap_t canCastleShort(bitmap_t attacked, bitmap_t occupied,
+                                    bitmap_t rook) {
+  if (state.turn() && state.whiteHasShortCastle()) {
+    if (occupied & Board::WhiteShortCastleMoveMask) return false;
+    if (attacked & Board::WhiteShortCastleAttackMask) return false;
+    if (rook & Board::WhiteShortCastleRookMask) return true;
+  } else if (state.blackHasShortCastle()) {
+    if (occupied & Board::BlackShortCastleMoveMask) return false;
+    if (attacked & Board::BlackShortCastleAttackMask) return false;
+    if (rook & Board::BlackShortCastleRookMask) return true;
   }
   return false;
 }

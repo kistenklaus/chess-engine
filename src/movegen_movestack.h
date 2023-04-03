@@ -20,14 +20,15 @@
 
 namespace movegen::Movestack {
 
-const int MAX_DEPTH = 32;
-inline bitmap_t g_KingAttack[MAX_DEPTH];
-inline bitmap_t g_EnemyKingAttack[MAX_DEPTH];
-inline checkmask_t g_Checkmask[MAX_DEPTH];
+static inline const int MAX_DEPTH = 32;
+static inline bitmap_t g_KingAttack[MAX_DEPTH];
+static inline bitmap_t g_EnemyKingAttack[MAX_DEPTH];
+static inline bitmap_t g_Checkmask[MAX_DEPTH];
 
-inline bitmap_t g_EnPassantTarget = {};
-inline bitmap_t g_RookPin = {};
-inline bitmap_t g_BishopPin = {};
+static inline bitmap_t g_EnPassantTarget = {};
+static inline bitmap_t g_RookPin = {};
+static inline bitmap_t g_BishopPin = {};
+
 
 template <GameState state, int depth>
 void init(const Board &board, bitmap_t epTarget) {
@@ -141,7 +142,7 @@ inline void checkBySlider(bitmap_t kingTile, bitmap_t enemyTile,
 
 template <GameState state, int depth>
 force_inline bitmap_t refreshStack(const Board &board, banmask_t &banmask,
-                                   checkmask_t &checkmask) {
+                                   bitmap_t &checkmask) {
   using namespace shift;
   constexpr bool turn = state.turn();
   const bitmap_t king = board.King<turn>();
@@ -205,9 +206,9 @@ force_inline bitmap_t refreshStack(const Board &board, banmask_t &banmask,
   {
     const bitmap_t pawns = board.Pawns<!turn>();
     const bitmap_t pawnAttacksLeft =
-        PawnAttackLeft<!turn>(pawns) & shift::PawnsNotLeft();
+        PawnAttackLeft<!turn>(pawns & shift::PawnsNotLeft());
     const bitmap_t pawnAttacksRight =
-        PawnAttackRight<!turn>(pawns) & shift::PawnsNotRight();
+        PawnAttackRight<!turn>(pawns & shift::PawnsNotRight());
     banmask |= pawnAttacksLeft | pawnAttacksRight;
   }
   // Calculate enemy bishops
