@@ -47,7 +47,7 @@ include_directories(/usr/lib/gcc/x86_64-pc-linux-gnu/11.3.0/include/
 add_compile_options(
   -std=c++20 -march=native # required for x86 instructions
   -Wno-attributes -g -O0
-  # -fomit-frame-pointer -foptimize-sibling-calls
+  #-fomit-frame-pointer -foptimize-sibling-calls
 )
 add_executable(${This} ${SOURCES} ${HEADERS} ${MAIN_SOURCE})
 # target_precompile_headers(${This} PUBLIC src/Movemap.h)
